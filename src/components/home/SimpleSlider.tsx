@@ -39,7 +39,7 @@ export default function SimpleSlider() {
   }, [])
 
   return (
-    <div className="relative w-full h-[400px] overflow-hidden bg-yellow-300">
+    <div className="relative w-full h-[300px] sm:h-[400px] overflow-hidden bg-yellow-300">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
@@ -47,13 +47,13 @@ export default function SimpleSlider() {
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <div className="container mx-auto px-4 h-full flex items-center">
-            <div className="w-1/2">
-              <h2 className="text-4xl font-bold mb-2">{slide.title}</h2>
-              <div className="text-6xl font-bold mb-4">{slide.subtitle}</div>
-              <p className="text-xl">👍 {slide.description}</p>
+          <div className="container mx-auto px-4 h-full flex flex-col sm:flex-row items-center">
+            <div className="w-full sm:w-1/2 text-center sm:text-left mb-4 sm:mb-0">
+              <h2 className="text-2xl sm:text-4xl font-bold mb-2">{slide.title}</h2>
+              <div className="text-3xl sm:text-6xl font-bold mb-4">{slide.subtitle}</div>
+              <p className="text-lg sm:text-xl">👍 {slide.description}</p>
             </div>
-            <div className="w-1/2">
+            <div className="w-full sm:w-1/2">
               <Image
                 src={slide.image}
                 alt={slide.title}
