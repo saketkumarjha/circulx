@@ -1,21 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Search, Mail, ShoppingBag, User, Menu } from 'lucide-react'
 import { Input } from "@/components/ui/input"
-import { Modal } from "@/components/ui/Modal"
-import Login from '@/app/login/page'
-import Signup from '@/app/signup/page'
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [user, setUser] = useState<any>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [modalContent, setModalContent] = useState<'login' | 'signup'>('login')
-  const router = useRouter()
   
   const categories = [
     "Storage Tanks, Drums",
@@ -28,32 +20,6 @@ export default function Header() {
     "Containers",
     "Papers"
   ]
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-  }, [])
-
-  const handleLogout = () => {
-    localStorage.removeItem('user')
-    setUser(null)
-    router.push('/')
-  }
-
-  const openModal = (content: 'login' | 'signup') => {
-    setModalContent(content)
-    setIsModalOpen(true)
-  }
-
-  const closeModal = () => {
-    setIsModalOpen(false)
-  }
-
-  const switchModalContent = () => {
-    setModalContent(modalContent === 'login' ? 'signup' : 'login')
-  }
 
   return (
     <header className="w-full bg-white shadow-sm">
@@ -96,25 +62,11 @@ export default function Header() {
                 1
               </span>
             </button>
-            {user ? (
-              <div className="relative group">
-                <button className="flex items-center gap-2">
-                  <User className="w-6 h-6 text-gray-600" />
-                  <span className="hidden sm:inline">{user.name}</span>
-                </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                  <Link href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</Link>
-                  <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
-                </div>
-              </div>
-            ) : (
-              <button 
-                onClick={() => openModal('login')}
-                className="hidden sm:block px-6 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
-              >
-                Sign In
-              </button>
-            )}
+            <button 
+              className="hidden sm:block px-6 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
+            >
+              Sign In
+            </button>
             <button
               className="sm:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -138,14 +90,11 @@ export default function Header() {
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-gray-300"
                 />
               </div>
-              {!user && (
-                <button 
-                  onClick={() => openModal('login')}
-                  className="px-6 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors text-center"
-                >
-                  Sign In
-                </button>
-              )}
+              <button 
+                className="px-6 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors text-center"
+              >
+                Sign In
+              </button>
             </div>
           </div>
         )}
@@ -168,19 +117,7 @@ export default function Header() {
           </div>
         </div>
       </div>
-
-      {/* Auth Modal */}
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={closeModal}
-        onBack={switchModalContent}
-      >
-        {modalContent === 'login' ? (
-          <Login onSignupClick={switchModalContent} />
-        ) : (
-          <Signup onLoginClick={switchModalContent} />
-        )}
-      </Modal>
     </header>
   )
 }
+
