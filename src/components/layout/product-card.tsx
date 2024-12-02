@@ -49,7 +49,7 @@ export default function ProductCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:border hover:border-gray-300">
+      <div className="bg-gray rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:border hover:border-gray-300">
         <Link href={href}>
           <div className="relative aspect-square overflow-hidden p-4 bg-white-100">
             {/* Discount Badge */}

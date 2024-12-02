@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { ShoppingBag } from 'lucide-react'
+import Help from '@/Footer1/Help/page'
 
 export default function Footer() {
   return (
-    <footer className="bg-white pt-16 pb-8">
+    <footer className="bg- pt-16 pb-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Logo and Description */}
@@ -89,8 +90,8 @@ export default function Footer() {
               <Link href="/contact-us" className="block text-gray-600 hover:text-gray-900">
                 Contact Us
               </Link>
-              <Link href="/support-ticket" className="block text-gray-600 hover:text-gray-900">
-                Support Ticket
+              <Link href="/Help" className="block text-gray-600 hover:text-gray-900">
+                Help
               </Link>
               <Link href="/feedback" className="block text-gray-600 hover:text-gray-900">
                 Feedback

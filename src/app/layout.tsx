@@ -2,6 +2,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import { getCurrentUser } from './actions/auth' 
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -10,15 +11,18 @@ export const metadata = {
   description: 'Your one-stop shop for all your needs',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+
+  const user = await getCurrentUser()
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
+        <Header user={user} />
         
         
         {children}

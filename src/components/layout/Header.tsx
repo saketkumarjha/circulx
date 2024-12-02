@@ -2,12 +2,32 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Search, Mail, ShoppingBag, User, Menu } from 'lucide-react'
+import { Search, Mail, ShoppingBag, User, Menu, LogOut } from 'lucide-react'
 import { Input } from "@/components/ui/input"
+import { AuthModal } from '../auth/auth-modal'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { signOut } from '@/app/actions/auth'
 
-export default function Header() {
+interface HeaderProps {
+  user?: {
+    id: string
+    name: string
+    email: string
+    role: string
+  } | null
+}
+
+export default function Header({ user }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   
   const categories = [
     "Storage Tanks, Drums",
@@ -16,17 +36,20 @@ export default function Header() {
     "Wire Mesh & Gratings",
     "Containers",
     "Papers",
-    "Wire Mesh & Gratings",
-    "Containers",
-    "Papers"
   ]
+
+  function handleAuthSuccess() {
+    setIsAuthModalOpen(false)
+    // Refresh the page to update the user state
+    window.location.reload()
+  }
 
   return (
     <header className="w-full bg-white shadow-sm">
       {/* Top Navigation */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo - Positioned at top left */}
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 mr-auto">
             <div className="w-8 h-8 bg-emerald-400 rounded-lg flex items-center justify-center">
               <ShoppingBag className="w-5 h-5 text-white" />
@@ -34,7 +57,7 @@ export default function Header() {
             <span className="text-xl font-semibold">Circulx</span>
           </Link>
 
-          {/* Search Bar - Centered on larger screens */}
+          {/* Search Bar */}
           <div className="hidden md:block flex-1 max-w-2xl mx-8">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -48,7 +71,7 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Right Navigation - Shifted more to the right */}
+          {/* Right Navigation */}
           <div className="flex items-center gap-4 sm:gap-6 ml-auto">
             <button className="relative hidden sm:block">
               <Mail className="w-6 h-6 text-gray-600" />
@@ -62,11 +85,37 @@ export default function Header() {
                 1
               </span>
             </button>
-            <button 
-              className="hidden sm:block px-6 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
-            >
-              Sign In
-            </button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="rounded-full h-10 px-4 flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} />
+                      <AvatarFallback>{user.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:inline">{user.name.split(' ')[0]}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href={user.role === 'admin' ? '/admin' : '/dashboard'}>
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                onClick={() => setIsAuthModalOpen(true)}
+                className="hidden sm:block px-6 py-2 rounded-full"
+              >
+                Sign In
+              </Button>
+            )}
             <button
               className="sm:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -90,11 +139,14 @@ export default function Header() {
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-gray-300"
                 />
               </div>
-              <button 
-                className="px-6 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors text-center"
-              >
-                Sign In
-              </button>
+              {!user && (
+                <Button 
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="px-6 py-2 rounded-full w-full"
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         )}
@@ -117,6 +169,12 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={handleAuthSuccess}
+      />
     </header>
   )
 }
