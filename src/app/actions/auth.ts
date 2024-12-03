@@ -12,6 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 export async function signIn(formData: FormData) {
   try {
     await connectDB()
+    console.log("MongoDB connected successfully")
     
     const email = formData.get('email') as string
     const password = formData.get('password') as string
@@ -41,6 +42,7 @@ export async function signIn(formData: FormData) {
     
     return {
       success: true,
+      message: 'Signed in successfully',
       user: {
         id: user._id,
         name: user.name,
@@ -49,6 +51,7 @@ export async function signIn(formData: FormData) {
       },
     }
   } catch (error) {
+    console.error("Error in signIn:", error)
     return { error: 'Something went wrong' }
   }
 }
@@ -56,6 +59,7 @@ export async function signIn(formData: FormData) {
 export async function signUp(formData: FormData) {
   try {
     await connectDB()
+    console.log("MongoDB connected successfully")
     
     const name = formData.get('name') as string
     const email = formData.get('email') as string
@@ -75,21 +79,9 @@ export async function signUp(formData: FormData) {
       role: 'client', // Default role
     })
     
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    )
-    
-    cookies().set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    })
-    
     return {
       success: true,
+      message: 'Registered successfully. Please sign in.',
       user: {
         id: user._id,
         name: user.name,
@@ -98,6 +90,7 @@ export async function signUp(formData: FormData) {
       },
     }
   } catch (error) {
+    console.error("Error in signUp:", error)
     return { error: 'Something went wrong' }
   }
 }
@@ -120,6 +113,7 @@ export async function getCurrentUser() {
     }
     
     await connectDB()
+    console.log("MongoDB connected successfully")
     const user = await User.findById(decoded.userId).select('-password')
     
     if (!user) return null
@@ -131,6 +125,7 @@ export async function getCurrentUser() {
       role: user.role,
     }
   } catch (error) {
+    console.error("Error in getCurrentUser:", error)
     return null
   }
 }

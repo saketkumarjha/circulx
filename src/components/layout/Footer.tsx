@@ -22,26 +22,19 @@ export default function Footer() {
 
           {/* About Links */}
           <div>
-            <h3 className="font-semibold mb-4">About</h3>
+            <h3 className="font-semibold mb-4">Support</h3>
             <div className="space-y-3">
               <Link href="/community-guidelines" className="block text-gray-600 hover:text-gray-900">
-                Community Guidelines
+                Shipping Policy
               </Link>
               <Link href="/careers" className="block text-gray-600 hover:text-gray-900">
-                Careers
+                Refund/Return policy
               </Link>
               <Link href="/coinmarketcap" className="block text-gray-600 hover:text-gray-900">
-                CoinMarketCap
+                Buyer Protection
               </Link>
-              <Link href="/coingecko" className="block text-gray-600 hover:text-gray-900">
-                CoinGecko
-              </Link>
-              <Link href="/partners" className="block text-gray-600 hover:text-gray-900">
-                Partners
-              </Link>
-              <Link href="/disclaimer" className="block text-gray-600 hover:text-gray-900">
-                Disclaimer
-              </Link>
+              
+              
             </div>
           </div>
 

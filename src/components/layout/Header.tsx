@@ -153,7 +153,7 @@ export default function Header({ user }: HeaderProps) {
       </div>
 
       {/* Categories Navigation */}
-      <div className="bg-[#004D40] text-white overflow-x-auto">
+      <div className="bg-[#004D41] text-white overflow-x-auto">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center py-3 space-x-4 sm:space-x-8">
             <span className="text-sm whitespace-nowrap">Explore:</span>
