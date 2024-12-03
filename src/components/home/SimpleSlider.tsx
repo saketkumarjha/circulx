@@ -9,7 +9,7 @@ const slides = [
     title: "Delivery Within",
     subtitle: "24 HOURS",
     description: "At No Extra Cost",
-    image: "/placeholder.svg?height=400&width=800&text=Delivery+Within+24+Hours",
+    image: "/OIP.jpg",
   },
   {
     id: 2,
@@ -39,7 +39,7 @@ export default function SimpleSlider() {
   }, [])
 
   return (
-    <div className="relative w-full h-[300px] sm:h-[400px] overflow-hidden bg-yellow-300">
+    <div className="relative w-full h-[300px] sm:h-[400px] overflow-hidden bg-blue-100">
       {slides.map((slide, index) => (
         <div
           key={slide.id}

@@ -102,8 +102,10 @@ export async function signOut() {
 
 export async function getCurrentUser() {
   try {
-    const cookieStore = cookies()
-    const token = cookieStore.get('auth-token')?.value
+    await connectDB()
+    console.log("MongoDB connected successfully")
+
+    const token = cookies().get('auth-token')?.value
 
     if (!token) return null
     
@@ -112,18 +114,19 @@ export async function getCurrentUser() {
       role: string
     }
     
-    await connectDB()
-    console.log("MongoDB connected successfully")
     const user = await User.findById(decoded.userId).select('-password')
     
     if (!user) return null
     
-    return {
-      id: user._id,
+    // Convert MongoDB document to a plain object
+    const plainUser = {
+      id: user._id.toString(), // Convert ObjectId to string
       name: user.name,
       email: user.email,
       role: user.role,
     }
+
+    return plainUser
   } catch (error) {
     console.error("Error in getCurrentUser:", error)
     return null

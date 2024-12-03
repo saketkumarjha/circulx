@@ -88,7 +88,7 @@ export default function Header({ user }: HeaderProps) {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="rounded-full h-10 px-4 flex items-center gap-2">
+                  <Button variant="outline" className="rounded-full h-8 px-4 flex items-center gap-2">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} />
                       <AvatarFallback>{user.name[0]}</AvatarFallback>
@@ -97,14 +97,14 @@ export default function Header({ user }: HeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut className="w-3 h-3 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href={user.role === 'admin' ? '/admin' : '/dashboard'}>
                       Dashboard
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => signOut()}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -153,7 +153,7 @@ export default function Header({ user }: HeaderProps) {
       </div>
 
       {/* Categories Navigation */}
-      <div className="bg-[#004D41] text-white overflow-x-auto">
+      <div className="bg-[#004D40] text-white overflow-x-auto">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center py-3 space-x-4 sm:space-x-8">
             <span className="text-sm whitespace-nowrap">Explore:</span>
