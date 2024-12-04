@@ -1,15 +1,14 @@
 import mongoose, { Document, Model, Schema } from 'mongoose'
 
-// Define the interface for the user document
-interface IUser extends Document {
+export interface IUser extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
   password: string;
-  role: 'admin' | 'client';
+  type: 'admin' | 'seller' | 'customer';
   createdAt: Date;
 }
 
-// Define the user schema
 const userSchema = new Schema<IUser>({
   name: {
     type: String,
@@ -24,10 +23,10 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
   },
-  role: {
+  type: {
     type: String,
-    enum: ['admin', 'client'],
-    default: 'client',
+    enum: ['admin', 'seller', 'customer'],
+    default: 'customer',
   },
   createdAt: {
     type: Date,
@@ -35,6 +34,5 @@ const userSchema = new Schema<IUser>({
   },
 })
 
-// Define and export the User model
 export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema)
 

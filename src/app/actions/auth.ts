@@ -3,11 +3,11 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { connectDB } from '@/lib/db'
-import { User } from '@/models/user'
+import { User, IUser } from '@/models/user'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+const JWT_SECRET = process.env.JWT_SECRET || 'gyuhiuhthoju2596rfyjhtfykjb'
 
 export async function signIn(formData: FormData) {
   try {
@@ -28,7 +28,7 @@ export async function signIn(formData: FormData) {
     }
     
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, type: user.type },
       JWT_SECRET,
       { expiresIn: '7d' }
     )
@@ -47,7 +47,7 @@ export async function signIn(formData: FormData) {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        type: user.type,
       },
     }
   } catch (error) {
@@ -76,7 +76,7 @@ export async function signUp(formData: FormData) {
       name,
       email,
       password: hashedPassword,
-      role: 'client', // Default role
+      type: 'customer', // Default type
     })
     
     return {
@@ -86,7 +86,7 @@ export async function signUp(formData: FormData) {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        type: user.type,
       },
     }
   } catch (error) {
@@ -105,13 +105,14 @@ export async function getCurrentUser() {
     await connectDB()
     console.log("MongoDB connected successfully")
 
-    const token = cookies().get('auth-token')?.value
+    const cookieStore = await cookies()
+    const token = cookieStore.get('auth-token')
 
-    if (!token) return null
+    if (!token || !token.value) return null
     
-    const decoded = jwt.verify(token, JWT_SECRET) as {
+    const decoded = jwt.verify(token.value, JWT_SECRET) as {
       userId: string
-      role: string
+      type: string
     }
     
     const user = await User.findById(decoded.userId).select('-password')
@@ -120,16 +121,43 @@ export async function getCurrentUser() {
     
     // Convert MongoDB document to a plain object
     const plainUser = {
-      id: user._id.toString(), // Convert ObjectId to string
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
-      role: user.role,
+      type: user.type,
     }
 
     return plainUser
   } catch (error) {
     console.error("Error in getCurrentUser:", error)
     return null
+  }
+}
+
+export async function updateUserType(userId: string, newType: 'admin' | 'seller' | 'customer') {
+  try {
+    await connectDB()
+    console.log("MongoDB connected successfully")
+
+    const user = await User.findByIdAndUpdate(userId, { type: newType }, { new: true })
+
+    if (!user) {
+      return { error: 'User not found' }
+    }
+
+    return {
+      success: true,
+      message: 'User type updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        type: user.type,
+      },
+    }
+  } catch (error) {
+    console.error("Error in updateUserType:", error)
+    return { error: 'Something went wrong' }
   }
 }
 

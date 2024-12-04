@@ -20,7 +20,7 @@ interface HeaderProps {
     id: string
     name: string
     email: string
-    role: string
+    type: 'admin' | 'seller' | 'customer'
   } | null
 }
 
@@ -88,7 +88,7 @@ export default function Header({ user }: HeaderProps) {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="rounded-full h-8 px-4 flex items-center gap-2">
+                  <Button variant="outline" className="rounded-full h-10 px-4 flex items-center gap-2">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} />
                       <AvatarFallback>{user.name[0]}</AvatarFallback>
@@ -97,14 +97,18 @@ export default function Header({ user }: HeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => signOut()}>
-                    <LogOut className="w-3 h-3 mr-2" />
-                    Sign Out
-                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href={user.role === 'admin' ? '/admin' : '/dashboard'}>
+                    <Link href={
+                      user.type === 'admin' ? '/admin' :
+                      user.type === 'seller' ? '/seller' :
+                      '/dashboard'
+                    }>
                       Dashboard
                     </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
