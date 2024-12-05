@@ -31,7 +31,7 @@ export function DropdownMenuContent({
     <DropdownMenuPrimitive.Content
       {...props}
       className={clsx(
-        "min-w-[6rem] p-.5 bg-white border rounded shadow-lg",
+        "min-w-[8rem] p-2 bg-white border rounded shadow-lg",
         className
       )}
     >
@@ -49,7 +49,7 @@ export function DropdownMenuItem({
     <DropdownMenuPrimitive.Item
       {...props}
       className={clsx(
-        "flex items-center px-2 py-1 rounded cursor-pointer hover:bg-gray-200",
+        "flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-100",
         className
       )}
     >
@@ -65,7 +65,7 @@ export function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       {...props}
-      className={clsx("h-px bg-blue-800", className)}
+      className={clsx("h-px bg-gray-200", className)}
     />
   );
 }
