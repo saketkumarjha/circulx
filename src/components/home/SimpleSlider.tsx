@@ -16,14 +16,14 @@ const slides = [
     title: "Special Offers",
     subtitle: "UP TO 50% OFF",
     description: "Limited Time Only",
-    image: "/placeholder.svg?height=400&width=800&text=Special+Offers+Up+To+50%+Off",
+    image: "/th.jpg",
   },
   {
     id: 3,
     title: "New Arrivals",
     subtitle: "SHOP NOW",
     description: "Fresh Stock Available",
-    image: "/placeholder.svg?height=400&width=800&text=New+Arrivals+Shop+Now",
+    image: "/OIP.jpg",
   },
 ]
 
