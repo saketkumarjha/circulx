@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { SignInForm } from './sign-in-form'
 import { SignUpForm } from './sign-up-form'
 import { ArrowLeft } from 'lucide-react'
@@ -33,6 +33,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[400px] p-0 bg-[#004D41] border-0">
+        <DialogTitle className="sr-only">Authentication</DialogTitle>
         <div className="px-14 py-3 relative">
           <button 
             onClick={handleBack}
