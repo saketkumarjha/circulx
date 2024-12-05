@@ -33,7 +33,8 @@ export async function signIn(formData: FormData) {
       { expiresIn: '7d' }
     )
     
-    cookies().set('auth-token', token, {
+    const cookieStore = await cookies()
+    cookieStore.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -96,7 +97,8 @@ export async function signUp(formData: FormData) {
 }
 
 export async function signOut() {
-  cookies().delete('auth-token')
+  const cookieStore = await cookies()
+  cookieStore.delete('auth-token')
   redirect('/')
 }
 
