@@ -7,7 +7,7 @@ import { getCurrentUser } from './actions/auth'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Circulx E-commerce',
+  title: 'Circulx ',
   description: 'Your one-stop shop for all your needs',
 }
 
@@ -18,6 +18,7 @@ export default async function RootLayout({
 }) {
 
   const user = await getCurrentUser()
+  
  
   return (
     <html lang="en">

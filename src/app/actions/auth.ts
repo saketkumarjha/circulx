@@ -30,7 +30,7 @@ export async function signIn(formData: FormData) {
     const token = jwt.sign(
       { userId: user._id, type: user.type },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: '1d' }
     )
     
     const cookieStore = await cookies()
@@ -38,7 +38,7 @@ export async function signIn(formData: FormData) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 1, // 1 days
     })
     
     return {
@@ -82,7 +82,7 @@ export async function signUp(formData: FormData) {
     
     return {
       success: true,
-      message: 'Registered successfully. Please sign in.',
+      message: 'Registered successfully.',
       user: {
         id: user._id,
         name: user.name,

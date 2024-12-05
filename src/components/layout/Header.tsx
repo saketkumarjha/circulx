@@ -17,9 +17,9 @@ import { signOut } from '@/app/actions/auth'
 
 interface HeaderProps {
   user?: {
-    id: string
-    name: string
-    email: string
+    id: string;
+    name: string;
+    email: string;
     type: 'admin' | 'seller' | 'customer'
   } | null
 }
