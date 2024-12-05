@@ -6,9 +6,9 @@ import { getCurrentUser } from '@/app/actions/auth'
 export async function GET() {
   try {
     const currentUser = await getCurrentUser()
-    /*if (!currentUser || currentUser.type !== 'admin') {
+    if (!currentUser || currentUser.type !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }*/
+    }
 
     await connectDB()
     const users: IUser[] = await User.find({}).select('-password')
