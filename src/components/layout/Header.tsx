@@ -17,9 +17,9 @@ import { signOut } from '@/app/actions/auth'
 
 interface HeaderProps {
   user?: {
-    id: string;
-    name: string;
-    email: string;
+    id: string
+    name: string
+    email: string
     type: 'admin' | 'seller' | 'customer'
   } | null
 }
@@ -88,7 +88,7 @@ export default function Header({ user }: HeaderProps) {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="rounded-full h-8 px-4 flex items-center gap-2">
+                  <Button variant="outline" className="rounded-full h-10 px-4 flex items-center gap-2">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} />
                       <AvatarFallback>{user.name[0]}</AvatarFallback>
@@ -115,7 +115,7 @@ export default function Header({ user }: HeaderProps) {
             ) : (
               <Button 
                 onClick={() => setIsAuthModalOpen(true)}
-                className=" sm:block px-6 py-2 rounded-full"
+                className="hidden sm:block px-6 py-2 rounded-full"
               >
                 Sign In
               </Button>
@@ -140,7 +140,7 @@ export default function Header({ user }: HeaderProps) {
                   placeholder="Search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-5 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-gray-300"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-gray-300"
                 />
               </div>
               {!user && (
