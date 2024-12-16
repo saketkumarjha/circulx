@@ -31,6 +31,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
+    "react-states": "^8.3.7",
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
