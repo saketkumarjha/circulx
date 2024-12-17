@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProductCard from './product-card'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const solarWaterHeaters = [
   {
     id: 1,
-    title: '300 LPD ETC Ceramic Coated Supreme Solar Water Heater',
+    title: '301 LPD ETC Ceramic Coated Supreme Solar Water Heater',
     company: 'Waaree Pvt Ltd',
     location: 'Gurugram,Haryana',
     price: 33000,
@@ -20,7 +20,7 @@ const solarWaterHeaters = [
   },
   {
     id: 2,
-    title: '300 LPD ETC Ceramic Coated Supreme Solar Water Heater',
+    title: '302 LPD ETC Ceramic Coated Supreme Solar Water Heater',
     company: 'Waaree Pvt Ltd',
     location: 'Gurugram,Haryana',
     price: 33000,
@@ -33,7 +33,7 @@ const solarWaterHeaters = [
   },
   {
     id: 3,
-    title: '300 LPD ETC Ceramic Coated Supreme Solar Water Heater',
+    title: '303 LPD ETC Ceramic Coated Supreme Solar Water Heater',
     company: 'Waaree Pvt Ltd',
     location: 'Gurugram,Haryana',
     price: 33000,
@@ -46,7 +46,7 @@ const solarWaterHeaters = [
   },
   {
     id: 4,
-    title: '300 LPD ETC Ceramic Coated Supreme Solar Water Heater',
+    title: '304 LPD ETC Ceramic Coated Supreme Solar Water Heater',
     company: 'Waaree Pvt Ltd',
     location: 'Gurugram,Haryana',
     price: 33000,
@@ -59,7 +59,7 @@ const solarWaterHeaters = [
   },
   {
     id: 5,
-    title: '300 LPD ETC Ceramic Coated Supreme Solar Water Heater',
+    title: '305 LPD ETC Ceramic Coated Supreme Solar Water Heater',
     company: 'Waaree Pvt Ltd',
     location: 'Gurugram,Haryana',
     price: 33000,
@@ -72,7 +72,7 @@ const solarWaterHeaters = [
   },
   {
     id: 6,
-    title: '300 LPD ETC Ceramic Coated Supreme Solar Water Heater',
+    title: '306 LPD ETC Ceramic Coated Supreme Solar Water Heater',
     company: 'Waaree Pvt Ltd',
     location: 'Gurugram,Haryana',
     price: 33000,
@@ -154,45 +154,65 @@ const solarPanels = [
   {
     id: 12,
     title: '360W Flexible Solar Panel',
-    company: 'Luminous Power ',
+    company: 'Luminous Power Technologies',
     location: 'Noida, Uttar Pradesh',
     price: 16000,
     originalPrice: 20000,
     discount: 20,
     image: '/th.jpg',
     hoverImage: '/download.jpg',
-    href: '/product/12',
+    href: '/product/11',
     rating: 4.5
   }
 ]
 
 function ProductCarousel({ products, title }: { products: typeof solarWaterHeaters, title: string }) {
   const [startIndex, setStartIndex] = useState(0)
+  const [visibleProducts, setVisibleProducts] = useState(6)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) {
+        setVisibleProducts(6)
+      } else if (window.innerWidth >= 1024) {
+        setVisibleProducts(4)
+      } else if (window.innerWidth >= 768) {
+        setVisibleProducts(3)
+      } else if (window.innerWidth >= 640) {
+        setVisibleProducts(2)
+      } else {
+        setVisibleProducts(1)
+      }
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handlePrevious = () => {
-    setStartIndex((prevIndex) => (prevIndex === 0 ? products.length - 1 : prevIndex - 1))
+    setStartIndex((prevIndex) => (prevIndex === 0 ? products.length - visibleProducts : prevIndex - visibleProducts))
   }
 
   const handleNext = () => {
-    setStartIndex((prevIndex) => (prevIndex === products.length - 1 ? 0 : prevIndex + 1))
+    setStartIndex((prevIndex) => (prevIndex + visibleProducts >= products.length ? 0 : prevIndex + visibleProducts))
   }
 
-  const visibleProducts = [
-    products[startIndex],
-    products[(startIndex + 1) % products.length],
-    products[(startIndex + 2) % products.length],
-    products[(startIndex + 3) % products.length],
-    products[(startIndex + 4) % products.length],
-    products[(startIndex + 5) % products.length],
-  ]
+  const currentProducts = products.slice(startIndex, startIndex + visibleProducts)
 
   return (
-    <div className="mb-6">
+    <div className="mb-12">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">{title}</h2>
       <div className="relative">
         <div className="flex overflow-hidden">
-          {visibleProducts.map((product) => (
-            <div key={product.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/6 px-2">
+          {currentProducts.map((product) => (
+            <div key={product.id} className={`w-full px-2 ${
+              visibleProducts === 1 ? 'sm:w-full' :
+              visibleProducts === 2 ? 'sm:w-1/2' :
+              visibleProducts === 3 ? 'sm:w-1/2 md:w-1/3' :
+              visibleProducts === 4 ? 'sm:w-1/2 md:w-1/3 lg:w-1/4' :
+              'sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/6'
+            }`}>
               <ProductCard
                 title={product.title}
                 company={product.company}
@@ -210,14 +230,14 @@ function ProductCarousel({ products, title }: { products: typeof solarWaterHeate
         </div>
         <button
           onClick={handlePrevious}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none z-10"
           aria-label="Previous product"
         >
           <ChevronLeft className="w-6 h-6 text-gray-800" />
         </button>
         <button
           onClick={handleNext}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none z-10"
           aria-label="Next product"
         >
           <ChevronRight className="w-6 h-6 text-gray-800" />
@@ -229,7 +249,7 @@ function ProductCarousel({ products, title }: { products: typeof solarWaterHeate
 
 export default function ProductGrid() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full px-4 py-8">
       <ProductCarousel products={solarWaterHeaters} title="Solar Water Heaters" />
       <ProductCarousel products={solarPanels} title="Solar Panels" />
     </div>
