@@ -94,8 +94,8 @@ const solarPanels = [
     price: 12000,
     originalPrice: 15000,
     discount: 20,
-    image: '/download.jpg',
-    hoverImage: '/th.jpg',
+    image: '/th.jpg',
+    hoverImage: '/download.jpg',
     href: '/product/7',
     rating: 4.7
   },
@@ -107,8 +107,8 @@ const solarPanels = [
     price: 9500,
     originalPrice: 11000,
     discount: 14,
-    image: '/download.jpg',
-    hoverImage: '/th.jpg',
+    image: '/th.jpg',
+    hoverImage: '/download.jpg',
     href: '/product/8',
     rating: 4.4
   },
@@ -120,8 +120,8 @@ const solarPanels = [
     price: 18000,
     originalPrice: 22000,
     discount: 18,
-    image: '/download.jpg',
-    hoverImage: '/th.jpg',
+    image: '/th.jpg',
+    hoverImage: '/download.jpg',
     href: '/product/9',
     rating: 4.9
   },
@@ -133,8 +133,8 @@ const solarPanels = [
     price: 11500,
     originalPrice: 13500,
     discount: 15,
-    image: '/download.jpg',
-    hoverImage: '/th.jpg',
+    image: '/th.jpg',
+    hoverImage: '/download.jpg',
     href: '/product/10',
     rating: 4.6
   },
@@ -146,21 +146,21 @@ const solarPanels = [
     price: 14500,
     originalPrice: 17000,
     discount: 15,
-    image: '/download.jpg',
-    hoverImage: '/th.jpg',
+    image: '/th.jpg',
+    hoverImage: '/download.jpg',
     href: '/product/11',
     rating: 4.8
   },
   {
     id: 12,
     title: '360W Flexible Solar Panel',
-    company: 'Luminous Power Technologies',
+    company: 'Luminous Power ',
     location: 'Noida, Uttar Pradesh',
     price: 16000,
     originalPrice: 20000,
     discount: 20,
-    image: '/download.jpg',
-    hoverImage: '/th.jpg',
+    image: '/th.jpg',
+    hoverImage: '/download.jpg',
     href: '/product/12',
     rating: 4.5
   }
@@ -183,15 +183,16 @@ function ProductCarousel({ products, title }: { products: typeof solarWaterHeate
     products[(startIndex + 2) % products.length],
     products[(startIndex + 3) % products.length],
     products[(startIndex + 4) % products.length],
+    products[(startIndex + 5) % products.length],
   ]
 
   return (
-    <div className="mb-12">
+    <div className="mb-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">{title}</h2>
       <div className="relative">
         <div className="flex overflow-hidden">
           {visibleProducts.map((product) => (
-            <div key={product.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/5 px-2">
+            <div key={product.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/6 px-2">
               <ProductCard
                 title={product.title}
                 company={product.company}
