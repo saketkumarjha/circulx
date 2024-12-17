@@ -54,7 +54,7 @@ export default function FeaturesSection() {
 
   return (
     <div className="w-full py-4 flex justify-center items-center">
-      <div className="bg-blue-50 rounded-2xl py-8 px-6 sm:px-6 md:px-8 lg:px-12 w-full max-w-full">
+      <div className="bg-blue-100 rounded-2xl py-8 px-6 sm:px-6 md:px-8 lg:px-12 w-full max-w-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
           {features.map((feature, index) => (
             <FeatureCard
