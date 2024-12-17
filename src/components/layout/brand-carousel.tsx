@@ -8,17 +8,15 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 const allBrands = [
   { name: 'Canon', logo: '/audi.jpeg', href: '/brands/canon' },
   { name: 'Audi', logo: '/download.png', href: '/brands/audi' },
-  { name: 'Tata', logo: '/audi.jpeg', href: '/brands/tata' },
+  { name: 'Tata', logo: '/download (1).png', href: '/brands/tata' },
   { name: 'Royal', logo: '/download.png', href: '/brands/royal' },
-  { name: 'Tata', logo: '/audi.jpeg', href: '/brands/tata2' },
-  { name: 'Hyundai', logo: '/download.png', href: '/brands/hyundai' },
-  { name: 'Tata', logo: '/audi.jpeg', href: '/brands/tata3' },
+  { name: 'Hyundai', logo: '/audi.jpeg', href: '/brands/hyundai' },
   { name: 'BMW', logo: '/download.png', href: '/brands/bmw' },
-  { name: 'Mercedes', logo: '/audi.jpeg', href: '/brands/mercedes' },
+  { name: 'Mercedes', logo: '/download (1).png', href: '/brands/mercedes' },
   { name: 'Toyota', logo: '/download.png', href: '/brands/toyota' },
   { name: 'Honda', logo: '/audi.jpeg', href: '/brands/honda' },
   { name: 'Ford', logo: '/download.png', href: '/brands/ford' },
-  { name: 'Chevrolet', logo: '/audi.jpeg', href: '/brands/chevrolet' },
+  { name: 'Chevrolet', logo: '/download (1).png', href: '/brands/chevrolet' },
   { name: 'Nissan', logo: '/download.png', href: '/brands/nissan' },
 ]
 
@@ -41,13 +39,18 @@ function useInterval(callback: () => void, delay: number | null) {
 }
 
 export function BrandCarousel() {
-  const [visibleBrands, setVisibleBrands] = useState(allBrands.slice(0, 7))
+  const [visibleBrands, setVisibleBrands] = useState(allBrands.slice(0, 6))
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const updateBrands = useCallback(() => {
     setCurrentIndex((prevIndex) => {
       const nextIndex = (prevIndex + 1) % allBrands.length
-      setVisibleBrands(allBrands.slice(nextIndex, nextIndex + 7))
+      setVisibleBrands(prevBrands => {
+        const newBrands = [...prevBrands]
+        newBrands.shift() // Remove the first brand
+        newBrands.push(allBrands[(nextIndex + 5) % allBrands.length]) // Add the next brand
+        return newBrands
+      })
       return nextIndex
     })
   }, [])
