@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Search, Mail, ShoppingBag, User, Menu, LogOut } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { AuthModal } from '../auth/auth-modal'
@@ -80,7 +81,11 @@ export default function Header({ user }: HeaderProps) {
               </span>
             </button>
             <button className="relative">
-              <ShoppingBag className="w-6 h-6 text-gray-600" />
+            <Image  src="/cart.png"
+                alt="Shopping Cart"
+                width={24}
+                height={24}
+              />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                 1
               </span>
