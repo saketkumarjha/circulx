@@ -50,7 +50,7 @@ export default function ProductCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="bg-gray rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:border hover:border-gray-300">
-        <Link href={href}>
+        <Link href={`/product/${href.split('/').pop()}`}>
           <div className="relative aspect-square overflow-hidden p-4 bg-white-100">
             {/* Discount Badge */}
             <div className="absolute top-6 left-6 z-10">
@@ -74,7 +74,7 @@ export default function ProductCard({
 
         <div className="p-3 space-y-2">
           {/* Product Title with href */}
-          <Link href={href} className="block hover:text-emerald-600 transition-colors duration-300">
+          <Link href={`/product/${href.split('/').pop()}`} className="block hover:text-emerald-600 transition-colors duration-300">
             <h3 className="text-white-800 font-medium text-sm line-clamp-2 min-h-[2.5rem] hover:text-gray-800">
               {title}
             </h3>
