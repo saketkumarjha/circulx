@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react'
@@ -56,4 +57,141 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     </Dialog>
   )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*'use client'
+
+import { useState } from 'react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { LoginForm } from './login-form'
+import { RegisterForm } from './register-form'
+import { OTPValidation } from './otp-validation'
+
+interface AuthModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSuccess: () => void
+}
+
+type AuthStep = 'login' | 'register' | 'otp'
+
+export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
+  const [currentStep, setCurrentStep] = useState<AuthStep>('login')
+  const [otpData, setOtpData] = useState<{
+    otpId?: string
+    phone?: string
+  }>({})
+
+  const handleOTPSent = (data: { otpId: string; phone: string }) => {
+    setOtpData(data)
+    setCurrentStep('otp')
+  }
+
+  const handleBackToLogin = () => {
+    setCurrentStep('login')
+    setOtpData({})
+  }
+
+  const handleSuccess = () => {
+    onSuccess()
+    onClose()
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[800px] p-0 bg-white">
+        {currentStep === 'login' && (
+          <LoginForm
+            onOTPSent={handleOTPSent}
+            onRegisterClick={() => setCurrentStep('register')}
+          />
+        )}
+        {currentStep === 'register' && (
+          <RegisterForm
+            onOTPSent={handleOTPSent}
+            onLoginClick={() => setCurrentStep('login')}
+          />
+        )}
+        {currentStep === 'otp' && (
+          <OTPValidation
+            otpId={otpData.otpId!}
+            phone={otpData.phone!}
+            onSuccess={handleSuccess}
+            onBack={handleBackToLogin}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}*/
 

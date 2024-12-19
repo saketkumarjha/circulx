@@ -48,7 +48,7 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
             type="email"
             required
             placeholder=""
-            className="h-9 px-8 bg-white text-green-900 placeholder:text-gray-500 rounded-lg"
+            className="h-9 px-8 bg-white text-white-100 placeholder:text-gray-500 rounded-lg"
           />
         </div>
         <div>
@@ -59,7 +59,7 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
             type="password"
             required
             placeholder=""
-            className="h-9 px-8 bg-white text-green-900 placeholder:text-gray-500 rounded-lg"
+            className="h-9 px-8 bg-white text-white placeholder:text-gray-500 rounded-lg"
           />
         </div>
         <div className="flex items-center space-x-2">
