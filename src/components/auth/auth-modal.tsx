@@ -1,3 +1,101 @@
+/*'use client'
+
+import { useState } from 'react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { LoginForm } from './login-form'
+import { OTPValidation } from './otp-validation'
+
+interface AuthModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSuccess: () => void
+}
+
+type AuthStep = 'login' | 'otp'
+
+export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
+  const [currentStep, setCurrentStep] = useState<AuthStep>('login')
+  const [otpData, setOtpData] = useState<{
+    verificationId?: string
+    phoneNumber?: string
+  }>({})
+
+  const handleOTPSent = (data: { verificationId: string; phoneNumber: string }) => {
+    setOtpData(data)
+    setCurrentStep('otp')
+  }
+
+  const handleBackToLogin = () => {
+    setCurrentStep('login')
+    setOtpData({})
+  }
+
+  const handleSuccess = () => {
+    onSuccess()
+    onClose()
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[800px] p-0 bg-white">
+        {currentStep === 'login' && (
+          <LoginForm
+            onOTPSent={handleOTPSent}
+          />
+        )}
+        {currentStep === 'otp' && (
+          <OTPValidation
+            verificationId={otpData.verificationId!}
+            phoneNumber={otpData.phoneNumber!}
+            onSuccess={handleSuccess}
+            onBack={handleBackToLogin}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 'use client'
 
@@ -57,8 +155,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     </Dialog>
   )
 }
-
-
 
 
 

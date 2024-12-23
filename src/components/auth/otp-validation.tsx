@@ -2,30 +2,27 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { verifyOTP, resendOTP } from '@/lib/auth'
+import { verifyOTP } from '@/lib/auth'
 import { ArrowLeft } from 'lucide-react'
 import OtpInput from 'react-otp-input'
 
 interface OTPValidationProps {
-  otpId: string
-  phone: string
+  verificationId: string
+  phoneNumber: string
   onSuccess: () => void
   onBack: () => void
 }
 
 export function OTPValidation({
-  otpId,
-  phone,
+  verificationId,
+  phoneNumber,
   onSuccess,
   onBack,
 }: OTPValidationProps) {
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [resendTimer, setResendTimer] = useState(30)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -33,12 +30,7 @@ export function OTPValidation({
     setError('')
 
     try {
-      const result = await verifyOTP({
-        otpId,
-        otp,
-        phone,
-      })
-
+      const result = await verifyOTP(verificationId, otp)
       if (result.success) {
         onSuccess()
       } else {
@@ -48,31 +40,6 @@ export function OTPValidation({
       setError('Failed to verify OTP. Please try again.')
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  async function handleResendOTP() {
-    try {
-      const result = await resendOTP({
-        phone,
-      })
-
-      if (result.success) {
-        setResendTimer(30)
-        const timer = setInterval(() => {
-          setResendTimer((prev) => {
-            if (prev <= 1) {
-              clearInterval(timer)
-              return 0
-            }
-            return prev - 1
-          })
-        }, 1000)
-      } else {
-        setError(result.message)
-      }
-    } catch (err) {
-      setError('Failed to resend OTP. Please try again.')
     }
   }
 
@@ -89,17 +56,18 @@ export function OTPValidation({
           </button>
 
           <div>
-          <Link href="/" className="flex items-center gap-2 mr-auto">
-            <div className="w-7 h-6 bg-emerald-300 rounded-lg flex items-center justify-center">
-              <ShoppingBag className="w-5 h-4 text-white" />
-            </div>
-            <span className="text-xl font-semibold">Circulx</span>
-          </Link>
+            <Image
+              src="/logo.png"
+              alt="CirculX"
+              width={120}
+              height={40}
+              className="mb-6"
+            />
             <h1 className="text-2xl font-bold">Verify OTP 🔒</h1>
             <p className="text-gray-600">
               Enter the OTP sent to{' '}
               <span className="font-medium">
-                {phone}
+                {phoneNumber}
               </span>
             </p>
           </div>
@@ -131,27 +99,12 @@ export function OTPValidation({
             >
               {isLoading ? 'Verifying...' : 'Verify OTP'}
             </Button>
-
-            <p className="text-center text-sm text-gray-600">
-              Didn't receive the OTP?{' '}
-              {resendTimer > 0 ? (
-                <span>Resend in {resendTimer}s</span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleResendOTP}
-                  className="text-orange-500 hover:underline"
-                >
-                  Resend OTP
-                </button>
-              )}
-            </p>
           </form>
         </div>
       </div>
       <div className="bg-[#1a365d] p-8 flex items-center justify-center">
         <Image
-          src="/login.png"
+          src="/auth-illustration.svg"
           alt="Authentication"
           width={300}
           height={300}

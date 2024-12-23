@@ -2,20 +2,18 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { sendOTP } from '@/lib/auth'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 
 interface LoginFormProps {
-  onOTPSent: (data: { otpId: string; phone: string }) => void
-  onRegisterClick: () => void
+  onOTPSent: (data: { verificationId: string; phoneNumber: string }) => void
 }
 
-export function LoginForm({ onOTPSent, onRegisterClick }: LoginFormProps) {
-  const [phone, setPhone] = useState('')
+export function LoginForm({ onOTPSent }: LoginFormProps) {
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -25,17 +23,18 @@ export function LoginForm({ onOTPSent, onRegisterClick }: LoginFormProps) {
     setError('')
 
     try {
-      const result = await sendOTP({ phone })
-      if (result.success) {
+      const result = await sendOTP(phoneNumber)
+      if (result.success && result.verificationId) {
         onOTPSent({ 
-          otpId: result.otpId!,
-          phone
+          verificationId: result.verificationId,
+          phoneNumber
         })
       } else {
-        setError(result.message)
+        setError(result.message || 'Failed to send OTP')
       }
     } catch (err) {
       setError('Failed to send OTP. Please try again.')
+      console.error('Error in handleSubmit:', err)
     } finally {
       setIsLoading(false)
     }
@@ -46,15 +45,16 @@ export function LoginForm({ onOTPSent, onRegisterClick }: LoginFormProps) {
       <div className="p-8">
         <div className="space-y-6">
           <div>
-          <Link href="/" className="flex items-center gap-2 mr-auto">
-            <div className="w-7 h-6 bg-emerald-300 rounded-lg flex items-center justify-center">
-              <ShoppingBag className="w-5 h-4 text-white" />
-            </div>
-            <span className="text-xl font-semibold">Circulx</span>
-          </Link>
-            <h1 className="text-1xl py-3 font-bold">Hi, Welcome! 👋</h1>
-            <p className="text-blue-700 font-semibold">
-              Please Login Into Your Account.
+            <Image
+              src="/logo.png"
+              alt="CirculX"
+              width={120}
+              height={40}
+              className="mb-6"
+            />
+            <h1 className="text-2xl font-bold">Hi, Welcome! 👋</h1>
+            <p className="text-gray-600">
+              Welcome Back! Please Login Into Your Account.
             </p>
           </div>
 
@@ -65,8 +65,8 @@ export function LoginForm({ onOTPSent, onRegisterClick }: LoginFormProps) {
               </label>
               <PhoneInput
                 country={'in'}
-                value={phone}
-                onChange={(phone) => setPhone(phone)}
+                value={phoneNumber}
+                onChange={(phone) => setPhoneNumber(`+${phone}`)}
                 inputClass="w-full p-2 border rounded-md"
               />
             </div>
@@ -78,26 +78,16 @@ export function LoginForm({ onOTPSent, onRegisterClick }: LoginFormProps) {
             <Button
               type="submit"
               className="w-full bg-orange-500 hover:bg-orange-600"
-              disabled={isLoading || !phone}
+              disabled={isLoading || !phoneNumber}
             >
               {isLoading ? 'Sending OTP...' : 'Submit'}
             </Button>
           </form>
-
-          <p className="text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <button
-              onClick={onRegisterClick}
-              className="text-orange-500 hover:underline"
-            >
-              Sign up
-            </button>
-          </p>
         </div>
       </div>
       <div className="bg-[#1a365d] p-8 flex items-center justify-center">
         <Image
-          src="/logininmage.png"
+          src="/login.png"
           alt="Authentication"
           width={300}
           height={300}

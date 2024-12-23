@@ -18,7 +18,7 @@ const allBrands = [
   { name: 'Ford', logo: '/download.png', href: '/brands/ford' },
   { name: 'Chevrolet', logo: '/download (1).png', href: '/brands/chevrolet' },
   { name: 'Nissan', logo: '/download.png', href: '/brands/nissan' },
-]
+] 
 
 function useInterval(callback: () => void, delay: number | null) {
   const savedCallback = useRef(callback)
