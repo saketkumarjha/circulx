@@ -1,5 +1,6 @@
-import { Sidebar } from "@/components/sidebar"
-import { Search } from 'lucide-react'
+import { Sidebar } from "@/components/seller/sidebar"
+import { Search, Bell } from 'lucide-react'
+import { Button } from "@/components/ui/button"
 
 // Layout component that wraps all seller dashboard pages
 export default function SellerLayout({
@@ -11,10 +12,10 @@ export default function SellerLayout({
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1">
-        {/* Header with search */}
+        {/* Header with search and notification */}
         <div className="border-b bg-white px-4 py-3">
           <div className="flex justify-end items-center">
-            <div className="relative">
+            <div className="relative mr-4">
               <input
                 type="text"
                 placeholder="Search for products or orders"
@@ -22,17 +23,12 @@ export default function SellerLayout({
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
-            <div className="ml-4 flex items-center gap-2">
-              <img
-                src="/placeholder.svg?height=32&width=32"
-                alt="Profile"
-                className="h-8 w-8 rounded-full"
-              />
-              <div>
-                <p className="text-sm font-medium">Olivia Rhye</p>
-                <p className="text-xs text-green-600">Seller</p>
-              </div>
-            </div>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+                3
+              </span>
+            </Button>
           </div>
         </div>
         <main>{children}</main>

@@ -6,15 +6,9 @@ import { LayoutDashboard, Package2, ClipboardList, Star, UserCircle, HelpCircle 
 // Sidebar component that provides main navigation for the seller dashboard
 export function Sidebar() {
   return (
-    <div className="h-screen w-56 bg-[#4CAF50]">
+    <div className="h-screen w-56 bg-[#3f8f5d]">
       <div className="py-4">
-        {/* Logo Section */}
-        <div className="px-4 mb-6">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-semibold text-white">CirculX</span>
-          </div>
-        </div>
-
+        
         {/* Navigation Links */}
         <nav className="space-y-1 px-2">
           <Link 

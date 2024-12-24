@@ -1,5 +1,6 @@
 import { Package2, ClipboardList, Wallet, TrendingUp } from 'lucide-react'
 import { Card } from "@/components/ui/card"
+import { SalesChart } from '@/components/seller/sales-chart'
 
 // Dashboard content component that displays the main seller dashboard interface
 export default function DashboardContent() {
@@ -18,7 +19,7 @@ export default function DashboardContent() {
     <div className="p-6">
       {/* Welcome Section */}
       <div className="mb-6">
-        <h1 className="text-xl font-semibold mb-1">Welcome, Olivia Rhye</h1>
+        <h1 className="text-xl font-semibold mb-1">Welcome, Ranjesh Roy</h1>
         <p className="text-sm text-gray-600">Here's your performance summary for this Month</p>
       </div>
 
@@ -77,67 +78,86 @@ export default function DashboardContent() {
         </Card>
       </div>
 
-      {/* Recent Orders Section */}
-      <div className="bg-white rounded-lg border">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h2 className="font-medium">Recent Orders</h2>
-          <div className="flex items-center gap-4 text-sm">
-            <button className="text-gray-600 hover:text-gray-900">Share</button>
-            <button className="text-gray-600 hover:text-gray-900">Filter</button>
-            <button className="text-gray-600 hover:text-gray-900">Export</button>
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Recent Orders Section */}
+        <div className="bg-white rounded-lg border">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h2 className="font-medium">Recent Orders</h2>
+            <div className="flex items-center gap-4 text-sm">
+              <button className="text-gray-600 hover:text-gray-900">Share</button>
+              <button className="text-gray-600 hover:text-gray-900">Filter</button>
+              <button className="text-gray-600 hover:text-gray-900">Export</button>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-gray-50">
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Order #</th>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Product</th>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Customer</th>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Status</th>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Amount</th>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">View</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order) => (
+                  <tr key={order.id} className="border-b last:border-b-0">
+                    <td className="px-4 py-3 text-sm">{order.id}</td>
+                    <td className="px-4 py-3 text-sm">{order.product}</td>
+                    <td className="px-4 py-3 text-sm">{order.customer}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        order.status === 'Completed' 
+                          ? 'bg-green-50 text-green-600' 
+                          : 'bg-yellow-50 text-yellow-600'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">{order.amount}</td>
+                    <td className="px-4 py-3">
+                      <button className="text-sm text-gray-600 hover:text-gray-900">View</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-gray-50">
-                <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Order #</th>
-                <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Product</th>
-                <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Customer</th>
-                <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Status</th>
-                <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">Amount</th>
-                <th className="text-left px-4 py-2 text-xs font-medium text-gray-600">View</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3 text-sm">{order.id}</td>
-                  <td className="px-4 py-3 text-sm">{order.product}</td>
-                  <td className="px-4 py-3 text-sm">{order.customer}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      order.status === 'Completed' 
-                        ? 'bg-green-50 text-green-600' 
-                        : 'bg-yellow-50 text-yellow-600'
-                    }`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm">{order.amount}</td>
-                  <td className="px-4 py-3">
-                    <button className="text-sm text-gray-600 hover:text-gray-900">View</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-      {/* Sales Trends Section */}
-      <div className="mt-6">
+        {/* Sales Trends Section */}
         <Card className="p-4">
-          <h3 className="font-medium mb-4">Sales Trends</h3>
-          <div className="aspect-[2/1] w-full bg-gray-50 rounded-lg"></div>
-          <div className="mt-4 space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Revenue this month:</span>
-              <span className="font-medium">₹1,50,000</span>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Sales Trend</h2>
+            <select className="text-sm border rounded px-2 py-1">
+              <option>This Week</option>
+              <option>This Month</option>
+              <option>This Year</option>
+            </select>
+          </div>
+          <SalesChart />
+          <div className="mt-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Revenue this month:</span>
+              <span className="text-sm font-semibold">₹1,50,000</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Top Product:</span>
-              <span className="font-medium">Aluminum Scrap (₹50,000 sales)</span>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Top Product:</span>
+              <span className="text-sm font-semibold">Aluminum Scrap</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Top Product Revenue:</span>
+              <span className="text-sm font-semibold">₹50,000</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Least Revenue Product:</span>
+              <span className="text-sm font-semibold">Glass Sheets</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Least Revenue:</span>
+              <span className="text-sm font-semibold">₹10,000</span>
             </div>
           </div>
         </Card>

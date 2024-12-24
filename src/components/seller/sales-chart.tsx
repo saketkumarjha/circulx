@@ -10,6 +10,7 @@ import {
   Title,
   Tooltip,
   Filler,
+  Legend,
 } from "chart.js"
 
 // Register ChartJS components
@@ -20,7 +21,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Filler
+  Filler,
+  Legend
 )
 
 // Sales chart component that displays sales trends
@@ -29,11 +31,19 @@ export function SalesChart() {
     labels: ["Mon 10", "Tues 11", "Wed 12", "Thurs 13", "Fri 14", "Sat 15"],
     datasets: [
       {
+        label: "Aluminum Scrap",
         fill: true,
-        label: "Sales",
-        data: [30000, 45000, 40000, 35000, 25000, 20000],
-        borderColor: "rgb(255, 98, 0)",
-        backgroundColor: "rgba(255, 98, 0, 0.1)",
+        data: [30000, 45000, 40000, 35000, 25000, 50000],
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        tension: 0.3,
+      },
+      {
+        label: "Glass Sheets",
+        fill: true,
+        data: [10000, 15000, 12000, 8000, 20000, 10000],
+        borderColor: "rgb(53, 162, 235)",
+        backgroundColor: "rgba(53, 162, 235, 0.2)",
         tension: 0.3,
       },
     ],
@@ -42,6 +52,9 @@ export function SalesChart() {
   const options = {
     responsive: true,
     plugins: {
+      legend: {
+        position: 'top' as const,
+      },
       title: {
         display: false,
       },
@@ -53,6 +66,9 @@ export function SalesChart() {
           display: true,
           color: "rgba(0, 0, 0, 0.05)",
         },
+        ticks: {
+          callback: (value: number) => `₹${value.toLocaleString()}`,
+        },
       },
       x: {
         grid: {
@@ -63,23 +79,8 @@ export function SalesChart() {
   }
 
   return (
-    <div className="rounded-lg border bg-white p-4">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">Sales Trends</h3>
-      </div>
-      <div className="h-[300px]">
-        <Line data={data} options={options} />
-      </div>
-      <div className="mt-4 space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Revenue this month:</span>
-          <span className="font-medium">₹1,50,000</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Top Product:</span>
-          <span className="font-medium">Aluminum Scrap (₹50,000 sales)</span>
-        </div>
-      </div>
+    <div className="h-[300px]">
+      <Line data={data} options={options} />
     </div>
   )
 }
