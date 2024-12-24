@@ -1,56 +1,65 @@
 "use client"
 
 import Link from "next/link"
-import { LayoutDashboard, Package2, ClipboardList, Star, HelpCircle } from 'lucide-react'
+import { LayoutDashboard, Package2, ClipboardList, Star, UserCircle, HelpCircle } from 'lucide-react'
 
+// Sidebar component that provides main navigation for the seller dashboard
 export function Sidebar() {
   return (
-    <div className="h-screen w-64 border-r bg-[#4CAF50]">
-      <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-xl font-semibold tracking-tight text-white">
-            CirculX
-          </h2>
+    <div className="h-screen w-56 bg-[#4CAF50]">
+      <div className="py-4">
+        {/* Logo Section */}
+        <div className="px-4 mb-6">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-semibold text-white">CirculX</span>
+          </div>
         </div>
-        <div className="space-y-1">
-          <nav className="grid gap-1 px-2">
-            <Link 
-              href="/seller"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-white hover:bg-white/10 transition-all"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard
-            </Link>
-            <Link 
-              href="/seller/products"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-white hover:bg-white/10 transition-all"
-            >
-              <Package2 className="h-4 w-4" />
-              Product Management
-            </Link>
-            <Link 
-              href="/seller/orders"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-white hover:bg-white/10 transition-all"
-            >
-              <ClipboardList className="h-4 w-4" />
-              Order Management
-            </Link>
-            <Link 
-              href="/seller/reviews"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-white hover:bg-white/10 transition-all"
-            >
-              <Star className="h-4 w-4" />
-              Ratings & Reviews
-            </Link>
-            <Link 
-              href="/seller/help"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-white hover:bg-white/10 transition-all"
-            >
-              <HelpCircle className="h-4 w-4" />
-              Help/Support
-            </Link>
-          </nav>
-        </div>
+
+        {/* Navigation Links */}
+        <nav className="space-y-1 px-2">
+          <Link 
+            href="/dashboard"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            Dashboard
+          </Link>
+          <Link 
+            href="/products"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
+          >
+            <Package2 className="h-4 w-4" />
+            Product Management
+          </Link>
+          <Link 
+            href="/orders"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
+          >
+            <ClipboardList className="h-4 w-4" />
+            Order Management
+          </Link>
+          <Link 
+            href="/reviews"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
+          >
+            <Star className="h-4 w-4" />
+            Ratings & Reviews
+          </Link>
+          <Link 
+            href="/profile"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
+          >
+            <UserCircle className="h-4 w-4" />
+            Profile Management
+          </Link>
+          <Link 
+            href="/help"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
+          >
+            <HelpCircle className="h-4 w-4" />
+            Help/Support
+          </Link>
+        </nav>
       </div>
     </div>
   )
