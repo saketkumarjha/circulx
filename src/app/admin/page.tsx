@@ -1,4 +1,4 @@
-'use client'
+/*'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -115,5 +115,24 @@ export default function AdminDashboard() {
       </div>
     </div>
   )
+}*/
+
+import DashboardContent from '../admin/dashboard-content'
+// Main dashboard page component
+export default function SellerDashboard() {
+  
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header Section */}
+
+        <DashboardContent />
+        
+      </div>
+    
+  )
 }
+
+
+
 
