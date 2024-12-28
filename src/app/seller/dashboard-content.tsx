@@ -20,7 +20,7 @@ export default function DashboardContent() {
       {/* Welcome Section */}
       <div className="mb-6">
         <h1 className="text-xl font-semibold mb-1">Welcome, Ranjesh Roy</h1>
-        <p className="text-sm text-gray-600">Here's your performance summary for this Month</p>
+        <p className="text-sm text-gray-600">Here's your Selle Performace  summary for this Month</p>
       </div>
 
       {/* Performance Metrics */}

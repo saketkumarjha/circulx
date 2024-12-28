@@ -1,60 +1,34 @@
-"use client"
-
 import Link from "next/link"
-import { LayoutDashboard, Package2, ClipboardList, Star, UserCircle, HelpCircle } from 'lucide-react'
+import { LayoutDashboard, Users, Package, ShoppingCart, BarChart2, HelpCircle } from 'lucide-react'
 
-// Sidebar component that provides main navigation for the seller dashboard
+const navigation = [
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, active: true },
+  { name: 'Seller Management', href: '/admin/sellers', icon: Users },
+  { name: 'Product Management', href: '/admin/products', icon: Package },
+  { name: 'Order Management', href: '/admin/orders', icon: ShoppingCart },
+  { name: 'Report & Analytics', href: '/admin/reports', icon: BarChart2 },
+  { name: 'Help/FAQs Management', href: '/admin/help', icon: HelpCircle },
+]
+
 export function Sidebar() {
   return (
-    <div className="h-screen w-56 bg-[#3f8f5d]">
-      <div className="py-4">
-        
-        {/* Navigation Links */}
-        <nav className="space-y-1 px-2">
-          <Link 
-            href="/dashboard"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
+    <div className="h-full py-4">
+      <nav className="space-y-1 px-3">
+        {navigation.map((item) => (
+          <Link
+            key={item.name}
+            href={item.href}
+            className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+              ${item.active 
+                ? 'bg-emerald-600 text-white' 
+                : 'hover:bg-emerald-600 hover:text-white'
+              }`}
           >
-            <LayoutDashboard className="h-4 w-4" />
-            Dashboard
+            <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+            {item.name}
           </Link>
-          <Link 
-            href="/products"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
-          >
-            <Package2 className="h-4 w-4" />
-            Seller Management
-          </Link>
-          <Link 
-            href="/orders"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
-          >
-            <ClipboardList className="h-4 w-4" />
-            Product Management
-          </Link>
-          <Link 
-            href="/reviews"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
-          >
-            <Star className="h-4 w-4" />
-            Order Management
-          </Link>
-          <Link 
-            href="/profile"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
-          >
-            <UserCircle className="h-4 w-4" />
-            Reports & Analytics
-          </Link>
-          <Link 
-            href="/help"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-sm hover:bg-white/10"
-          >
-            <HelpCircle className="h-4 w-4" />
-            Help/Faq Management
-          </Link>
-        </nav>
-      </div>
+        ))}
+      </nav>
     </div>
   )
 }

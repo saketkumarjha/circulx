@@ -1,87 +1,170 @@
-"use client"
+'use client'
 
-import { Line } from "react-chartjs-2"
+import { useState } from "react"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
+  Line,
+  LineChart,
+  ResponsiveContainer,
   Tooltip,
-  Filler,
-  Legend,
-} from "chart.js"
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Area
+} from "recharts"
 
-// Register ChartJS components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend
-)
+// Define the structure for our data points
+interface SalesDataPoint {
+  value: number
+  percentage: number
+  k: string
+}
 
-// Sales chart component that displays sales trends
-export function SalesChart() {
-  const data = {
-    labels: ["Mon 10", "Tues 11", "Wed 12", "Thurs 13", "Fri 14", "Sat 15"],
-    datasets: [
-      {
-        label: "Aluminum Scrap",
-        fill: true,
-        data: [30000, 45000, 40000, 35000, 25000, 50000],
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        tension: 0.3,
-      },
-      {
-        label: "Glass Sheets",
-        fill: true,
-        data: [10000, 15000, 12000, 8000, 20000, 10000],
-        borderColor: "rgb(53, 162, 235)",
-        backgroundColor: "rgba(53, 162, 235, 0.2)",
-        tension: 0.3,
-      },
-    ],
+// Define monthly data structure
+interface MonthlyData {
+  [key: string]: SalesDataPoint[]
+}
+
+// Generate sample data for each month
+const generateMonthlyData = (): MonthlyData => {
+  const months = ['october', 'november', 'december']
+  const monthlyData: MonthlyData = {}
+
+  months.forEach(month => {
+    monthlyData[month] = Array.from({ length: 12 }, (_, i) => {
+      const k = `${(i + 1) * 5}k`
+      // Generate different patterns for different months
+      const basePercentage = month === 'october' ? 40 : month === 'november' ? 50 : 45
+      return {
+        k,
+        value: (i + 1) * 5000,
+        percentage: Math.floor(Math.random() * 40) + basePercentage,
+      }
+    })
+  })
+
+  return monthlyData
+}
+
+// Custom tooltip component
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white border rounded-lg shadow-lg p-2 text-xs">
+        <p className="font-medium text-orange-500">{payload[0].value.toFixed(4)}%</p>
+      </div>
+    )
   }
+  return null
+}
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: false,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          display: true,
-          color: "rgba(0, 0, 0, 0.05)",
-        },
-        ticks: {
-          callback: (value: number) => `₹${value.toLocaleString()}`,
-        },
-      },
-      x: {
-        grid: {
-          display: false,
-        },
-      },
-    },
+export function SalesChart() {
+  // Initialize state for selected month and data
+  const [selectedMonth, setSelectedMonth] = useState('october')
+  const monthlyData = generateMonthlyData()
+
+  // Handle month change
+  const handleMonthChange = (value: string) => {
+    setSelectedMonth(value)
   }
 
   return (
-    <div className="h-[300px]">
-      <Line data={data} options={options} />
-    </div>
+    <Card className="col-span-4">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <h3 className="text-lg font-semibold">Sales Details</h3>
+        <Select value={selectedMonth} onValueChange={handleMonthChange}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Select month" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="october">October</SelectItem>
+            <SelectItem value="november">November</SelectItem>
+            <SelectItem value="december">December</SelectItem>
+          </SelectContent>
+        </Select>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[400px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={monthlyData[selectedMonth]}
+              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            >
+              {/* Customized CartesianGrid */}
+              <CartesianGrid
+                horizontal={true}
+                vertical={false}
+                strokeDasharray="3 3"
+                stroke="#E5E7EB"
+              />
+              
+              {/* X-axis configuration */}
+              <XAxis
+                dataKey="k"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#6B7280', fontSize: 12 }}
+                padding={{ left: 10, right: 10 }}
+              />
+              
+              {/* Y-axis configuration */}
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#6B7280', fontSize: 12 }}
+                tickFormatter={(value) => `${value}%`}
+                domain={[0, 100]}
+                padding={{ top: 20, bottom: 20 }}
+              />
+              
+              {/* Custom tooltip */}
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={false}
+              />
+              
+              {/* Gradient definitions */}
+              <defs>
+                <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#FF6B2C" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#FF6B2C" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              
+              {/* Area under the line */}
+              <Area
+                type="monotone"
+                dataKey="percentage"
+                stroke="transparent"
+                fill="url(#colorGradient)"
+                fillOpacity={1}
+              />
+              
+              {/* Main line */}
+              <Line
+                type="monotone"
+                dataKey="percentage"
+                stroke="#FF6B2C"
+                strokeWidth={2}
+                dot={{
+                  r: 4,
+                  fill: "#FF6B2C",
+                  strokeWidth: 2,
+                  stroke: "#FFFFFF"
+                }}
+                activeDot={{
+                  r: 6,
+                  fill: "#FF6B2C",
+                  stroke: "#FFFFFF",
+                  strokeWidth: 2
+                }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
