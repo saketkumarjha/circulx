@@ -3,7 +3,8 @@ import { LayoutDashboard, Users, Package, ShoppingCart, BarChart2, HelpCircle } 
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, active: true },
-  { name: 'Seller Management', href: '/admin/sellers', icon: Users },
+  { name: 'Seller Portal', href: '/admin/sellers', icon: Users },
+  { name: 'User Management', href: '/admin/Users', icon: Users },
   { name: 'Product Management', href: '/admin/products', icon: Package },
   { name: 'Order Management', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Report & Analytics', href: '/admin/reports', icon: BarChart2 },

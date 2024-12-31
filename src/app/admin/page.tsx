@@ -1,8 +1,12 @@
 import { StatCard } from "@/components/admin/stat-card"
 import { PendingCard } from "@/components/admin/pending-card"
 import { SalesChart } from "@/components/admin/sales-chart"
+import { RecentSellersTable } from "@/components/dashboard/recent-sellers-table"
+import { RecentIssuesTable } from "@/components/dashboard/recent-issues-table"
+import { RecentProductsTable } from "@/components/dashboard/recent-products-table"
 import { Users, Package, DollarSign, UserCheck, PackageCheck, AlertCircle } from 'lucide-react'
 import { formatNumber, formatCurrency } from "@/lib/utils"
+
 
 export default function AdminDashboard() {
   return (
@@ -73,6 +77,14 @@ export default function AdminDashboard() {
       </div>
 
       <SalesChart />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <RecentSellersTable />
+        <RecentIssuesTable />
+      </div>
+      
+      <div className="mb-8">
+        <RecentProductsTable />
+      </div>
     </div>
   )
 }
