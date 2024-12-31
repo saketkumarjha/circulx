@@ -4,82 +4,12 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { MapPin } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import ImageGallery from './ImageGallery'
 
 interface ProductImage {
   id: number
   src: string
   alt: string
-}
-
-interface QuantitySelectorProps {
-  initialQuantity?: number
-  onQuantityChange?: (quantity: number) => void
-}
-
-function QuantitySelector({ initialQuantity = 1, onQuantityChange }: QuantitySelectorProps) {
-  const [quantity, setQuantity] = useState(initialQuantity)
-
-  const handleQuantityChange = (change: number) => {
-    const newQuantity = Math.max(1, quantity + change)
-    setQuantity(newQuantity)
-    onQuantityChange?.(newQuantity)
-  }
-
-  return (
-    <div className="flex items-center gap-3">
-      <Button 
-        variant="outline" 
-        size="icon"
-        onClick={() => handleQuantityChange(-1)}
-        disabled={quantity <= 1}
-      >
-        -
-      </Button>
-      <span className="w-8 text-center">{quantity}</span>
-      <Button 
-        variant="outline" 
-        size="icon"
-        onClick={() => handleQuantityChange(1)}
-      >
-        +
-      </Button>
-    </div>
-  )
-}
-
-function ImageGallery({ images }: { images: ProductImage[] }) {
-  const [selectedImage, setSelectedImage] = useState(images[0])
-
-  return (
-    <div className="space-y-4">
-      <div className="aspect-square relative overflow-hidden rounded-lg">
-        <Image
-          src={selectedImage.src}
-          alt={selectedImage.alt}
-          fill
-          className="object-cover"
-        />
-      </div>
-      <div className="grid grid-cols-4 gap-4">
-        {images.map((image) => (
-          <button
-            key={image.id}
-            onClick={() => setSelectedImage(image)}
-            className={`aspect-square relative overflow-hidden rounded-lg ${
-              selectedImage.id === image.id ? 'ring-2 ring-blue-500' : ''
-            }`}
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              className="object-cover"
-            />
-          </button>
-        ))}
-      </div>
-    </div>
-  )
 }
 
 interface ProductDetailProps {
@@ -90,6 +20,10 @@ interface ProductDetailProps {
 
 export default function ProductDetail({ params }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1)
+
+  const handleQuantityChange = (change: number) => {
+    setQuantity(prev => Math.max(1, prev + change))
+  }
 
   const productImages: ProductImage[] = [
     { id: 1, src: '/download.jpg', alt: 'Product view 1' },
@@ -127,7 +61,24 @@ export default function ProductDetail({ params }: ProductDetailProps) {
           <div className="space-y-4 border-t border-b py-4">
             <div className="flex items-center justify-between">
               <span className="text-sm md:text-base font-medium">Quantity</span>
-              <QuantitySelector initialQuantity={quantity} onQuantityChange={setQuantity} />
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={quantity <= 1}
+                >
+                  -
+                </Button>
+                <span className="w-8 text-center">{quantity}</span>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => handleQuantityChange(1)}
+                >
+                  +
+                </Button>
+              </div>
             </div>
           </div>
 
