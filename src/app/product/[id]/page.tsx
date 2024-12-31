@@ -9,12 +9,14 @@ interface ProductImage {
   alt: string
 }
 
-interface PageProps {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
+export default async function ProductDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  // Await the params to get the id
+  const { id } = await params
 
-export default async function ProductDetail({ params, searchParams }: PageProps) {
   const productImages: ProductImage[] = [
     { id: 1, src: '/download.jpg', alt: 'Product view 1' },
     { id: 2, src: '/download (1).png', alt: 'Product view 2' },
@@ -22,8 +24,8 @@ export default async function ProductDetail({ params, searchParams }: PageProps)
     { id: 4, src: '/audi.jpeg', alt: 'Product view 4' },
   ]
 
-  // You can use params.id to fetch the product data
-  // const product = await fetchProduct(params.id)
+  // Here you would typically fetch the product data using the id
+  // const product = await fetchProduct(id)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
