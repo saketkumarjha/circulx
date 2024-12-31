@@ -70,9 +70,9 @@ export function RecentSellersTable() {
                       <X className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant="success"
+                      variant="default"
                       size="icon"
-                      className="h-7 w-7 bg-emerald-500 hover:bg-emerald-600"
+                      className="h-7 w-7 bg-emerald-500 hover:bg-emerald-600 text-white"
                     >
                       <Check className="h-4 w-4" />
                     </Button>
