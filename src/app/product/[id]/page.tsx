@@ -56,8 +56,8 @@ function ImageGallery({ images }: { images: ProductImage[] }) {
         <Image
           src={selectedImage.src}
           alt={selectedImage.alt}
-          layout="fill"
-          objectFit="cover"
+          fill
+          className="object-cover"
         />
       </div>
       <div className="grid grid-cols-4 gap-4">
@@ -72,8 +72,8 @@ function ImageGallery({ images }: { images: ProductImage[] }) {
             <Image
               src={image.src}
               alt={image.alt}
-              layout="fill"
-              objectFit="cover"
+              fill
+              className="object-cover"
             />
           </button>
         ))}
@@ -82,7 +82,13 @@ function ImageGallery({ images }: { images: ProductImage[] }) {
   )
 }
 
-export default function ProductDetail({ params }: { params: { id: string } }) {
+interface ProductDetailProps {
+  params: {
+    id: string
+  }
+}
+
+export default function ProductDetail({ params }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1)
 
   const productImages: ProductImage[] = [
@@ -93,7 +99,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   ]
 
   // Here you would typically fetch the product data using the id
-  // const product = await fetchProduct(params.id)
+  // const product = fetchProduct(params.id)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
