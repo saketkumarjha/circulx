@@ -1,9 +1,7 @@
-'use client'
-
-import { useState } from 'react'
 import Image from 'next/image'
-import { ChevronRight, MapPin } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import ImageGallery from './ImageGallery'
 
 interface ProductImage {
   id: number
@@ -11,10 +9,11 @@ interface ProductImage {
   alt: string
 }
 
-export default function ProductDetail({ params }: { params: { id: string } }) {
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [quantity, setQuantity] = useState(1)
+interface PageProps {
+  params: { id: string }
+}
 
+export default function ProductDetail({ params }: PageProps) {
   const productImages: ProductImage[] = [
     { id: 1, src: '/download.jpg', alt: 'Product view 1' },
     { id: 2, src: '/download (1).png', alt: 'Product view 2' },
@@ -22,56 +21,24 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
     { id: 4, src: '/audi.jpeg', alt: 'Product view 4' },
   ]
 
-  const handleQuantityChange = (change: number) => {
-    const newQuantity = quantity + change
-    if (newQuantity >= 1) {
-      setQuantity(newQuantity)
-    }
-  }
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Left Column - Images */}
-        <div className="w-full lg:w-1/2 space-y-4">
-          <div className="relative aspect-square rounded-lg overflow-hidden border max-w-md mx-auto">
-            <Image
-              src={productImages[selectedImage].src}
-              alt={productImages[selectedImage].alt}
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="grid grid-cols-4 gap-2 max-w-md mx-auto">
-            {productImages.map((image, index) => (
-              <button
-                key={image.id}
-                onClick={() => setSelectedImage(index)}
-                className={`relative aspect-square rounded-lg overflow-hidden border ${
-                  selectedImage === index ? 'border-primary' : 'border-gray-200'
-                }`}
-              >
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
+        <div className="w-full lg:w-1/2">
+          <ImageGallery images={productImages} />
         </div>
 
         {/* Right Column - Product Details */}
         <div className="w-full lg:w-1/2 space-y-6">
           <div className="space-y-2">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">301 LPD ETC Ceramic Coated Supreme Solar Water Heater, Size: 6</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Fortune Black Gold 10 inch PVC Safety Work Gumboots, Size: 6</h1>
             <p className="text-sm md:text-base text-muted-foreground">Gumboots, Size: 6</p>
           </div>
 
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
-              <span className="text-xl sm:text-2xl md:text-3xl font-bold">₹33000</span>
+              <span className="text-xl sm:text-2xl md:text-3xl font-bold">₹208</span>
               <span className="text-sm md:text-base text-muted-foreground">+75 GST</span>
             </div>
             <div className="text-sm md:text-base text-emerald-600">69% OFF</div>
@@ -84,16 +51,13 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                 <Button 
                   variant="outline" 
                   size="icon"
-                  onClick={() => handleQuantityChange(-1)}
-                  disabled={quantity <= 1}
                 >
                   -
                 </Button>
-                <span className="w-8 text-center">{quantity}</span>
+                <span className="w-8 text-center">1</span>
                 <Button 
                   variant="outline" 
                   size="icon"
-                  onClick={() => handleQuantityChange(1)}
                 >
                   +
                 </Button>
