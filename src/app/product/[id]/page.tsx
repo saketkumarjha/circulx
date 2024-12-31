@@ -11,15 +11,19 @@ interface ProductImage {
 
 interface PageProps {
   params: { id: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default function ProductDetail({ params }: PageProps) {
+export default async function ProductDetail({ params, searchParams }: PageProps) {
   const productImages: ProductImage[] = [
     { id: 1, src: '/download.jpg', alt: 'Product view 1' },
     { id: 2, src: '/download (1).png', alt: 'Product view 2' },
     { id: 3, src: '/th.jpg', alt: 'Product view 3' },
     { id: 4, src: '/audi.jpeg', alt: 'Product view 4' },
   ]
+
+  // You can use params.id to fetch the product data
+  // const product = await fetchProduct(params.id)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
