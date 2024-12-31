@@ -10,8 +10,8 @@ import {
   Title,
   Tooltip,
   Filler,
-  Legend,
 } from "chart.js"
+import { Card } from "@/components/ui/card"
 
 // Register ChartJS components
 ChartJS.register(
@@ -21,8 +21,7 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Filler,
-  Legend
+  Filler
 )
 
 // Sales chart component that displays sales trends
@@ -31,32 +30,46 @@ export function SalesChart() {
     labels: ["Mon 10", "Tues 11", "Wed 12", "Thurs 13", "Fri 14", "Sat 15"],
     datasets: [
       {
-        label: "Aluminum Scrap",
         fill: true,
-        data: [30000, 45000, 40000, 35000, 25000, 50000],
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        label: "Sales",
+        data: [45000, 48000, 42000, 38000, 35000, 30000],
+        borderColor: "rgb(255, 98, 0)",
+        backgroundColor: (context: any) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+          gradient.addColorStop(0, "rgba(255, 98, 0, 0.3)");
+          gradient.addColorStop(1, "rgba(255, 98, 0, 0)");
+          return gradient;
+        },
+        borderWidth: 2,
         tension: 0.3,
-      },
-      {
-        label: "Glass Sheets",
-        fill: true,
-        data: [10000, 15000, 12000, 8000, 20000, 10000],
-        borderColor: "rgb(53, 162, 235)",
-        backgroundColor: "rgba(53, 162, 235, 0.2)",
-        tension: 0.3,
-      },
+        pointRadius: 0,
+      }
     ],
   }
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
-      },
-      title: {
         display: false,
+      },
+      tooltip: {
+        mode: 'index' as const,
+        intersect: false,
+        callbacks: {
+          label: function(context: any) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += '₹' + context.parsed.y.toLocaleString('en-IN');
+            }
+            return label;
+          }
+        }
       },
     },
     scales: {
@@ -67,7 +80,12 @@ export function SalesChart() {
           color: "rgba(0, 0, 0, 0.05)",
         },
         ticks: {
-          callback: (value: number) => `₹${value.toLocaleString()}`,
+          callback: function(this: any, tickValue: number | string, index: number, ticks: any[]) {
+            if (typeof tickValue === 'number') {
+              return `₹${tickValue.toLocaleString()}`;
+            }
+            return tickValue;
+          },
         },
       },
       x: {
@@ -76,12 +94,38 @@ export function SalesChart() {
         },
       },
     },
+    interaction: {
+      mode: 'nearest' as const,
+      axis: 'x' as const,
+      intersect: false
+    },
   }
 
   return (
-    <div className="h-[300px]">
-      <Line data={data} options={options} />
-    </div>
+    <Card className="p-6">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold">Sales Trends</h3>
+      </div>
+      <div className="relative h-[200px]">
+        <Line data={data} options={options} />
+        <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
+          <div className="flex items-center gap-2 text-xs text-orange-500">
+            <span>4,890:</span>
+            <span>Low sales in June</span>
+          </div>
+        </div>
+      </div>
+      <div className="mt-4 space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-600">Revenue this month:</span>
+          <span className="font-medium">₹1,50,000</span>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-600">Top Product:</span>
+          <span className="font-medium">Aluminum Scrap (₹50,000 sales)</span>
+        </div>
+      </div>
+    </Card>
   )
 }
 
