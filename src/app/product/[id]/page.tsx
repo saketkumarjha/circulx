@@ -1,3 +1,8 @@
+'use client'
+
+import { useState } from 'react'
+
+
 import Image from 'next/image'
 import { MapPin } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -115,3 +120,38 @@ export default async function ProductDetail({
   )
 }
 
+interface QuantitySelectorProps {
+  initialQuantity?: number
+  onQuantityChange?: (quantity: number) => void
+}
+
+export function QuantitySelector({ initialQuantity = 1, onQuantityChange }: QuantitySelectorProps) {
+  const [quantity, setQuantity] = useState(initialQuantity)
+
+  const handleQuantityChange = (change: number) => {
+    const newQuantity = Math.max(1, quantity + change)
+    setQuantity(newQuantity)
+    onQuantityChange?.(newQuantity)
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      <Button 
+        variant="outline" 
+        size="icon"
+        onClick={() => handleQuantityChange(-1)}
+        disabled={quantity <= 1}
+      >
+        -
+      </Button>
+      <span className="w-8 text-center">{quantity}</span>
+      <Button 
+        variant="outline" 
+        size="icon"
+        onClick={() => handleQuantityChange(1)}
+      >
+        +
+      </Button>
+    </div>
+  )
+}
