@@ -75,7 +75,7 @@ export default async function UserManagementPage() {
     )
   } catch (error) {
     console.error('Error in UserManagementPage:', error)
-    
+    redirect('/users')
   }
 }
 
