@@ -1,11 +1,12 @@
 import { StatCard } from "@/components/admin/stat-card"
 import { PendingCard } from "@/components/admin/pending-card"
 import { SalesChart } from "@/components/admin/sales-chart"
-import { RecentSellersTable } from "@/components/dashboard/recent-sellers-table"
-import { RecentIssuesTable } from "@/components/dashboard/recent-issues-table"
-import { RecentProductsTable } from "@/components/dashboard/recent-products-table"
+import { RecentSellersTable } from "@/components/admin/recent-sellers-table"
+import { RecentIssuesTable } from "@/components/admin/recent-issues-table"
+import { RecentProductsTable } from "@/components/admin/recent-products-table"
 import { Users, Package, DollarSign, UserCheck, PackageCheck, AlertCircle } from 'lucide-react'
 import { formatNumber, formatCurrency } from "@/lib/utils"
+
 
 
 export default function AdminDashboard() {
