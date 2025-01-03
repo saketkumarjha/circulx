@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Package2, ClipboardList, Star, UserCircle, HelpCircle, Menu } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
-// Sidebar component that provides main navigation for the seller dashboard
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
@@ -28,7 +27,6 @@ export function Sidebar() {
   }, [isOpen])
 
   useEffect(() => {
-    // Close sidebar on route change (mobile only)
     setIsOpen(false)
   }, [pathname])
 
@@ -42,42 +40,36 @@ export function Sidebar() {
   ]
 
   return (
-    <>
+    <div className="relative h-full">
+      {/* Toggle button moved inside the main container and hidden when sidebar is open */}
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden fixed top-4 left-4 z-50"
+        className={`md:hidden absolute top-4 left-4 z-30 ${isOpen ? 'invisible' : 'visible'}`}
         onClick={toggleSidebar}
       >
         <Menu className="h-6 w-6" />
       </Button>
-      {/* 
-        IMPROVEMENT: Added border, rounded corners, and adjusted padding
-        - border: border border-gray-200
-        - rounded corners: rounded-lg
-        - adjusted padding: p-4 (removed py-4 from inner div)
-      */}
       <div 
         ref={sidebarRef}
         className={`
+          fixed inset-y-0 left-0 z-40 w-64 
+          bg-white shadow-lg
+          transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
-          md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 
-          bg-[#f8fafc] transition-transform duration-300 ease-in-out
-          overflow-y-auto border border-gray-200 rounded-lg p-4
+          md:translate-x-0 md:static md:shadow-none
         `}
       >
-        <div>
-          {/* 
-            IMPROVEMENT: Adjusted padding and added space at the top
-            - removed px-2 as it's now handled by the parent div
-            - kept pt-8 to maintain space at the top
-          */}
-          <nav className="space-y-1 pt-8">
+        <div className="flex flex-col h-full">
+          <div className="px-4 py-6 border-b border-gray-200">
+            <h1 className="text-xl font-bold text-green-900">Seller Portal</h1>
+          </div>
+          <nav className="flex-1 overflow-y-auto px-4 ">
             {navItems.map((item) => (
               <SidebarLink 
                 key={item.href}
                 href={item.href}
-                icon={<item.icon className="h-4 w-4" />}
+                icon={<item.icon className="h-5 w-5" />}
                 label={item.label}
                 isActive={pathname === item.href}
               />
@@ -85,7 +77,7 @@ export function Sidebar() {
           </nav>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
@@ -101,11 +93,11 @@ function SidebarLink({ href, icon, label, isActive }: SidebarLinkProps) {
     <Link 
       href={href}
       className={`
-        flex items-center gap-3 rounded-lg px-3 py-2 
+        flex items-center gap-3 rounded-md px-3 py-2 mb-1
         text-sm font-medium transition-colors duration-200
         ${isActive 
-          ? 'bg-blue-200 text-blue-800' 
-          : 'text-gray-700 hover:bg-blue-100 hover:text-blue-600'}
+          ? 'bg-blue-600 text-white' 
+          : 'text-gray-700 hover:bg-gray-100'}
       `}
     >
       {icon}
