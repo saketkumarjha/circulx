@@ -11,9 +11,7 @@ import {
   Tooltip,
   Filler,
 } from "chart.js"
-import { Card } from "@/components/ui/card"
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -24,15 +22,14 @@ ChartJS.register(
   Filler
 )
 
-// Sales chart component that displays sales trends
 export function SalesChart() {
   const data = {
-    labels: ["Mon 10", "Tues 11", "Wed 12", "Thurs 13", "Fri 14", "Sat 15"],
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [
       {
         fill: true,
         label: "Sales",
-        data: [45000, 48000, 42000, 38000, 35000, 30000],
+        data: [45000, 48000, 42000, 38000, 35000, 30000, 32000],
         borderColor: "rgb(255, 98, 0)",
         backgroundColor: (context: any) => {
           const ctx = context.chart.ctx;
@@ -80,11 +77,11 @@ export function SalesChart() {
           color: "rgba(0, 0, 0, 0.05)",
         },
         ticks: {
-          callback: function(this: any, tickValue: number | string, index: number, ticks: any[]) {
-            if (typeof tickValue === 'number') {
-              return `₹${tickValue.toLocaleString()}`;
+          callback: function(value: number | string) {
+            if (typeof value === 'number') {
+              return '₹' + value.toLocaleString('en-IN', { maximumSignificantDigits: 3 });
             }
-            return tickValue;
+            return value;
           },
         },
       },
@@ -102,30 +99,9 @@ export function SalesChart() {
   }
 
   return (
-    <Card className="p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">Sales Trends</h3>
-      </div>
-      <div className="relative h-[200px]">
-        <Line data={data} options={options} />
-        <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
-          <div className="flex items-center gap-2 text-xs text-orange-500">
-            <span>4,890:</span>
-            <span>Low sales in June</span>
-          </div>
-        </div>
-      </div>
-      <div className="mt-4 space-y-2">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">Revenue this month:</span>
-          <span className="font-medium">₹1,50,000</span>
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">Top Product:</span>
-          <span className="font-medium">Aluminum Scrap (₹50,000 sales)</span>
-        </div>
-      </div>
-    </Card>
+    <div className="w-full h-full">
+      <Line data={data} options={options} />
+    </div>
   )
 }
 
