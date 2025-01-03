@@ -61,10 +61,10 @@ export function Sidebar() {
         `}
       >
         <div className="flex flex-col h-full">
-          <div className="px-4 py-6 border-b border-gray-200">
+          <div className="px-4 py-2 border-b border-gray-200">
             <h1 className="text-xl font-bold text-green-900">Seller Portal</h1>
           </div>
-          <nav className="flex-1 overflow-y-auto px-4 ">
+          <nav className="flex-1 overflow-y-auto px-4 py-1">
             {navItems.map((item) => (
               <SidebarLink 
                 key={item.href}
