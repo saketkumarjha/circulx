@@ -5,7 +5,7 @@ import { LayoutDashboard, Users, User, Package, ShoppingCart, BarChart2, HelpCir
 import { usePathname } from "next/navigation"
 
 const navigation = [
-  { name: 'Dashboard', href: '/seller', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Seller Portal', href: '/admin/sellers', icon: Users },
   { name: 'User Management', href: '/admin/users', icon: User },
   { name: 'Product Management', href: '/admin/products', icon: Package },

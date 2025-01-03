@@ -31,7 +31,7 @@ export function Sidebar() {
   }, [pathname])
 
   const navItems = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/seller", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/products", icon: Package2, label: "Product Management" },
     { href: "/orders", icon: ClipboardList, label: "Order Management" },
     { href: "/reviews", icon: Star, label: "Ratings & Reviews" },
