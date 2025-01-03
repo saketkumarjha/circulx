@@ -22,16 +22,16 @@ const recentSellers: Seller[] = [
     registeredDate: 'Sep. 24, 1985',
   },
   {
-    id: '883',
-    name: 'Esther Howard',
-    email: 'deepak.firm.com',
-    registeredDate: 'Sep. 24, 1985',
+    id: '884',
+    name: 'Jane Cooper',
+    email: 'jane.cooper@example.com',
+    registeredDate: 'Jan. 15, 2000',
   },
   {
-    id: '883',
-    name: 'Esther Howard',
-    email: 'deepak.firm.com',
-    registeredDate: 'Sep. 24, 1985',
+    id: '885',
+    name: 'Robert Fox',
+    email: 'robert.fox@example.com',
+    registeredDate: 'Mar. 30, 1998',
   },
 ]
 
@@ -39,14 +39,14 @@ export function RecentSellersTable() {
   return (
     <div className="rounded-lg border bg-card">
       <div className="p-4 font-semibold">Recently Added Sellers</div>
-      <div className="relative overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="text-xs uppercase bg-gray-50">
             <tr>
               <th className="px-4 py-3">ID</th>
               <th className="px-4 py-3">Seller Name</th>
-              <th className="px-4 py-3">Email ID</th>
-              <th className="px-4 py-3">Registered Date</th>
+              <th className="px-4 py-3 hidden sm:table-cell">Email ID</th>
+              <th className="px-4 py-3 hidden md:table-cell">Registered Date</th>
               <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
@@ -58,8 +58,8 @@ export function RecentSellersTable() {
               >
                 <td className="px-4 py-3">{seller.id}</td>
                 <td className="px-4 py-3">{seller.name}</td>
-                <td className="px-4 py-3">{seller.email}</td>
-                <td className="px-4 py-3">{seller.registeredDate}</td>
+                <td className="px-4 py-3 hidden sm:table-cell">{seller.email}</td>
+                <td className="px-4 py-3 hidden md:table-cell">{seller.registeredDate}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
                     <Button

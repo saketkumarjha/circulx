@@ -7,14 +7,12 @@ import { RecentProductsTable } from "@/components/admin/recent-products-table"
 import { Users, Package, DollarSign, UserCheck, PackageCheck, AlertCircle } from 'lucide-react'
 import { formatNumber, formatCurrency } from "@/lib/utils"
 
-
-
 export default function AdminDashboard() {
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-8"> Admin Dashboard</h1>
+    <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">
+      <h1 className="text-2xl md:text-3xl font-bold">Admin Dashboard</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <StatCard
           title="Total Sellers"
           value={formatNumber(12000)}
@@ -47,7 +45,7 @@ export default function AdminDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <PendingCard
           title="Sellers Pending Approval"
           value={25}
@@ -77,13 +75,16 @@ export default function AdminDashboard() {
         />
       </div>
 
-      <SalesChart />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="w-full overflow-hidden">
+        <SalesChart />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <RecentSellersTable />
         <RecentIssuesTable />
       </div>
       
-      <div className="mb-8">
+      <div>
         <RecentProductsTable />
       </div>
     </div>

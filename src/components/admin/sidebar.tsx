@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { LayoutDashboard, Users,User, Package, ShoppingCart, BarChart2, HelpCircle } from 'lucide-react'
+import { LayoutDashboard, Users, User, Package, ShoppingCart, BarChart2, HelpCircle } from 'lucide-react'
 import { usePathname } from "next/navigation"
 
 const navigation = [
@@ -18,7 +18,10 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <div className="h-full py-4">
+    <div className="h-full py-4 overflow-y-auto">
+      <div className="px-3 mb-6">
+        <h2 className="text-lg font-semibold px-3">Admin Panel</h2>
+      </div>
       <nav className="space-y-1 px-3">
         {navigation.map((item) => {
           const isActive = pathname === item.href
@@ -33,7 +36,7 @@ export function Sidebar() {
                 }`}
             >
               <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
-              {item.name}
+              <span className="truncate">{item.name}</span>
             </Link>
           )
         })}

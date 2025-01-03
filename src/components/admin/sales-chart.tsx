@@ -60,18 +60,16 @@ const CustomTooltip = ({ active, payload }: any) => {
 }
 
 export function SalesChart() {
-  // Initialize state for selected month and data
   const [selectedMonth, setSelectedMonth] = useState('october')
   const monthlyData = generateMonthlyData()
 
-  // Handle month change
   const handleMonthChange = (value: string) => {
     setSelectedMonth(value)
   }
 
   return (
-    <Card className="col-span-4">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card>
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h3 className="text-lg font-semibold">Sales Details</h3>
         <Select value={selectedMonth} onValueChange={handleMonthChange}>
           <SelectTrigger className="w-[120px]">
@@ -85,21 +83,18 @@ export function SalesChart() {
         </Select>
       </CardHeader>
       <CardContent>
-        <div className="h-[400px] w-full">
+        <div className="h-[300px] sm:h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={monthlyData[selectedMonth]}
               margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
             >
-              {/* Customized CartesianGrid */}
               <CartesianGrid
                 horizontal={true}
                 vertical={false}
                 strokeDasharray="3 3"
                 stroke="#E5E7EB"
               />
-              
-              {/* X-axis configuration */}
               <XAxis
                 dataKey="k"
                 axisLine={false}
@@ -107,8 +102,6 @@ export function SalesChart() {
                 tick={{ fill: '#6B7280', fontSize: 12 }}
                 padding={{ left: 10, right: 10 }}
               />
-              
-              {/* Y-axis configuration */}
               <YAxis
                 axisLine={false}
                 tickLine={false}
@@ -117,22 +110,16 @@ export function SalesChart() {
                 domain={[0, 100]}
                 padding={{ top: 20, bottom: 20 }}
               />
-              
-              {/* Custom tooltip */}
               <Tooltip
                 content={<CustomTooltip />}
                 cursor={false}
               />
-              
-              {/* Gradient definitions */}
               <defs>
                 <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#FF6B2C" stopOpacity={0.4}/>
                   <stop offset="95%" stopColor="#FF6B2C" stopOpacity={0.1}/>
                 </linearGradient>
               </defs>
-              
-              {/* Area under the line */}
               <Area
                 type="monotone"
                 dataKey="percentage"
@@ -140,8 +127,6 @@ export function SalesChart() {
                 fill="url(#colorGradient)"
                 fillOpacity={1}
               />
-              
-              {/* Main line */}
               <Line
                 type="monotone"
                 dataKey="percentage"
