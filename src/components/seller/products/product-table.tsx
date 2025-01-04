@@ -201,18 +201,18 @@ export default function ProductTable() {
   return (
     <div className="w-full">
       {/* Header section with title and buttons */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Product Stock</h1>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <h1 className="text-2xl px-12 font-bold">Product Stock</h1>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           {/* Add Product button */}
-          <Button>
+          <Button className="w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
             Add Product
           </Button>
           {/* Filter dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Filter className="w-4 h-4 mr-2" />
                 Filters
               </Button>
@@ -285,8 +285,8 @@ export default function ProductTable() {
       </div>
 
       {/* Pagination section */}
-      <div className="flex items-center justify-between mt-4 text-sm">
-        <div>
+      <div className="flex flex-col sm:flex-row items-center justify-between mt-4 text-sm gap-4">
+        <div className="text-center sm:text-left w-full sm:w-auto">
           Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, totalProducts)} of {totalProducts}
         </div>
         <div className="flex items-center gap-2">
