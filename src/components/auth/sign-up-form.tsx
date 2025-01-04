@@ -45,7 +45,7 @@ export function SignUpForm({ onSuccess, onSignIn }: SignUpFormProps) {
             name="name"
             required
             
-            className="h-9 px-8 bg-white text-white  rounded-lg"
+            className="h-9 px-8 bg-white text-black  rounded-lg"
           />
         </div>
         <div>
@@ -56,7 +56,7 @@ export function SignUpForm({ onSuccess, onSignIn }: SignUpFormProps) {
             type="email"
             required
             placeholder=""
-            className="h-9 px-8 bg-white text-white placeholder:text-gray-500 rounded-lg"
+            className="h-9 px-8 bg-white text-black placeholder:text-gray-500 rounded-lg"
           />
         </div>
         <div>
@@ -67,7 +67,7 @@ export function SignUpForm({ onSuccess, onSignIn }: SignUpFormProps) {
             type="password"
             required
             placeholder=""
-            className="h-9 px-8 bg-white text-white placeholder:text-gray-500 rounded-lg"
+            className="h-9 px-8 bg-white text-black placeholder:text-gray-500 rounded-lg"
           />
         </div>
         {error && (
