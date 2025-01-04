@@ -32,8 +32,8 @@ export function Sidebar() {
 
   const navItems = [
     { href: "/seller", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/products", icon: Package2, label: "Product Management" },
-    { href: "/orders", icon: ClipboardList, label: "Order Management" },
+    { href: "/seller/products", icon: Package2, label: "Product Management" },
+    { href: "/seller/orders", icon: ClipboardList, label: "Order Management" },
     { href: "/reviews", icon: Star, label: "Ratings & Reviews" },
     { href: "/profile", icon: UserCircle, label: "Profile Management" },
     { href: "/help", icon: HelpCircle, label: "Help/Support" },
