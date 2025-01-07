@@ -35,7 +35,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Search } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
 
 type Order = {
   id: string
@@ -46,7 +53,7 @@ type Order = {
   payment: "Paid" | "Pending"
 }
 
-const data: Order[] = [
+const initialData: Order[] = [
   { id: "1234", orderDate: "10 Dec 2024", buyerName: "ABC Industries", status: "Delivered", amount: 25000, payment: "Paid" },
   { id: "1235", orderDate: "09 Dec 2024", buyerName: "XYZ Pvt Ltd", status: "Delivered", amount: 45000, payment: "Paid" },
   { id: "1236", orderDate: "04 Dec 2024", buyerName: "DEF Enterprises", status: "Pending", amount: 30000, payment: "Pending" },
@@ -54,13 +61,24 @@ const data: Order[] = [
   { id: "1238", orderDate: "06 Dec 2024", buyerName: "Aditya Industries", status: "Pending", amount: 30000, payment: "Pending" },
   { id: "1239", orderDate: "18 Dec 2024", buyerName: "E.S Enterprises", status: "Delivered", amount: 45000, payment: "Paid" },
   { id: "1240", orderDate: "28 Dec 2024", buyerName: "Dilip Enterprises", status: "Delivered", amount: 25000, payment: "Paid" },
+  { id: "1241", orderDate: "29 Dec 2024", buyerName: "GHI Corp", status: "Pending", amount: 35000, payment: "Pending" },
+  { id: "1242", orderDate: "30 Dec 2024", buyerName: "JKL Limited", status: "Delivered", amount: 28000, payment: "Paid" },
+  { id: "1243", orderDate: "31 Dec 2024", buyerName: "MNO Systems", status: "Delivered", amount: 42000, payment: "Paid" },
+  { id: "1244", orderDate: "01 Jan 2025", buyerName: "PQR Solutions", status: "Pending", amount: 33000, payment: "Pending" },
+  { id: "1245", orderDate: "02 Jan 2025", buyerName: "STU Technologies", status: "Delivered", amount: 38000, payment: "Paid" },
+  { id: "1246", orderDate: "03 Jan 2025", buyerName: "VWX Industries", status: "Pending", amount: 27000, payment: "Pending" },
+  { id: "1247", orderDate: "04 Jan 2025", buyerName: "YZA Corporation", status: "Delivered", amount: 51000, payment: "Paid" },
+  { id: "1248", orderDate: "05 Jan 2025", buyerName: "BCD Enterprises", status: "Delivered", amount: 44000, payment: "Paid" },
 ]
 
 export function OrderManagement() {
+  const [data, setData] = React.useState(initialData)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [selectedStatus, setSelectedStatus] = React.useState<string | null>(null)
+  const [selectedPayment, setSelectedPayment] = React.useState<string | null>(null)
 
   const columns: ColumnDef<Order>[] = [
     {
@@ -112,13 +130,28 @@ export function OrderManagement() {
       cell: ({ row }) => {
         const status = row.getValue("status") as string
         return (
-          <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            status === "Delivered" 
-              ? "bg-green-100 text-green-800" 
-              : "bg-yellow-100 text-yellow-800"
-          }`}>
-            {status}
-          </div>
+          <Select
+            value={status}
+            onValueChange={(value) => {
+              const newData = [...data]
+              const index = newData.findIndex((item) => item.id === row.getValue("id"))
+              newData[index] = { ...newData[index], status: value as "Delivered" | "Pending" }
+              setData(newData)
+              console.log(`Updating status for order ${row.getValue("id")} to ${value}`)
+            }}
+          >
+            <SelectTrigger className={`w-[110px] h-8 ${
+              status === "Delivered" 
+                ? "bg-green-100 text-green-800 border-green-200" 
+                : "bg-yellow-100 text-yellow-800 border-yellow-200"
+            }`}>
+              <SelectValue>{status}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Delivered">Delivered</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
         )
       },
     },
@@ -150,13 +183,28 @@ export function OrderManagement() {
       cell: ({ row }) => {
         const payment = row.getValue("payment") as string
         return (
-          <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            payment === "Paid" 
-              ? "bg-green-100 text-green-800" 
-              : "bg-gray-100 text-gray-800"
-          }`}>
-            {payment}
-          </div>
+          <Select
+            value={payment}
+            onValueChange={(value) => {
+              const newData = [...data]
+              const index = newData.findIndex((item) => item.id === row.getValue("id"))
+              newData[index] = { ...newData[index], payment: value as "Paid" | "Pending" }
+              setData(newData)
+              console.log(`Updating payment for order ${row.getValue("id")} to ${value}`)
+            }}
+          >
+            <SelectTrigger className={`w-[110px] h-8 ${
+              payment === "Paid" 
+                ? "bg-green-100 text-green-800 border-green-200" 
+                : "bg-gray-100 text-gray-800 border-gray-200"
+            }`}>
+              <SelectValue>{payment}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Paid">Paid</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
         )
       },
     },
@@ -183,6 +231,11 @@ export function OrderManagement() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
     state: {
       sorting,
       columnFilters,
@@ -190,6 +243,25 @@ export function OrderManagement() {
       rowSelection,
     },
   })
+
+  React.useEffect(() => {
+    if (selectedStatus && selectedStatus !== "all") {
+      table.getColumn("status")?.setFilterValue(selectedStatus)
+    } else {
+      table.getColumn("status")?.setFilterValue(null)
+    }
+    if (selectedPayment && selectedPayment !== "all") {
+      table.getColumn("payment")?.setFilterValue(selectedPayment)
+    } else {
+      table.getColumn("payment")?.setFilterValue(null)
+    }
+  }, [selectedStatus, selectedPayment, table])
+
+  const currentPage = table.getState().pagination.pageIndex + 1
+  const totalPages = table.getPageCount()
+  const startItem = (currentPage - 1) * table.getState().pagination.pageSize + 1
+  const endItem = Math.min(currentPage * table.getState().pagination.pageSize, table.getFilteredRowModel().rows.length)
+  const totalItems = table.getFilteredRowModel().rows.length
 
   return (
     <div className="w-full px-2 py-4 sm:px-4 md:px-6 lg:px-8">
@@ -199,7 +271,7 @@ export function OrderManagement() {
             <Search className="h-5 w-5 text-gray-400" />
           </div>
           <Input
-            placeholder="Search by Buyer Name"
+            placeholder="Search by Buyer Name/Company Name"
             value={(table.getColumn("buyerName")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("buyerName")?.setFilterValue(event.target.value)
@@ -207,43 +279,52 @@ export function OrderManagement() {
             className="pl-10 pr-4 w-full"
           />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto px-3 py-2 text-sm">
-              Filters <ChevronDownIcon className="ml-2 h-4 w-4" />
+        <div className="flex flex-wrap gap-2">
+          <Select
+            value={selectedStatus || "all"}
+            onValueChange={(value) => setSelectedStatus(value === "all" ? null : value)}
+          >
+            <SelectTrigger className="w-[130px]">
+              <SelectValue placeholder="Filter Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="Delivered">Delivered</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedPayment || "all"}
+            onValueChange={(value) => setSelectedPayment(value === "all" ? null : value)}
+          >
+            <SelectTrigger className="w-[130px]">
+              <SelectValue placeholder="Filter Payment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Payments</SelectItem>
+              <SelectItem value="Paid">Paid</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {(selectedStatus || selectedPayment) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedStatus("all")
+                setSelectedPayment("all")
+                table.getColumn("status")?.setFilterValue(null)
+                table.getColumn("payment")?.setFilterValue(null)
+              }}
+              className="px-3 py-2 text-sm"
+            >
+              Clear Filters
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel className="text-[#84cc16] font-bold px-4 py-2 text-bold">
-              Filter by Status
-            </DropdownMenuLabel>
-            <DropdownMenuItem 
-              onClick={() => table.getColumn("status")?.setFilterValue("Delivered")}
-            >
-              Delivered
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => table.getColumn("status")?.setFilterValue("Pending")}
-            >
-              Pending
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-green-800" />
-            <DropdownMenuLabel className="text-[#84cc16] font-bold px-4 py-2 text-bold">
-              Filter by Payment
-            </DropdownMenuLabel>
-            <DropdownMenuItem 
-              onClick={() => table.getColumn("payment")?.setFilterValue("Paid")}
-            >
-              Paid
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => table.getColumn("payment")?.setFilterValue("Pending")}
-            >
-              Pending
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
+        </div>
       </div>
+
       <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
@@ -286,27 +367,32 @@ export function OrderManagement() {
           </TableBody>
         </Table>
       </div>
+
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-        <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+        <div className="text-sm text-gray-700">
+          Showing {startItem}-{endItem} of {totalItems}
         </div>
-        <div className="flex justify-end gap-2">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            className="h-8 w-8 p-0"
           >
-            Previous
+            <ChevronLeft className="h-4 w-4" />
           </Button>
+          <div className="text-sm text-gray-700">
+            Page {currentPage} of {totalPages}
+          </div>
           <Button
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            className="h-8 w-8 p-0"
           >
-            Next
+            <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
