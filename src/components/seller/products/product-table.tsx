@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Filter, Pencil, Plus, Trash2 } from 'lucide-react'
+import React from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -12,6 +13,8 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { AddProductDialog } from './add-product-dialog'
+import { Toaster } from '@/components/ui/toaster'
 
 interface Product {
   id: string
@@ -23,7 +26,7 @@ interface Product {
   status: boolean
 }
 
-type CategoryType = 'Metal' | 'Wood' | 'Plastic' | 'Electronics' | 'All'
+type CategoryType = string | 'All'
 
 export function ProductTable() {
   const [products, setProducts] = useState<Product[]>([
@@ -166,6 +169,8 @@ export function ProductTable() {
 
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>('All')
+  const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false)
+  const [categories, setCategories] = useState<string[]>(['Metal', 'Wood', 'Plastic', 'Electronics'])
   
   const filteredProducts = products.filter(product => 
     selectedCategory === 'All' ? true : product.category === selectedCategory
@@ -187,8 +192,6 @@ export function ProductTable() {
     setCurrentPage(prev => Math.min(prev + 1, totalPages))
   }
 
-  const categories: CategoryType[] = ['All', 'Metal', 'Wood', 'Plastic', 'Electronics']
-
   const handleStatusChange = (id: string, newStatus: boolean) => {
     setProducts(prevProducts =>
       prevProducts.map(product =>
@@ -201,12 +204,26 @@ export function ProductTable() {
     setProducts(prevProducts => prevProducts.filter(product => product.id !== id))
   }
 
+  const handleAddProduct = (newProduct: Omit<Product, 'id'>) => {
+    const productWithId = {
+      ...newProduct,
+      id: (products.length + 1).toString(),
+    }
+    setProducts(prevProducts => [...prevProducts, productWithId])
+  }
+
+  const handleAddCategory = (newCategory: string) => {
+    if (!categories.includes(newCategory)) {
+      setCategories(prevCategories => [...prevCategories, newCategory])
+    }
+  }
+
   return (
     <div className="w-full p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Product Stock</h1>
         <div className="flex items-center gap-2">
-          <Button>
+          <Button onClick={() => setIsAddProductDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Add Product
           </Button>
@@ -218,13 +235,19 @@ export function ProductTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuCheckboxItem
+                checked={selectedCategory === 'All'}
+                onCheckedChange={() => setSelectedCategory('All')}
+              >
+                All Products
+              </DropdownMenuCheckboxItem>
               {categories.map((category) => (
                 <DropdownMenuCheckboxItem
                   key={category}
                   checked={selectedCategory === category}
                   onCheckedChange={() => setSelectedCategory(category)}
                 >
-                  {category === 'All' ? 'All Products' : `${category} Products`}
+                  {category} Products
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
@@ -315,6 +338,15 @@ export function ProductTable() {
           </Button>
         </div>
       </div>
+
+      <AddProductDialog
+        isOpen={isAddProductDialogOpen}
+        onClose={() => setIsAddProductDialogOpen(false)}
+        onAddProduct={handleAddProduct}
+        onAddCategory={handleAddCategory}
+        categories={categories}
+      />
+      <Toaster />
     </div>
   )
 }
