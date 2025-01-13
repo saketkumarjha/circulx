@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Toaster } from '@/components/ui/toaster'
-import { useToast } from '@/components/ui/use-toast'
+import { useToast } from "@/components/ui/use-toast"
 import { Product, CategoryType, ProductFormData } from '@/types'
 import ProductForm from './product-form'
 
@@ -152,8 +152,8 @@ export function ProductTable() {
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>('All')
   const [showAddForm, setShowAddForm] = useState(false)
-  const { toast } = useToast()
   const router = useRouter()
+  const { toast } = useToast()
   
   const categories: CategoryType[] = ['All', 'Metal', 'Wood', 'Plastic', 'Electronics']
   
@@ -222,8 +222,9 @@ export function ProductTable() {
     setProducts(prevProducts => [...prevProducts, productWithId])
     setShowAddForm(false)
     toast({
-      title: "Product added",
-      description: `${formData.productName} has been successfully added.`,
+      title: "Product Uploaded Successfully",
+      description: `${formData.productName} has been added to your inventory.`,
+     
     })
   }
 
