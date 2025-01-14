@@ -1,11 +1,14 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import HelpSearch from "@/components/seller/help/help-search"
+import TutorialDashboard from "@/components/seller/help/tutorial-dashboard"
+import FaqSection from "@/components/seller/help/faq-section"
 
 export default function SellerHelpPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="grid lg:grid-cols-2 gap-8 items-center min-h-[calc(100vh-8rem)]">
+      {/* Hero Section */}
+      <div className="grid lg:grid-cols-2 gap-8 items-center mb-16">
         <div className="space-y-8">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight">
@@ -16,7 +19,7 @@ export default function SellerHelpPage() {
             <HelpSearch />
             <Button 
               size="lg"
-              className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white px-8 rounded-full"
+              className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white px-8 py-3 rounded-full text-lg"
             >
               Try your Luck
             </Button>
@@ -25,7 +28,7 @@ export default function SellerHelpPage() {
         <div className="relative h-[400px] lg:h-[500px]">
           <Image
             src="/image.png"
-            alt="Help and Support Illustration showing two people with a question mark"
+            alt="Help and Support Illustration"
             fill
             className="object-contain"
             priority
@@ -33,9 +36,18 @@ export default function SellerHelpPage() {
         </div>
       </div>
       
+      {/* Tutorial Section */}
       <div className="mt-16 border-t pt-8">
-        <h2 className="text-3xl md:text-4xl font-medium">Tutorials</h2>
-        {/* Tutorial content will be added in future updates */}
+        <h2 className="text-3xl md:text-4xl font-medium mb-8">Tutorials</h2>
+        <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
+          <TutorialDashboard />
+        </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="mt-16 pt-8">
+        <h2 className="text-3xl md:text-4xl font-medium mb-8">FAQs</h2>
+        <FaqSection />
       </div>
     </div>
   )
