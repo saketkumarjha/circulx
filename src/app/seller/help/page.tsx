@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import HelpSearch from "@/components/seller/help/help-search"
 import TutorialDashboard from "@/components/seller/help/tutorial-dashboard"
 import FaqSection from "@/components/seller/help/faq-section"
-import ContactForm from "@/components/contact-form"
+import ContactForm from "@/components/seller/help/contact-form"
 
 export default function SellerHelpPage() {
   return (
