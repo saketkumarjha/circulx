@@ -137,18 +137,7 @@ export default function Footer() {
               </div>
 
               {/* Subscribe Form */}
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#00BFA5]"
-                />
-                <button
-                  className="px-6 py-2 bg-[#004D40] text-white rounded-md hover:bg-[#00352D] transition-colors"
-                >
-                  Subscribe
-                </button>
-              </div>
+              
             </div>
           </div>
         </div>
