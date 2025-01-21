@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
@@ -83,6 +84,7 @@ const ordersData = [
 ]
 
 export default function OrdersTable() {
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
   const totalPages = Math.ceil(ordersData.length / itemsPerPage)
@@ -91,6 +93,10 @@ export default function OrdersTable() {
     const startIndex = (currentPage - 1) * itemsPerPage
     const endIndex = startIndex + itemsPerPage
     return ordersData.slice(startIndex, endIndex)
+  }
+
+  const handleRowClick = (orderId: string) => {
+    router.push(`/admin/order/${orderId}`)
   }
 
   return (
@@ -135,7 +141,11 @@ export default function OrdersTable() {
             </TableHeader>
             <TableBody>
               {getCurrentPageData().map((order) => (
-                <TableRow key={order.id}>
+                <TableRow
+                  key={order.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleRowClick(order.id)}
+                >
                   <TableCell>{order.id}</TableCell>
                   <TableCell>{order.buyer}</TableCell>
                   <TableCell>{order.seller}</TableCell>
