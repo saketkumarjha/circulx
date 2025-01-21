@@ -9,7 +9,7 @@ const navigation = [
   { name: 'Seller Portal', href: '/admin/sellers', icon: Users },
   { name: 'User Management', href: '/admin/users', icon: User },
   { name: 'Product Management', href: '/admin/products', icon: Package },
-  { name: 'Order Management', href: '/admin/orders', icon: ShoppingCart },
+  { name: 'Order Management', href: '/admin/order', icon: ShoppingCart },
   { name: 'Report & Analytics', href: '/admin/reports', icon: BarChart2 },
   { name: 'Help/FAQs Management', href: '/admin/help', icon: HelpCircle },
 ]
