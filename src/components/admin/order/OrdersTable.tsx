@@ -2,18 +2,20 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
+// Sample order data with dates for filtering
 const ordersData = [
   {
     id: "00001",
     buyer: "Christine Brooks",
     seller: "ABC Metals",
-    date: "04 Sep 2019",
+    date: "2024-01-04",
+    displayDate: "04 Jan 2024",
     total: "$12,000",
     status: "Delivered",
     payment: "Paid",
@@ -22,7 +24,8 @@ const ordersData = [
     id: "00002",
     buyer: "John Smith",
     seller: "XYZ Corp",
-    date: "05 Sep 2019",
+    date: "2024-01-05",
+    displayDate: "05 Jan 2024",
     total: "$8,500",
     status: "Pending",
     payment: "Unpaid",
@@ -31,7 +34,8 @@ const ordersData = [
     id: "00003",
     buyer: "Sarah Johnson",
     seller: "Metal Works",
-    date: "06 Sep 2019",
+    date: "2024-01-06",
+    displayDate: "06 Jan 2024",
     total: "$15,000",
     status: "Shipped",
     payment: "Paid",
@@ -40,7 +44,8 @@ const ordersData = [
     id: "00004",
     buyer: "Michael Brown",
     seller: "Steel Inc",
-    date: "07 Sep 2019",
+    date: "2024-01-07",
+    displayDate: "07 Jan 2024",
     total: "$9,200",
     status: "Delivered",
     payment: "Paid",
@@ -49,7 +54,8 @@ const ordersData = [
     id: "00005",
     buyer: "Emily Davis",
     seller: "Iron Co",
-    date: "08 Sep 2019",
+    date: "2024-01-08",
+    displayDate: "08 Jan 2024",
     total: "$11,500",
     status: "Shipped",
     payment: "Paid",
@@ -58,7 +64,8 @@ const ordersData = [
     id: "00006",
     buyer: "David Wilson",
     seller: "Metal Corp",
-    date: "09 Sep 2019",
+    date: "2024-01-09",
+    displayDate: "09 Jan 2024",
     total: "$7,800",
     status: "Pending",
     payment: "Unpaid",
@@ -67,7 +74,8 @@ const ordersData = [
     id: "00007",
     buyer: "Lisa Anderson",
     seller: "Steel Works",
-    date: "10 Sep 2019",
+    date: "2024-01-10",
+    displayDate: "10 Jan 2024",
     total: "$13,200",
     status: "Delivered",
     payment: "Paid",
@@ -76,7 +84,8 @@ const ordersData = [
     id: "00008",
     buyer: "Robert Taylor",
     seller: "Iron Industries",
-    date: "11 Sep 2019",
+    date: "2024-01-11",
+    displayDate: "11 Jan 2024",
     total: "$10,500",
     status: "Shipped",
     payment: "Paid",
@@ -86,41 +95,74 @@ const ordersData = [
 export default function OrdersTable() {
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
+  const [dateFilter, setDateFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
   const itemsPerPage = 5
-  const totalPages = Math.ceil(ordersData.length / itemsPerPage)
+
+  // Filter orders based on selected filters
+  const getFilteredOrders = () => {
+    return ordersData.filter((order) => {
+      const matchesDate = dateFilter === "all" || order.date === dateFilter
+      const matchesStatus = statusFilter === "all" || order.status === statusFilter
+      return matchesDate && matchesStatus
+    })
+  }
+
+  const filteredOrders = getFilteredOrders()
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage)
 
   const getCurrentPageData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage
     const endIndex = startIndex + itemsPerPage
-    return ordersData.slice(startIndex, endIndex)
+    return filteredOrders.slice(startIndex, endIndex)
   }
 
   const handleRowClick = (orderId: string) => {
     router.push(`/admin/order/${orderId}`)
   }
 
+  const handleReset = () => {
+    setDateFilter("all")
+    setStatusFilter("all")
+    setCurrentPage(1)
+  }
+
+  // Get unique dates and statuses for filter options
+  const dates = [...new Set(ordersData.map((order) => order.date))]
+  const statuses = [...new Set(ordersData.map((order) => order.status))]
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>List of Orders</CardTitle>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Select defaultValue="date">
-            <SelectTrigger className="w-full sm:w-[180px]">
+      <CardHeader className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h2 className="text-lg font-semibold">List of Orders</h2>
+        <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-end">
+          <Select value={dateFilter} onValueChange={setDateFilter}>
+            <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Filter by date" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="date">Date</SelectItem>
+              <SelectItem value="all">All Dates</SelectItem>
+              {dates.map((date) => (
+                <SelectItem key={date} value={date}>
+                  {ordersData.find((order) => order.date === date)?.displayDate}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-          <Select defaultValue="status">
-            <SelectTrigger className="w-full sm:w-[180px]">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="status">Status</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
+              {statuses.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button variant="outline" onClick={handleReset} className="w-full sm:w-auto">
             Reset Filter
           </Button>
         </div>
@@ -149,7 +191,7 @@ export default function OrdersTable() {
                   <TableCell>{order.id}</TableCell>
                   <TableCell>{order.buyer}</TableCell>
                   <TableCell>{order.seller}</TableCell>
-                  <TableCell>{order.date}</TableCell>
+                  <TableCell>{order.displayDate}</TableCell>
                   <TableCell>{order.total}</TableCell>
                   <TableCell>
                     <span
