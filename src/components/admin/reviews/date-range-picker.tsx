@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { CalendarIcon } from "lucide-react"
 import { addDays, format } from "date-fns"
-import type { DateRange } from "react-day-picker"
+import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react"
+import { type DateRange, DayPicker } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,8 @@ interface DateRangePickerProps {
 }
 
 export function DateRangePicker({ className, dateRange, onDateRangeChange }: DateRangePickerProps) {
+  const [month, setMonth] = React.useState<Date>(new Date())
+
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -41,6 +43,23 @@ export function DateRangePicker({ className, dateRange, onDateRangeChange }: Dat
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
+          <div className="flex items-center justify-between p-2">
+            <Button
+              variant="outline"
+              className="h-7 w-7 bg-transparent p-0"
+              onClick={() => setMonth(addDays(month, -30))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="font-medium">{format(month, "MMMM yyyy")}</div>
+            <Button
+              variant="outline"
+              className="h-7 w-7 bg-transparent p-0"
+              onClick={() => setMonth(addDays(month, 30))}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
           <Calendar
             initialFocus
             mode="range"
@@ -48,6 +67,8 @@ export function DateRangePicker({ className, dateRange, onDateRangeChange }: Dat
             selected={dateRange}
             onSelect={onDateRangeChange}
             numberOfMonths={2}
+            month={month}
+            onMonthChange={setMonth}
           />
         </PopoverContent>
       </Popover>

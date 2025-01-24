@@ -42,8 +42,6 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }: React.ComponentProps<typeof ChevronLeft>) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }: React.ComponentProps<typeof ChevronRight>) => <ChevronRight className="h-4 w-4" />,
         Dropdown: ({ ...props }: DropdownProps) => <select {...props} />,
       }}
       {...props}

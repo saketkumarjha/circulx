@@ -6,10 +6,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { DateRangePicker } from "./date-range-picker"
 import type { Review } from "@/types/reviews"
 import type { DateRange } from "react-day-picker"
-import { DateRangePicker } from "./date-range-picker"
-import { isWithinInterval, parseISO, format } from "date-fns"
+import { isWithinInterval, parseISO } from "date-fns"
 
 interface ReviewsTableProps {
   reviews: Review[]
@@ -131,7 +131,7 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
                     <p className="text-sm text-gray-500">{review.review}</p>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm text-gray-500">{format(parseISO(review.date), "LLL dd, y")}</TableCell>
+                <TableCell className="text-sm text-gray-500">{review.date}</TableCell>
                 <TableCell>{review.productName}</TableCell>
                 <TableCell>{review.sellerName}</TableCell>
                 <TableCell>
@@ -139,7 +139,7 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
                 </TableCell>
                 <TableCell>
                   <Button variant="ghost" size="icon">
-                    <MoreHorizontal className="w-4 h-4" />
+                    <MoreHorizontal className="w-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
