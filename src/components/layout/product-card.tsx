@@ -6,16 +6,14 @@ import Link from 'next/link'
 import { Building2, MapPin, ShoppingCart, Star } from 'lucide-react'
 
 interface ProductCardProps {
-  title: string
-  company: string
-  location: string
-  price: number
-  originalPrice: number
-  discount: number
-  image: string
-  hoverImage: string
-  href: string
-  rating: number
+  title: string;
+  company: string;
+  location: string;
+  price: number;
+  discount: number;
+  image_link: string;
+  href: string;
+  rating: number;
 }
 
 export default function ProductCard({
@@ -23,14 +21,14 @@ export default function ProductCard({
   company,
   location,
   price,
-  originalPrice,
   discount,
-  image,
-  hoverImage,
+  image_link,
   href,
   rating
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+
+  const discountedPrice = price - (price * discount) / 100;
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -62,7 +60,7 @@ export default function ProductCard({
             {/* Product Images */}
             <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500">
               <Image
-                src={isHovered ? hoverImage : image}
+                src={image_link}
                 alt={title}
                 fill
                 className="object-cover transition-opacity duration-300 rounded-lg"
@@ -105,9 +103,9 @@ export default function ProductCard({
               Cart
             </button>
             <div className="text-right">
-              <span className="text-sm font-bold text-blue-600">₹{price.toLocaleString()}</span>
+              <span className="text-sm font-bold text-blue-600">₹{discountedPrice.toLocaleString()}</span>
               <span className="block text-xs text-gray-500 line-through">
-                ₹{originalPrice.toLocaleString()}
+                ₹{price.toLocaleString()}
               </span>
             </div>
           </div>

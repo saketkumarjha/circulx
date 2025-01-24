@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/app/actions/auth'
+import Searchbar from '@/components/layout/searchbar';
 
 interface HeaderProps {
   user?: {
@@ -59,18 +60,7 @@ export default function Header({ user }: HeaderProps) {
           </Link>
 
           {/* Search Bar */}
-          <div className="hidden md:block flex-1 max-w-2xl mx-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-gray-300"
-              />
-            </div>
-          </div>
+          <Searchbar />
 
           {/* Right Navigation */}
           <div className="flex items-center gap-4 sm:gap-6 ml-auto">
