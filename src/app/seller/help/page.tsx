@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import HelpSearch from "@/components/seller/help/help-search"
 import TutorialDashboard from "@/components/seller/help/tutorial-dashboard"
 import FaqSection from "@/components/seller/help/faq-section"
+import ContactForm from "@/components/seller/help/contact-form"
 
 export default function SellerHelpPage() {
   return (
@@ -39,15 +40,19 @@ export default function SellerHelpPage() {
       {/* Tutorial Section */}
       <div className="mt-16 border-t pt-8">
         <h2 className="text-3xl md:text-4xl font-medium mb-8">Tutorials</h2>
-        <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
-          <TutorialDashboard />
-        </div>
+        <TutorialDashboard />
       </div>
 
       {/* FAQ Section */}
-      <div className="mt-16 pt-8">
+      <div className="mt-16 pt-8 border-t">
         <h2 className="text-3xl md:text-4xl font-medium mb-8">FAQs</h2>
         <FaqSection />
+      </div>
+
+      {/* Contact Section */}
+      <div className="mt-16 pt-8 border-t">
+        <h2 className="text-3xl md:text-4xl font-medium mb-8">Contact Us</h2>
+        <ContactForm />
       </div>
     </div>
   )
