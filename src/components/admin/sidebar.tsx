@@ -10,7 +10,7 @@ const navigation = [
   { name: 'User Management', href: '/admin/users', icon: User },
   { name: 'Product Management', href: '/admin/products', icon: Package },
   { name: 'Order Management', href: '/admin/order', icon: ShoppingCart },
-  { name: 'Report & Analytics', href: '/admin/reports', icon: BarChart2 },
+  { name: 'Report & Analytics', href: '/admin/reviews', icon: BarChart2 },
   { name: 'Help/FAQs Management', href: '/admin/help', icon: HelpCircle },
 ]
 
