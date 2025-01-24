@@ -1,6 +1,6 @@
 import { StatsCard } from "@/components/admin/reviews/stats-card"
 import { ReviewsTable } from "@/components/admin/reviews/reviews-table"
-import type { ReviewStats, Review } from "@/types/reviews"
+import type { ReviewStats } from "@/types/reviews"
 
 const stats: ReviewStats = {
   total: 4250,
@@ -13,18 +13,6 @@ const stats: ReviewStats = {
   flaggedGrowth: 13,
 }
 
-// Generate sample reviews data
-const reviews: Review[] = Array.from({ length: 25 }, (_, i) => ({
-  id: (i + 1).toString(),
-  image: "/placeholder.svg",
-  buyerName: `Buyer ${i + 1}`,
-  review: ["Great quality!, Excellent, Outstanding", "Defective item!", "Amazing product, highly recommended"][i % 3],
-  date: new Date(2024, 0, i + 1).toISOString(),
-  productName: ["Metal Sheets (2mm)", "Glass Bottles", "Kraft Paper Rolls"][i % 3],
-  sellerName: ["XYZ Metals Ltd", "ABC Glassworks", "Paper Suppliers"][i % 3],
-  status: ["Pending", "Approved", "Flagged"][i % 3] as "Pending" | "Approved" | "Flagged",
-}))
-
 export default function ReviewsPage() {
   return (
     <div className="p-6 max-w-[1400px] mx-auto space-y-6">
@@ -35,7 +23,7 @@ export default function ReviewsPage() {
         <StatsCard title="Flagged Reviews" value={stats.flagged} change={stats.flaggedGrowth} type="flagged" />
       </div>
 
-      <ReviewsTable reviews={reviews} />
+      <ReviewsTable />
     </div>
   )
 }
