@@ -8,9 +8,8 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Seller Portal', href: '/admin/sellers', icon: Users },
   { name: 'User Management', href: '/admin/users', icon: User },
-  { name: 'Product Management', href: '/admin/products', icon: Package },
-  { name: 'Order Management', href: '/admin/order', icon: ShoppingCart },
-  { name: 'Report & Analytics', href: '/admin/reviews', icon: BarChart2 },
+  { name: 'Product Reviews', href: '/admin/reviews', icon: BarChart2 },
+  { name: 'Report & Analytics', href: '/admin/analytics', icon: BarChart2 },
   { name: 'Help/FAQs Management', href: '/admin/help', icon: HelpCircle },
 ]
 
