@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import type { LucideIcon } from "lucide-react"
+import { TypeIcon as type, type LucideIcon } from "lucide-react"
 
 interface MetricCardProps {
   title: string
@@ -10,6 +10,7 @@ interface MetricCardProps {
   icon: LucideIcon
   iconColor: string
   iconBg: string
+  borderColor: string
 }
 
 export function MetricCard({
@@ -21,14 +22,15 @@ export function MetricCard({
   icon: Icon,
   iconColor,
   iconBg,
+  borderColor,
 }: MetricCardProps) {
   return (
-    <Card>
+    <Card className={`border-t-4 ${borderColor}`}>
       <CardContent className="p-6">
         <div className="flex justify-between">
           <div>
             <p className="text-sm text-muted-foreground">{title}</p>
-            <h2 className="text-2xl font-bold md:text-3xl">{value}</h2>
+            <h2 className="text-2xl font-bold md:text-3xl">{typeof value === "number" ? `$${value}` : value}</h2>
             <p
               className={`flex items-center text-sm mt-1 ${
                 trendType === "positive" ? "text-green-500" : "text-red-500"

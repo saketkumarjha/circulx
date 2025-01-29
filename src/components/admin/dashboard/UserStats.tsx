@@ -1,5 +1,9 @@
+"use client"
+
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Cell, PieChart, Pie } from "recharts"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Cell, PieChart, Pie, Tooltip } from "recharts"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const monthlyRegistrations = [
   { month: "Jan", users: 150 },
@@ -16,14 +20,29 @@ const monthlyRegistrations = [
   { month: "Dec", users: 350 },
 ]
 
+const weeklyRegistrations = [
+  { month: "Mon", users: 50 },
+  { month: "Tue", users: 80 },
+  { month: "Wed", users: 110 },
+  { month: "Thu", users: 90 },
+  { month: "Fri", users: 120 },
+  { month: "Sat", users: 150 },
+  { month: "Sun", users: 80 },
+]
+
 const usageData = [
   { name: "Progress", value: 75 },
   { name: "Remaining", value: 25 },
 ]
 
 export function UserStats() {
+  const [timeFrame, setTimeFrame] = useState("monthly")
+  const [activeIndex, setActiveIndex] = useState(-1)
+
+  const registrationData = timeFrame === "weekly" ? weeklyRegistrations : monthlyRegistrations
+
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="flex flex-col gap-4">
       <Card>
         <CardHeader>
           <CardTitle className="text-base font-medium">Users Usage</CardTitle>
@@ -69,16 +88,44 @@ export function UserStats() {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base font-medium">Registered Users</CardTitle>
+          <Select value={timeFrame} onValueChange={setTimeFrame}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Select view" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="monthly">Monthly</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent>
           <div className="h-[200px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyRegistrations}>
+              <BarChart data={registrationData}>
                 <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
-                <Bar dataKey="users" fill="#f97316" radius={[4, 4, 0, 0]} />
+                <Tooltip
+                  cursor={{ fill: "#f3f4f6" }}
+                  contentStyle={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "6px",
+                    padding: "8px",
+                  }}
+                />
+                <Bar
+                  dataKey="users"
+                  fill="#f97316"
+                  radius={[4, 4, 0, 0]}
+                  onMouseOver={(data, index) => setActiveIndex(index)}
+                  onMouseLeave={() => setActiveIndex(-1)}
+                >
+                  {registrationData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === activeIndex ? "#fb923c" : "#f97316"} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>

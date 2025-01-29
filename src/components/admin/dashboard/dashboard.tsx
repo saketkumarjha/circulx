@@ -44,8 +44,14 @@ export function Dashboard() {
         <Header />
         <Metrics timeFrame={timeFrame} getMetricValue={getMetricValue} />
         <Chart timeFrame={timeFrame} setTimeFrame={setTimeFrame} data={data} totalSales={totalSales} />
-        <UserStats />
-        <SellerStats />
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-4">
+            <UserStats />
+          </div>
+          <div className="md:row-span-2">
+            <SellerStats />
+          </div>
+        </div>
       </div>
     </main>
   )
