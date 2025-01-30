@@ -45,7 +45,7 @@ export function UserStats() {
     <div className="flex flex-col gap-4">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-medium">Users Usage</CardTitle>
+          <CardTitle className="text-base font-medium">Total Usages</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative h-[200px] w-full">
