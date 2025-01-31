@@ -4,16 +4,20 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Building2, MapPin, ShoppingCart, Star } from 'lucide-react'
+import { useDispatch } from 'react-redux'
+import { addItem } from '@/store/slices/cartSlice'
 
 interface ProductCardProps {
-  title: string;
-  company: string;
-  location: string;
-  price: number;
-  discount: number;
-  image_link: string;
-  href: string;
-  rating: number;
+  title: string
+  company: string
+  location: string
+  price: number
+  originalPrice: number
+  discount: number
+  image_link: string
+  hoverImage: string
+  href: string
+  rating: number
 }
 
 export default function ProductCard({
@@ -21,14 +25,15 @@ export default function ProductCard({
   company,
   location,
   price,
+  originalPrice,
   discount,
   image_link,
+  hoverImage,
   href,
   rating
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
-
-  const discountedPrice = price - (price * discount) / 100;
+  const dispatch = useDispatch()
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -39,6 +44,10 @@ export default function ProductCard({
         }`}
       />
     ))
+  }
+
+  const handleAddToCart = () => {
+    dispatch(addItem({ id: href, title, price, quantity: 1 }))
   }
 
   return (
@@ -60,7 +69,7 @@ export default function ProductCard({
             {/* Product Images */}
             <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500">
               <Image
-                src={image_link}
+                src={isHovered ? hoverImage : image_link}
                 alt={title}
                 fill
                 className="object-cover transition-opacity duration-300 rounded-lg"
@@ -98,14 +107,17 @@ export default function ProductCard({
 
           {/* Cart Button and Pricing */}
           <div className="flex items-center justify-between mt-3">
-            <button className="px-3 py-1 bg-green-900 text-white text-xs font-medium rounded hover:bg-blue-500 transition-colors duration-300 flex items-center gap-1">
+            <button 
+              onClick={handleAddToCart}
+              className="px-3 py-1 bg-green-900 text-white text-xs font-medium rounded hover:bg-blue-500 transition-colors duration-300 flex items-center gap-1"
+            >
               <ShoppingCart className="w-3 h-3" />
-              Cart
+              <Link href="/cart">Cart</Link>
             </button>
             <div className="text-right">
-              <span className="text-sm font-bold text-blue-600">₹{discountedPrice.toLocaleString()}</span>
+              <span className="text-sm font-bold text-blue-600">₹{price.toLocaleString()}</span>
               <span className="block text-xs text-gray-500 line-through">
-                ₹{price.toLocaleString()}
+                ₹{originalPrice.toLocaleString()}
               </span>
             </div>
           </div>

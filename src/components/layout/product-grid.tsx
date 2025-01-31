@@ -85,6 +85,8 @@ function ProductCarousel({ products, title }: { products: Product[], title: stri
                 image_link={product.image_link}
                 href={`/product/${product.product_id}`}
                 rating={product.rating}
+                originalPrice={product.price + product.discount}
+                hoverImage={product.image_link}
               />
             </div>
           ))}
