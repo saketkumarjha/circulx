@@ -108,14 +108,14 @@ export function SellerList() {
     <div className="w-full">
       {/* Header section with title and buttons */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-2xl font-semibold">List of Seller</h1>
+        <h1 className="text-2xl font-semibold px-4">List of Seller</h1>
 
         <div className="flex flex-wrap items-center gap-4">
           <Button onClick={handleAddSeller} className="bg-green-500 hover:bg-green-600">
             <Plus className="mr-2 h-4 w-4" /> Add Seller
           </Button>
           <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="flex items-center">
-            <Filter className="mr-2 h-4 w-4" />
+            <Filter className="mr-2 h-4 w-4 " />
             Filter by
           </Button>
         </div>
