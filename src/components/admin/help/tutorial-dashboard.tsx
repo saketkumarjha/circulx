@@ -16,7 +16,7 @@ import YouTubePlayer from "./video-player"
 
 export default function TutorialDashboard() {
   const [isPlaying, setIsPlaying] = useState(false)
-  const videoId = "xQRo9Iy5YHM"
+  const videoId = "8nuXappLMU8"
 
   return (
     <div className="flex flex-col lg:flex-row">
