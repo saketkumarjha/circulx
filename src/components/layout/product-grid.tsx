@@ -3,170 +3,33 @@
 import { useState, useEffect } from 'react'
 import ProductCard from './product-card'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import axios from 'axios'
 
-const solarWaterHeaters = [
-  {
-    id: 1,
-    title: '301 LPD ETC Ceramic Coated Supreme Solar Water Heater',
-    company: 'Waaree Pvt Ltd',
-    location: 'Gurugram,Haryana',
-    price: 33000,
-    originalPrice: 66000,
-    discount: 50,
-    image: '/download.jpg',
-    hoverImage: '/th.jpg',
-    href: '/product/1',
-    rating: 4.5
-  },
-  {
-    id: 2,
-    title: '302 LPD ETC Ceramic Coated Supreme Solar Water Heater',
-    company: 'Waaree Pvt Ltd',
-    location: 'Gurugram,Haryana',
-    price: 33000,
-    originalPrice: 66000,
-    discount: 50,
-    image: '/th.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/2',
-    rating: 4.2
-  },
-  {
-    id: 3,
-    title: '303 LPD ETC Ceramic Coated Supreme Solar Water Heater',
-    company: 'Waaree Pvt Ltd',
-    location: 'Gurugram,Haryana',
-    price: 33000,
-    originalPrice: 66000,
-    discount: 50,
-    image: '/download.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/3',
-    rating: 4.8
-  },
-  {
-    id: 4,
-    title: '304 LPD ETC Ceramic Coated Supreme Solar Water Heater',
-    company: 'Waaree Pvt Ltd',
-    location: 'Gurugram,Haryana',
-    price: 33000,
-    originalPrice: 66000,
-    discount: 50,
-    image: '/download.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/4',
-    rating: 4.0
-  },
-  {
-    id: 5,
-    title: '305 LPD ETC Ceramic Coated Supreme Solar Water Heater',
-    company: 'Waaree Pvt Ltd',
-    location: 'Gurugram,Haryana',
-    price: 33000,
-    originalPrice: 66000,
-    discount: 50,
-    image: '/download.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/5',
-    rating: 4.6
-  },
-  {
-    id: 6,
-    title: '306 LPD ETC Ceramic Coated Supreme Solar Water Heater',
-    company: 'Waaree Pvt Ltd',
-    location: 'Gurugram,Haryana',
-    price: 33000,
-    originalPrice: 66000,
-    discount: 50,
-    image: '/download.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/6',
-    rating: 4.3
-  }
-]
+interface Product {
+  product_id: number;
+  title: string;
+  model?: string;
+  description?: string;
+  category_id?: number;
+  sub_category_id?: number;
+  units?: string;
+  weight?: number;
+  dimensions?: object;
+  image_link: string;
+  stock: number;
+  price: number;
+  discount: number;
+  SKU: string;
+  seller_id?: number;
+  created_at?: string;
+  rating: number;
+  seller_name: string;
+  location: string;
+  category_name: string;
+  sub_category_name: string;
+}
 
-const solarPanels = [
-  {
-    id: 7,
-    title: '400W Monocrystalline Solar Panel',
-    company: 'SunTech Power',
-    location: 'Bengaluru, Karnataka',
-    price: 12000,
-    originalPrice: 15000,
-    discount: 20,
-    image: '/th.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/7',
-    rating: 4.7
-  },
-  {
-    id: 8,
-    title: '330W Polycrystalline Solar Panel',
-    company: 'Tata Power Solar',
-    location: 'Mumbai, Maharashtra',
-    price: 9500,
-    originalPrice: 11000,
-    discount: 14,
-    image: '/th.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/8',
-    rating: 4.4
-  },
-  {
-    id: 9,
-    title: '500W Bifacial Solar Panel',
-    company: 'Adani Solar',
-    location: 'Ahmedabad, Gujarat',
-    price: 18000,
-    originalPrice: 22000,
-    discount: 18,
-    image: '/th.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/9',
-    rating: 4.9
-  },
-  {
-    id: 10,
-    title: '375W PERC Solar Panel',
-    company: 'Vikram Solar',
-    location: 'Kolkata, West Bengal',
-    price: 11500,
-    originalPrice: 13500,
-    discount: 15,
-    image: '/th.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/10',
-    rating: 4.6
-  },
-  {
-    id: 11,
-    title: '450W Half-Cut Cell Solar Panel',
-    company: 'Waaree Energies',
-    location: 'Surat, Gujarat',
-    price: 14500,
-    originalPrice: 17000,
-    discount: 15,
-    image: '/th.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/11',
-    rating: 4.8
-  },
-  {
-    id: 12,
-    title: '360W Flexible Solar Panel',
-    company: 'Luminous Power Technologies',
-    location: 'Noida, Uttar Pradesh',
-    price: 16000,
-    originalPrice: 20000,
-    discount: 20,
-    image: '/th.jpg',
-    hoverImage: '/download.jpg',
-    href: '/product/11',
-    rating: 4.5
-  }
-]
-
-function ProductCarousel({ products, title }: { products: typeof solarWaterHeaters, title: string }) {
+function ProductCarousel({ products, title }: { products: Product[], title: string }) {
   const [startIndex, setStartIndex] = useState(0)
   const [visibleProducts, setVisibleProducts] = useState(6)
 
@@ -206,7 +69,7 @@ function ProductCarousel({ products, title }: { products: typeof solarWaterHeate
       <div className="relative">
         <div className="flex overflow-hidden">
           {currentProducts.map((product) => (
-            <div key={product.id} className={`w-full px-2 ${
+            <div key={product.product_id} className={`w-full px-2 ${
               visibleProducts === 1 ? 'sm:w-full' :
               visibleProducts === 2 ? 'sm:w-1/2' :
               visibleProducts === 3 ? 'sm:w-1/2 md:w-1/3' :
@@ -215,15 +78,15 @@ function ProductCarousel({ products, title }: { products: typeof solarWaterHeate
             }`}>
               <ProductCard
                 title={product.title}
-                company={product.company}
+                company={product.seller_name}
                 location={product.location}
                 price={product.price}
-                originalPrice={product.originalPrice}
                 discount={product.discount}
-                image={product.image}
-                hoverImage={product.hoverImage}
-                href={product.href}
+                image_link={product.image_link}
+                href={`/product/${product.product_id}`}
                 rating={product.rating}
+                originalPrice={product.price + product.discount}
+                hoverImage={product.image_link}
               />
             </div>
           ))}
@@ -248,10 +111,32 @@ function ProductCarousel({ products, title }: { products: typeof solarWaterHeate
 }
 
 export default function ProductGrid() {
+  const [solarWaterHeaters, setSolarWaterHeaters] = useState<Product[]>([])
+  const [solarPanels, setSolarPanels] = useState<Product[]>([])
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('/api/products')
+        const products: Product[] = response.data;
+        
+        const waterHeaters = products.filter((product) => product.sub_category_name === 'Printers')
+        const panels = products.filter((product) => product.sub_category_name === 'Power Saws')
+
+        setSolarWaterHeaters(waterHeaters)
+        setSolarPanels(panels)
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
   return (
     <div className="w-full px-4 py-8">
-      <ProductCarousel products={solarWaterHeaters} title="Solar Water Heaters" />
-      <ProductCarousel products={solarPanels} title="Solar Panels" />
+      <ProductCarousel products={solarWaterHeaters} title="Printers" />
+      <ProductCarousel products={solarPanels} title="Power Saws" />
     </div>
   )
 }

@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Building2, MapPin, ShoppingCart, Star } from 'lucide-react'
+import { useDispatch } from 'react-redux'
+import { addItem } from '@/store/slices/cartSlice'
 
 interface ProductCardProps {
   title: string
@@ -12,7 +14,7 @@ interface ProductCardProps {
   price: number
   originalPrice: number
   discount: number
-  image: string
+  image_link: string
   hoverImage: string
   href: string
   rating: number
@@ -25,12 +27,13 @@ export default function ProductCard({
   price,
   originalPrice,
   discount,
-  image,
+  image_link,
   hoverImage,
   href,
   rating
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const dispatch = useDispatch()
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -41,6 +44,10 @@ export default function ProductCard({
         }`}
       />
     ))
+  }
+
+  const handleAddToCart = () => {
+    dispatch(addItem({ id: href, title, price, quantity: 1 }))
   }
 
   return (
@@ -62,7 +69,7 @@ export default function ProductCard({
             {/* Product Images */}
             <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500">
               <Image
-                src={isHovered ? hoverImage : image}
+                src={isHovered ? hoverImage : image_link}
                 alt={title}
                 fill
                 className="object-cover transition-opacity duration-300 rounded-lg"
@@ -100,9 +107,12 @@ export default function ProductCard({
 
           {/* Cart Button and Pricing */}
           <div className="flex items-center justify-between mt-3">
-            <button className="px-3 py-1 bg-green-900 text-white text-xs font-medium rounded hover:bg-blue-500 transition-colors duration-300 flex items-center gap-1">
+            <button 
+              onClick={handleAddToCart}
+              className="px-3 py-1 bg-green-900 text-white text-xs font-medium rounded hover:bg-blue-500 transition-colors duration-300 flex items-center gap-1"
+            >
               <ShoppingCart className="w-3 h-3" />
-              Cart
+              <Link href="/cart">Cart</Link>
             </button>
             <div className="text-right">
               <span className="text-sm font-bold text-blue-600">₹{price.toLocaleString()}</span>

@@ -2,12 +2,13 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { getCurrentUser } from './actions/auth' 
+import { getCurrentUser } from './actions/auth'
+import Providers from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Circulx ',
+  title: 'Circulx',
   description: 'Your one-stop shop for all your needs',
 }
 
@@ -16,18 +17,16 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-
   const user = await getCurrentUser()
-  
- 
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header user={user} />
-        
-        
-        {children}
-        <Footer />
+        <Providers>
+          <Header user={user} />
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   )
