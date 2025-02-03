@@ -5,19 +5,12 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Filter, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Filter, ChevronLeft, ChevronRight, Plus } from "lucide-react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-
-// Interface for seller data type
-interface Seller {
-  id: string
-  name: string
-  email: string
-  registeredDate: Date
-  totalSales: string
-  status: "Approved" | "Pending" | "Rejected"
-}
+import type { Seller } from "@/types/seller"
+import { AddSellerForm } from "./add-seller-form"
 
 // Sample seller data - typically this would come from an API
 const SELLERS_DATA: Seller[] = Array.from({ length: 20 }, (_, index) => ({
@@ -33,12 +26,12 @@ const SELLERS_DATA: Seller[] = Array.from({ length: 20 }, (_, index) => ({
 const ITEMS_PER_PAGE = 10
 
 export function SellerList() {
-  // State management for filters and pagination
   const [dateFilter, setDateFilter] = React.useState<Date | null>(null)
   const [status, setStatus] = React.useState("")
   const [currentPage, setCurrentPage] = React.useState(1)
   const [filteredSellers, setFilteredSellers] = React.useState<Seller[]>(SELLERS_DATA)
   const [showFilters, setShowFilters] = React.useState(false)
+  const [showAddSellerForm, setShowAddSellerForm] = React.useState(false)
 
   // Calculate pagination values
   const totalPages = Math.ceil(filteredSellers.length / ITEMS_PER_PAGE)
@@ -99,57 +92,63 @@ export function SellerList() {
     return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
   }
 
-  // Function to handle adding a new seller (placeholder for now)
+  // Function to handle adding a new seller
   const handleAddSeller = () => {
-    alert("Add Seller functionality to be implemented")
+    setShowAddSellerForm(true)
   }
 
   return (
     <div className="w-full">
       {/* Header section with title and buttons */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-2xl font-semibold px-4">List of Seller</h1>
+        <h1 className="text-2xl font-semibold">List of Seller</h1>
 
         <div className="flex flex-wrap items-center gap-4">
           <Button onClick={handleAddSeller} className="bg-green-500 hover:bg-green-600">
             <Plus className="mr-2 h-4 w-4" /> Add Seller
           </Button>
           <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="flex items-center">
-            <Filter className="mr-2 h-4 w-4 " />
+            <Filter className="mr-2 h-4 w-4" />
             Filter by
           </Button>
         </div>
       </div>
 
+      {/* Add Seller Form Dialog */}
+      <Dialog open={showAddSellerForm} onOpenChange={setShowAddSellerForm}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Seller</DialogTitle>
+          </DialogHeader>
+          <AddSellerForm onSuccess={() => setShowAddSellerForm(false)} />
+        </DialogContent>
+      </Dialog>
+
       {/* Filter options */}
       {showFilters && (
-        <div className="w-full flex justify-end">
-          <div className="flex flex-wrap items-center gap-4 mb-6 ml-auto">
-            <DatePicker
-              selected={dateFilter}
-              onChange={(date: Date | null) => setDateFilter(date)}
-              dateFormat="yyyy-MM-dd"
-              placeholderText="Select a date"
-              className="w-[140px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Seller Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-
-            <Button variant="destructive" size="sm" className="text-xs" onClick={resetFilters}>
-              Reset Filters
-            </Button>
-          </div>
+        <div className="flex flex-wrap items-center gap-4 mb-6 ml-auto sm:ml-10 pr-4">
+          <DatePicker
+            selected={dateFilter}
+            onChange={(date: Date | null) => setDateFilter(date)}
+            dateFormat="yyyy-MM-dd"
+            placeholderText="Select a date"
+            className="w-[140px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          />
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Seller Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Button variant="destructive" size="sm" className="text-xs" onClick={resetFilters}>
+            Reset Filters
+          </Button>
         </div>
       )}
 
@@ -214,3 +213,4 @@ export function SellerList() {
     </div>
   )
 }
+
