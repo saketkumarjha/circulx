@@ -2,6 +2,7 @@ export interface Seller {
     id: string
     name: string
     email: string
+    address: string
     registeredDate: Date
     totalSales: string
     status: "Approved" | "Pending" | "Rejected"
