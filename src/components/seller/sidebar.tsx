@@ -35,7 +35,7 @@ export function Sidebar() {
     { href: "/seller/products", icon: Package2, label: "Product Management" },
     { href: "/seller/orders", icon: ClipboardList, label: "Order Management" },
     { href: "/seller/reviews", icon: Star, label: "Ratings & Reviews" },
-    { href: "/profile", icon: UserCircle, label: "Profile Management" },
+    { href: "/seller/profile", icon: UserCircle, label: "Profile Management" },
     { href: "/seller/help", icon: HelpCircle, label: "Help/Support" },
   ]
 
