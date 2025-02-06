@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Upload } from "lucide-react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -29,6 +30,8 @@ const bankSchema = z.object({
 })
 
 export function BankForm() {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
   const form = useForm<BankDetails>({
     resolver: zodResolver(bankSchema),
     defaultValues: {
@@ -44,6 +47,17 @@ export function BankForm() {
 
   function onSubmit(data: BankDetails) {
     console.log(data)
+  }
+
+  const handleFileChange = (file: File | undefined, onChange: (file: File) => void) => {
+    if (file) {
+      onChange(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   return (
@@ -112,15 +126,27 @@ export function BankForm() {
                         className="hidden"
                         id="bankLetter"
                         onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) onChange(file)
+                          handleFileChange(e.target.files?.[0], onChange)
                         }}
                         {...field}
                       />
                       <label htmlFor="bankLetter" className="cursor-pointer">
-                        <Upload className="w-8 h-8 mx-auto mb-2 text-orange-600" />
-                        <p className="text-sm text-muted-foreground">Click to Upload or drag and drop</p>
-                        <p className="text-xs text-muted-foreground mt-1">(Max file size 25 MB)</p>
+                        {previewUrl ? (
+                          <div className="relative w-full aspect-video">
+                            <img
+                              src={previewUrl || "/placeholder.svg"}
+                              alt="Preview"
+                              className="w-full h-full object-contain"
+                            />
+                            <p className="text-xs text-muted-foreground mt-2">Click to change file</p>
+                          </div>
+                        ) : (
+                          <>
+                            <Upload className="w-8 h-8 mx-auto mb-2 text-orange-600" />
+                            <p className="text-sm text-muted-foreground">Click to Upload or drag and drop</p>
+                            <p className="text-xs text-muted-foreground mt-1">(Max file size 25 MB)</p>
+                          </>
+                        )}
                       </label>
                     </div>
                   </FormControl>
@@ -208,7 +234,9 @@ export function BankForm() {
           <Button variant="outline" type="button">
             Back
           </Button>
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" className="bg-orange-600 hover:bg-orange-700 text-white">
+            Save Changes
+          </Button>
         </div>
       </form>
     </Form>
