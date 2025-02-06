@@ -4,7 +4,11 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { BusinessForm } from "@/components/seller/profiles/business-form"
 import { ContactForm } from "@/components/seller/profiles/contact-form"
+import { CategoryBrandForm } from "@/components/seller/profiles/category-brand-form"
 import type { TabType } from "@/types/profile"
+import { AddressForm } from "@/components/seller/profiles/address-form"
+import { BankForm } from "@/components/seller/profiles/bank-form"
+
 
 const tabs: { label: string; value: TabType }[] = [
   { label: "Business Details", value: "business" },
@@ -32,9 +36,11 @@ export default function ProfilePage() {
               key={tab.value}
               onClick={() => setActiveTab(tab.value)}
               className={cn(
-                "px-4 py-2 text-sm font-medium transition-colors hover:text-primary",
+                "px-4 py-2 text-sm font-medium transition-colors hover:text-orange-600",
                 "border-b-2 -mb-px",
-                activeTab === tab.value ? "border-primary text-primary" : "border-transparent text-muted-foreground",
+                activeTab === tab.value
+                  ? "border-orange-600 text-orange-600"
+                  : "border-transparent text-muted-foreground",
               )}
             >
               {tab.label}
@@ -46,9 +52,9 @@ export default function ProfilePage() {
       <div className="max-w-2xl">
         {activeTab === "business" && <BusinessForm />}
         {activeTab === "contact" && <ContactForm />}
-        {activeTab === "category" && <div>Category and Brand form coming soon...</div>}
-        {activeTab === "addresses" && <div>Addresses form coming soon...</div>}
-        {activeTab === "bank" && <div>Bank Details form coming soon...</div>}
+        {activeTab === "category" && <CategoryBrandForm />}
+        {activeTab === "addresses" && <AddressForm />}
+        {activeTab === "bank" && <BankForm />}
         {activeTab === "documents" && <div>Documents form coming soon...</div>}
       </div>
     </div>
