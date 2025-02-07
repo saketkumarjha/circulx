@@ -59,12 +59,7 @@ export function CategoryBrandForm() {
           />
         </div>
 
-        <div className="flex gap-4">
-          <Button variant="outline" type="button">
-            Back
-          </Button>
-          <Button type="submit" className="bg-orange-600 hover:bg-orange-700 text-white">Save Changes</Button>
-        </div>
+        
       </form>
     </Form>
   )
