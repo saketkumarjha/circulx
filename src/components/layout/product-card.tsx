@@ -47,7 +47,7 @@ export default function ProductCard({
   }
 
   const handleAddToCart = () => {
-    dispatch(addItem({ id: href, title, price, quantity: 1 }))
+    dispatch(addItem({ id: href, title, image_link, price, quantity: 1 }))
   }
 
   return (
@@ -112,7 +112,7 @@ export default function ProductCard({
               className="px-3 py-1 bg-green-900 text-white text-xs font-medium rounded hover:bg-blue-500 transition-colors duration-300 flex items-center gap-1"
             >
               <ShoppingCart className="w-3 h-3" />
-              <Link href="/cart">Cart</Link>
+              Cart
             </button>
             <div className="text-right">
               <span className="text-sm font-bold text-blue-600">₹{price.toLocaleString()}</span>
