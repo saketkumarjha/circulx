@@ -2,7 +2,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { getCurrentUser } from './actions/auth' 
+import { getCurrentUser } from '../actions/auth' 
 
 const inter = Inter({ subsets: ['latin'] })
 

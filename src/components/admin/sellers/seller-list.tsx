@@ -14,7 +14,7 @@ import { AddSellerForm } from "./add-seller-form"
 import { SellerDetailsCard } from "./seller-details-card"
 
 // Sample seller data - typically this would come from an API
-const SELLERS_DATA: Seller[] = Array.from({ length: 20 }, (_, index) => ({
+const INITIAL_SELLERS_DATA: Seller[] = Array.from({ length: 15 }, (_, index) => ({
   id: `0000${index + 1}`.slice(-5),
   name: `Seller ${index + 1}`,
   email: `seller${index + 1}@example.com`,
@@ -28,10 +28,11 @@ const SELLERS_DATA: Seller[] = Array.from({ length: 20 }, (_, index) => ({
 const ITEMS_PER_PAGE = 10
 
 export function SellerList() {
+  const [sellers, setSellers] = React.useState<Seller[]>(INITIAL_SELLERS_DATA)
   const [dateFilter, setDateFilter] = React.useState<Date | null>(null)
   const [status, setStatus] = React.useState("")
   const [currentPage, setCurrentPage] = React.useState(1)
-  const [filteredSellers, setFilteredSellers] = React.useState<Seller[]>(SELLERS_DATA)
+  const [filteredSellers, setFilteredSellers] = React.useState<Seller[]>(sellers)
   const [showFilters, setShowFilters] = React.useState(false)
   const [showAddSellerForm, setShowAddSellerForm] = React.useState(false)
   const [selectedSeller, setSelectedSeller] = React.useState<Seller | null>(null)
@@ -44,7 +45,7 @@ export function SellerList() {
 
   // Function to handle filter changes
   React.useEffect(() => {
-    let filtered = [...SELLERS_DATA]
+    let filtered = [...sellers]
 
     // Apply status filter
     if (status) {
@@ -58,7 +59,7 @@ export function SellerList() {
 
     setFilteredSellers(filtered)
     setCurrentPage(1) // Reset to first page when filters change
-  }, [dateFilter, status])
+  }, [dateFilter, status, sellers])
 
   // Function to get badge color based on status
   const getStatusBadgeColor = (status: string) => {
@@ -103,6 +104,12 @@ export function SellerList() {
   // Function to handle opening seller details
   const handleOpenSellerDetails = (seller: Seller) => {
     setSelectedSeller(seller)
+  }
+
+  // Function to add a new seller to the list
+  const addNewSeller = (newSeller: Seller) => {
+    setSellers((prevSellers) => [...prevSellers, newSeller])
+    setShowAddSellerForm(false)
   }
 
   return (
@@ -222,7 +229,7 @@ export function SellerList() {
           <DialogHeader>
             <DialogTitle>Add New Seller</DialogTitle>
           </DialogHeader>
-          <AddSellerForm onSuccess={() => setShowAddSellerForm(false)} />
+          <AddSellerForm onSuccess={addNewSeller} />
         </DialogContent>
       </Dialog>
 

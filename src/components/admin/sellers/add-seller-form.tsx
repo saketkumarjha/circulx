@@ -1,11 +1,14 @@
 "use client"
+
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import type { Seller } from "@/types/seller"
 
 const formSchema = z.object({
   // Business Details
@@ -50,11 +53,13 @@ const formSchema = z.object({
   ifscCode: z.string().min(11, { message: "IFSC Code must be 11 characters" }).max(11),
   bankName: z.string().min(1, { message: "Bank Name is required" }),
   bankCity: z.string().min(1, { message: "City is required" }),
-  accountType: z.string().min(1, { message: "Account Type is required" }),
+  accountType: z.enum(["Savings", "Current", "Other"], {
+    required_error: "Account Type is required",
+  }),
 })
 
 interface AddSellerFormProps {
-  onSuccess: () => void
+  onSuccess?: (newSeller: Seller) => void
 }
 
 export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
@@ -93,7 +98,7 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
       ifscCode: "",
       bankName: "",
       bankCity: "",
-      accountType: "",
+      accountType: undefined,
     },
   })
 
@@ -101,8 +106,23 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
     // Here you would typically send the data to your API
     console.log(values)
 
-    // Call the onSuccess callback to close the modal
-    onSuccess()
+    // Create a new seller object with the required fields
+    const newSeller: Seller = {
+      id: `0000${Math.floor(Math.random() * 10000)}`.slice(-5), // Generate a random ID
+      name: values.name,
+      email: values.emailId,
+      address: `${values.billingAddressLine1}, ${values.billingCity}, ${values.billingState}, ${values.billingCountry}`,
+      registeredDate: new Date(),
+      totalSales: "$0", // Initialize with zero sales
+      status: "Pending", // Set initial status as Pending
+    }
+
+    // Call the onSuccess callback if provided, otherwise redirect to the sellers page
+    if (onSuccess) {
+      onSuccess(newSeller)
+    } else {
+      router.push("/sellers")
+    }
   }
 
   return (
@@ -118,9 +138,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="legalEntityName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Legal Entity Name *</FormLabel>
+                  <FormLabel>
+                    Legal Entity Name <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -130,9 +152,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="tradeName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Trade Name *</FormLabel>
+                  <FormLabel>
+                    Trade Name <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -142,9 +166,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="gstin"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>GSTIN *</FormLabel>
+                  <FormLabel>
+                    GSTIN <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -154,9 +180,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="businessCountry"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Country *</FormLabel>
+                  <FormLabel>
+                    Country <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -166,9 +194,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="pincode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pincode *</FormLabel>
+                  <FormLabel>
+                    Pincode <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -178,9 +208,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="state"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>State *</FormLabel>
+                  <FormLabel>
+                    State <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -190,9 +222,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="city"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City *</FormLabel>
+                  <FormLabel>
+                    City <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -202,9 +236,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="businessEntityType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Business Entity Type *</FormLabel>
+                  <FormLabel>
+                    Business Entity Type <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -221,9 +257,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name *</FormLabel>
+                  <FormLabel>
+                    Name <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -233,9 +271,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number *</FormLabel>
+                  <FormLabel>
+                    Phone Number <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} type="tel" />
+                    <Input {...field} type="tel" required />
                   </FormControl>
                 </FormItem>
               )}
@@ -245,9 +285,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="emailId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Id *</FormLabel>
+                  <FormLabel>
+                    Email Id <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" />
+                    <Input {...field} type="email" required />
                   </FormControl>
                 </FormItem>
               )}
@@ -276,9 +318,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category *</FormLabel>
+                  <FormLabel>
+                    Category <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -307,9 +351,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="billingCountry"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Country *</FormLabel>
+                  <FormLabel>
+                    Country <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -319,9 +365,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="billingState"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>State *</FormLabel>
+                  <FormLabel>
+                    State <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -331,9 +379,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="billingCity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City *</FormLabel>
+                  <FormLabel>
+                    City <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -343,9 +393,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="billingAddressLine1"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address Line 1 *</FormLabel>
+                  <FormLabel>
+                    Address Line 1 <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -465,9 +517,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="accountHolderName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Account Holder Name *</FormLabel>
+                  <FormLabel>
+                    Account Holder Name <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -477,9 +531,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="accountNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Account Number *</FormLabel>
+                  <FormLabel>
+                    Account Number <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -489,9 +545,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="ifscCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>IFSC Code *</FormLabel>
+                  <FormLabel>
+                    IFSC Code <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -501,9 +559,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="bankName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Bank Name *</FormLabel>
+                  <FormLabel>
+                    Bank Name <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -513,9 +573,11 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="bankCity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City *</FormLabel>
+                  <FormLabel>
+                    City <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -525,10 +587,19 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
               name="accountType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Account Type *</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
+                  <FormLabel>
+                    Account Type <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Account Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Savings">Savings</SelectItem>
+                      <SelectItem value="Current">Current</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />
@@ -536,7 +607,7 @@ export function AddSellerForm({ onSuccess }: AddSellerFormProps) {
         </div>
 
         <div className="flex gap-4 justify-end">
-          <Button type="button" variant="outline" onClick={onSuccess}>
+          <Button type="button" variant="outline" onClick={() => router.push("/sellers")}>
             Cancel
           </Button>
           <Button type="submit">Submit</Button>

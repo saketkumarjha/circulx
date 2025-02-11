@@ -1,4 +1,4 @@
-import { getCurrentUser } from '../actions/auth'
+import { getCurrentUser } from '../../actions/auth'
 import { redirect } from 'next/navigation'
 
 export default async function CustomerDashboard() {

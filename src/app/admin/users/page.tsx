@@ -1,4 +1,4 @@
-import { getCurrentUser, updateUserType } from '@/app/actions/auth'
+import { getCurrentUser, updateUserType } from '@/actions/auth'
 import { redirect } from 'next/navigation'
 import { User } from '@/models/user'
 import { connectDB } from '@/lib/db'
