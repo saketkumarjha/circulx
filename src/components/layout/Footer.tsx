@@ -1,8 +1,40 @@
+'use client'
+
+import { useState } from 'react';
 import Link from 'next/link'
 import { ShoppingBag } from 'lucide-react'
 
 
 export default function Footer() {
+
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage('');
+    setError('');
+
+    try {
+      const response = await fetch('api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      })
+
+      if (!response.ok){
+        throw new Error('Network response is not ok.')
+      }
+      const data = response.json();
+    }
+    catch (error){
+      setError('There was a problem subscribing to the newsletter. Please try again after sometime.')
+    }
+  }
+
   return (
     <footer className="bg- pt-16 pb-8">
       <div className="container mx-auto px-4">

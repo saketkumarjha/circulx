@@ -1,11 +1,21 @@
+import { hostname } from "os"
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: import('next').NextConfig = {
   reactStrictMode: true,
 
   
   
   images: {
-    domains: ['via.placeholder.com', 'avatar.vercel.sh','lh3.googleusercontent.com','localhost','www.gstatic.com'],
+    remotePatterns: [
+      {hostname:'via.placeholder.com'},
+      {hostname:'avatar.vercel.sh'},
+      {hostname:'lh3.googleusercontent.com'},
+      {hostname:'localhost'},
+      {hostname:'www.gstatic.com'}, 
+      {hostname:'example.com'}, 
+      {hostname:'plus.unsplash.com'},
+      {hostname: 'images.unsplash.com'}],
   },
   experimental: {
     serverActions: {},

@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/actions/auth'
 import Searchbar from '@/components/layout/searchbar';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 
 interface HeaderProps {
   user?: {
@@ -30,6 +32,7 @@ export default function Header({ user }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const cartItemsCount = useSelector((state: RootState) => state.cart.items.length);
   
   const categories = [
     "Storage Tanks, Drums",
@@ -70,16 +73,14 @@ export default function Header({ user }: HeaderProps) {
                 2
               </span>
             </button>
-            <button className="relative">
-            <Image  src="/cart.png"
-                alt="Shopping Cart"
-                width={24}
-                height={24}
-              />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                1
-              </span>
-            </button>
+            <Link href="/cart">
+              <button className="relative">
+                <Image src="/cart.png" alt="Shopping Cart" width={24} height={24} />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              </button>
+            </Link>
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
