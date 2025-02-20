@@ -13,7 +13,7 @@ const nextConfig: import('next').NextConfig = {
       {hostname:'www.gstatic.com'}, 
       {hostname:'example.com'}, 
       {hostname:'plus.unsplash.com'},
-      {hostname: 'images.unsplash.com'}],
+      {hostname:'images.unsplash.com'}],
   },
   experimental: {
     serverActions: {},
