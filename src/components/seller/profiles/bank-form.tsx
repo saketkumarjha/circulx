@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Upload } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import * as pdfjsLib from "pdfjs-dist"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -31,6 +32,7 @@ const bankSchema = z.object({
 
 export function BankForm() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [fileType, setFileType] = useState<"image" | "pdf" | null>(null)
 
   const form = useForm<BankDetails>({
     resolver: zodResolver(bankSchema),
@@ -49,14 +51,34 @@ export function BankForm() {
     console.log(data)
   }
 
-  const handleFileChange = (file: File | undefined, onChange: (file: File) => void) => {
+  useEffect(() => {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+  }, [])
+
+  const handleFileChange = async (file: File | undefined, onChange: (file: File) => void) => {
     if (file) {
       onChange(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string)
+
+      if (file.type === "application/pdf") {
+        setFileType("pdf")
+        const pdfData = await file.arrayBuffer()
+        const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise
+        const page = await pdf.getPage(1)
+        const viewport = page.getViewport({ scale: 1 })
+        const canvas = document.createElement("canvas")
+        const context = canvas.getContext("2d")
+        canvas.height = viewport.height
+        canvas.width = viewport.width
+        await page.render({ canvasContext: context!, viewport: viewport }).promise
+        setPreviewUrl(canvas.toDataURL())
+      } else {
+        setFileType("image")
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setPreviewUrl(reader.result as string)
+        }
+        reader.readAsDataURL(file)
       }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -138,7 +160,9 @@ export function BankForm() {
                               alt="Preview"
                               className="w-full h-full object-contain"
                             />
-                            <p className="text-xs text-muted-foreground mt-2">Click to change file</p>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              {fileType === "pdf" ? "PDF Preview (First Page)" : "Image Preview"} - Click to change file
+                            </p>
                           </div>
                         ) : (
                           <>
@@ -230,14 +254,7 @@ export function BankForm() {
           </div>
         </div>
 
-        <div className="flex gap-4">
-          <Button variant="outline" type="button">
-            Back
-          </Button>
-          <Button type="submit" className="bg-orange-600 hover:bg-orange-700 text-white">
-            Save Changes
-          </Button>
-        </div>
+        
       </form>
     </Form>
   )

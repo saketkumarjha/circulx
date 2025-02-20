@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db'
 import { User, IUser } from '@/models/user'
-import { getCurrentUser } from '@/app/actions/auth'
+import { getCurrentUser } from '@/actions/auth'
 
 export async function GET() {
   try {

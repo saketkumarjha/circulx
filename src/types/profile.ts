@@ -78,3 +78,19 @@ export const ACCOUNT_TYPES = [
   "Cash Credit/Overdraft",
 ] as const
 
+export interface DocumentDetails {
+  panCard?: File
+  gstin?: File
+  bankLetter?: File
+  bankStatement?: File
+  corporationCertificate?: File
+  businessAddress?: File
+  pickupAddressProof?: File
+  signature?: File
+  balanceSheet2223?: File
+  balanceSheet2324?: File
+}
+
+// Update TabType to be more specific for navigation
+export const TAB_ORDER: TabType[] = ["business", "contact", "category", "addresses", "bank", "documents"] as const
+

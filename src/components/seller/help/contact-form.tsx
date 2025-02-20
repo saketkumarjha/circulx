@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { sendContactEmail } from "@/app/actions/contact"
+import { sendContactEmail } from "@/actions/contact"
 
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false)

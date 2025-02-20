@@ -8,6 +8,8 @@ import { CategoryBrandForm } from "@/components/seller/profiles/category-brand-f
 import type { TabType } from "@/types/profile"
 import { AddressForm } from "@/components/seller/profiles/address-form"
 import { BankForm } from "@/components/seller/profiles/bank-form"
+import { DocumentForm } from "@/components/seller/profiles/document-form"
+import { Button } from "@/components/ui/button"
 
 
 const tabs: { label: string; value: TabType }[] = [
@@ -21,6 +23,32 @@ const tabs: { label: string; value: TabType }[] = [
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<TabType>("business")
+
+  const handleBack = () => {
+    const currentIndex = tabs.findIndex((tab) => tab.value === activeTab)
+    if (currentIndex > 0) {
+      setActiveTab(tabs[currentIndex - 1].value)
+    }
+  }
+
+  const renderForm = () => {
+    switch (activeTab) {
+      case "business":
+        return <BusinessForm />
+      case "contact":
+        return <ContactForm />
+      case "category":
+        return <CategoryBrandForm />
+      case "addresses":
+        return <AddressForm />
+      case "bank":
+        return <BankForm />
+      case "documents":
+        return <DocumentForm />
+      default:
+        return null
+    }
+  }
 
   return (
     <div className="container mx-auto py-6 px-4">
@@ -50,12 +78,17 @@ export default function ProfilePage() {
       </div>
 
       <div className="max-w-2xl">
-        {activeTab === "business" && <BusinessForm />}
-        {activeTab === "contact" && <ContactForm />}
-        {activeTab === "category" && <CategoryBrandForm />}
-        {activeTab === "addresses" && <AddressForm />}
-        {activeTab === "bank" && <BankForm />}
-        {activeTab === "documents" && <div>Documents form coming soon...</div>}
+        {renderForm()}
+        <div className="mt-6 flex gap-4">
+          {activeTab !== "business" && (
+            <Button variant="outline" onClick={handleBack}>
+              Back
+            </Button>
+          )}
+          <Button type="submit" form={`${activeTab}-form`} className="bg-orange-600 hover:bg-orange-700 text-white">
+            Save Changes
+          </Button>
+        </div>
       </div>
     </div>
   )

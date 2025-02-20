@@ -3,6 +3,8 @@ import { hostname } from "os"
 /** @type {import('next').NextConfig} */
 const nextConfig: import('next').NextConfig = {
   reactStrictMode: true,
+
+  
   
   images: {
     remotePatterns: [
