@@ -1,21 +1,43 @@
-import pool from '@/lib/dbPostgres';
+import { connectDB } from '@/lib/prod_db';
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 
-interface SubCategory {
-    sub_category_id: number;
-    category_id: number;
-    sub_category_name: string;
-    created_at?: string;
+export interface SubCategory {
+  sub_category_id: number;
+  category_id: number;
+  sub_category_name: string;
+  created_at?: string;
 }
 
-export async function GET() {
-    try {
-        const result = await pool.query('SELECT * FROM sub_categories');
-        const subCategories: SubCategory[] = result.rows;
+export const subCategorySchema = new mongoose.Schema<SubCategory>({
+  sub_category_id: { type: Number, required: true },
+  category_id: { type: Number, required: true },
+  sub_category_name: { type: String, required: true },
+  created_at: { type: String }
+});
 
-        return NextResponse.json(subCategories, { status: 200 });
-    } catch (error) {
-        console.error('Error fetching sub_categories:', error);
-        return NextResponse.json({ error: 'Error fetching sub_categories' }, { status: 500 });
-    }
+const SubCategoryModel = mongoose.models.SubCategory || mongoose.model<SubCategory>('SubCategory', subCategorySchema);
+
+export async function GET() {
+  try {
+    await connectDB();
+    const subCategories = await SubCategoryModel.find().lean();
+    return NextResponse.json(subCategories, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching sub_categories:', error);
+    return NextResponse.json({ error: 'Error fetching sub_categories' }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    await connectDB();
+    const subCategoryData = await request.json();
+    const newSubCategory = new SubCategoryModel(subCategoryData);
+    await newSubCategory.save();
+    return NextResponse.json(newSubCategory, { status: 201 });
+  } catch (error) {
+    console.error('Error posting sub_category:', error);
+    return NextResponse.json({ error: 'Error posting sub_category' }, { status: 500 });
+  }
 }
