@@ -1,26 +1,52 @@
-import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/dbPostgres';
+import { connectDB } from '@/lib/prod_db';
+import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 
 interface Seller {
-    seller_id: number;
-    user_id: number;
-    seller_name: string;
-    rating_value: number;
-    review_count: number;
-    contact_no: string;
-    location: string;
-    created_at?: string;
+  seller_id: number;
+  user_id: number;
+  seller_name: string;
+  rating_value: number;
+  review_count: number;
+  contact_no: string;
+  location: string;
+  created_at?: string;
 }
 
-export async function GET(req: NextRequest) {
-    try {
-        const result = await pool.query('SELECT seller_id, user_id, seller_name, rating_value, review_count, contact_no, location, created_at FROM sellers');
-        const sellers: Seller[] = result.rows;
+const sellerSchema = new mongoose.Schema<Seller>({
+  seller_id: { type: Number, required: true },
+  user_id: { type: Number, required: true },
+  seller_name: { type: String, required: true },
+  rating_value: { type: Number, required: true },
+  review_count: { type: Number, required: true },
+  contact_no: { type: String, required: true },
+  location: { type: String, required: true },
+  created_at: { type: String }
+});
 
-        return NextResponse.json(sellers, { status: 200 });
-    } catch (error) {
-        console.error('Error fetching sellers:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    }
+const SellerModel = mongoose.models.Seller || mongoose.model<Seller>('Seller', sellerSchema);
+
+export async function GET() {
+  try {
+    await connectDB();
+    const sellers = await SellerModel.find().lean();
+    return NextResponse.json(sellers, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching sellers:', error);
+    return NextResponse.json({ error: 'Error fetching sellers' }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    await connectDB();
+    const sellerData = await request.json();
+    const newSeller = new SellerModel(sellerData);
+    await newSeller.save();
+    return NextResponse.json(newSeller, { status: 201 });
+  } catch (error) {
+    console.error('Error posting seller:', error);
+    return NextResponse.json({ error: 'Error posting seller' }, { status: 500 });
+  }
 }
 

@@ -157,7 +157,7 @@ export default function ProductsPage() {
     <div>
       <div className="max-w-180 mx-auto p-4 mb-80">
         <div 
-          className="relative w-[1440px] h-[645px] bg-cover bg-center flex justify-center mb-8 rounded-lg overflow-hidden" 
+          className="relative w-[1440px] h-80 bg-cover bg-center flex justify-center mb-8 rounded-lg overflow-hidden" 
           style={{ backgroundImage: 'url(https://s3-alpha-sig.figma.com/img/84bd/a9e5/fd9b94264980eff659745ea88d1557c0?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=GXbhLG2SW53yETIxo~gMDWer8pBx~wkKJVQrTiDndO4ZRFGVaCA7MO9C4iBlKl3km7Iq-GpcwLr~sbgdqtWfA7wQAmzsDeSlcMY7bFatnfIvXKcGPYjoK5dsCjQlMVFPv-X~H60PquN9faI20VklRb1ZbJ0oopCHnJebsay3Ar661VNGl9ShCbah8Ydq8bl-yIP5zpV0qVhftz3-Og3ED-H8HjYc0lX2iDjRi9iQg3t2yKi6e2FnFanN9P9ls38sJ7wOwq2-rjSe6t-9fUcdGESjHGeynulh9eL8crMxWWW67JF21rQbPDcFuimARlJMhgTROevZRDYvL2GK07W3pQ__)' }}
         >
           <div className="inset-0 max-w-[768px] max-h-[276px] flex flex-col items-start justify-center mt-[41px] text-white text-start">
@@ -338,7 +338,11 @@ export default function ProductsPage() {
                 </div>
               ))}
             </div>
+            <button className='rounded-2xl bg-green-800 text-white w-full p-1'>Show More</button>
           </div>
+        </div>
+        <div className="flex justify-center mt-4">
+          <Image src="/time-delivery-banner.png" alt="On time delivery" width={800} height={583} />
         </div>
       </div>
     </div>

@@ -1,20 +1,41 @@
-import pool from '@/lib/dbPostgres';
+import { connectDB } from '@/lib/prod_db';
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 
-interface Category {
-    category_id: number;
-    category_name: string;
-    created_at?: string;
+export interface Category {
+  category_id: number;
+  category_name: string;
+  created_at?: string;
 }
 
-export async function GET() {
-    try {
-        const result = await pool.query('SELECT * FROM categories');
-        const categories: Category[] = result.rows;
+export const categorySchema = new mongoose.Schema<Category>({
+  category_id: { type: Number, required: true },
+  category_name: { type: String, required: true },
+  created_at: { type: String }
+});
 
-        return NextResponse.json(categories, { status: 200 });
-    } catch (error) {
-        console.error('Error fetching categories:', error);
-        return NextResponse.json({ error: 'Error fetching categories' }, { status: 500 });
-    }
+const CategoryModel = mongoose.models.Category || mongoose.model<Category>('Category', categorySchema);
+
+export async function GET() {
+  try {
+    await connectDB();
+    const categories = await CategoryModel.find().lean();
+    return NextResponse.json(categories, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return NextResponse.json({ error: 'Error fetching categories' }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    await connectDB();
+    const categoryData = await request.json();
+    const newCategory = new CategoryModel(categoryData);
+    await newCategory.save();
+    return NextResponse.json(newCategory, { status: 201 });
+  } catch (error) {
+    console.error('Error posting category:', error);
+    return NextResponse.json({ error: 'Error posting category' }, { status: 500 });
+  }
 }
