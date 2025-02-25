@@ -6,10 +6,10 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
 import { Country, State } from "country-state-city"
 import { User } from "lucide-react"
+import { CountryStateSelect } from "./CountryStateSelect"
 
 export default function AccountSettings() {
   const [formData, setFormData] = useState({
@@ -159,40 +159,24 @@ export default function AccountSettings() {
                 required
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="country">
                 Country/Region <span className="text-orange-500">*</span>
               </Label>
-              <Select value={formData.country} onValueChange={handleCountryChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countries.map((country) => (
-                    <SelectItem key={country.isoCode} value={country.isoCode}>
-                      {country.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CountryStateSelect
+                selectedCountry={formData.country}
+                selectedState={formData.state}
+                onCountryChange={(value) => {
+                  setFormData((prev) => ({ ...prev, country: value, state: "" }))
+                }}
+                onStateChange={(value) => {
+                  setFormData((prev) => ({ ...prev, state: value }))
+                }}
+                label="country"
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="state">
-                State <span className="text-orange-500">*</span>
-              </Label>
-              <Select value={formData.state} onValueChange={handleStateChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select state" />
-                </SelectTrigger>
-                <SelectContent>
-                  {states.map((state) => (
-                    <SelectItem key={state.isoCode} value={state.isoCode}>
-                      {state.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+
             <div className="space-y-2">
               <Label htmlFor="zipCode">
                 Zip Code <span className="text-orange-500">*</span>
