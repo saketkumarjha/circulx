@@ -3,9 +3,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Image from 'next/image'
-// import { useRouter } from 'next/router'
-import ProductCard from '@/components/layout/product-card'
-import Header from '@/components/layout/Header'
 
 interface Product {
   product_id: number;
@@ -172,7 +169,7 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-20 pt-[60px]">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-20 pt-[60px] pb-24">
           <div className='w-[262px] h-[32px] mb-60'>
             <div className='flex gap-1 mb-4'>
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAXklEQVR4nOWUQQrAIAwE5/8fa5tPbS8KHopYjVWagb3JLsgQiIIBAs5ZAyriUlJLpvXddwPTv6jGlcoP/oRtp64GknHRVL0Db1FcdW07/VoZOWzqvaauA09lwfRjBTfsYIzjlbUBMQAAAABJRU5ErkJggg==" alt="horizontal-settings-mixer--v1"></img>
@@ -341,8 +338,15 @@ export default function ProductsPage() {
             <button className='rounded-2xl bg-green-800 text-white w-full p-1'>Show More</button>
           </div>
         </div>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-20">
           <Image src="/time-delivery-banner.png" alt="On time delivery" width={800} height={583} />
+        </div>
+        <div className='px-40 flex flex-col mt-28'>
+            <div className="">
+              <h3 className='text-[#FF6600] font-bold text-base leading-4 mb-4'>PROMOTION</h3>
+              <h2 className='text-[40px] font-normal leading-10 mb-4'>Live shopping | Explore top deals</h2>
+              <p className=''>Introducing new collections</p>
+            </div>
         </div>
       </div>
     </div>

@@ -19,7 +19,27 @@ const CategoryModel = mongoose.models.Category || mongoose.model<Category>('Cate
 export async function GET() {
   try {
     await connectDB();
-    const categories = await CategoryModel.find().lean();
+    const categories = await CategoryModel.aggregate([
+      {
+        $lookup: {
+          from: "products",        // Collection name for products
+          localField: "category_id",
+          foreignField: "category_id",
+          as: "products"
+        }
+      },
+      {
+        $addFields: {
+          product_count: { $size: "$products" }
+        }
+      },
+      {
+        $project: {
+          products: 0              // Remove the temporary products array
+        }
+      }
+    ]);
+
     return NextResponse.json(categories, { status: 200 });
   } catch (error) {
     console.error('Error fetching categories:', error);

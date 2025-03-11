@@ -28,7 +28,7 @@ export async function connectDB() {
     }
 
     cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      console.log("MongoDB connected successfully")
+      console.log("MongoDB2 connected successfully")
       return mongoose
     })
   }
