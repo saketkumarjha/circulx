@@ -19,7 +19,7 @@ export default function DashboardSidebar() {
   return (
     <aside className="w-full md:w-64 bg-white border-b md:border-r md:border-b-0">
       <div className="p-4 border-b">
-        <h1 className="text-xl font-bold text-green-700">Customer Dashboard</h1>
+        <h1 className="text-xl font-bold text-emerald-900">Customer Dashboard</h1>
       </div>
       <nav className="p-4 space-y-2">
         {navigation.map((item) => {
@@ -29,7 +29,7 @@ export default function DashboardSidebar() {
               key={item.name}
               href={item.href}
               className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                isActive ? "bg-green-700 text-white" : "text-gray-600 hover:bg-orange-500 hover:text-white"
+                isActive ? "bg-emerald-900 text-white" : "text-gray-600 hover:bg-orange-500 hover:text-white"
               }`}
             >
               <item.icon className="w-5 h-5" />
