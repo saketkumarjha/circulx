@@ -18,7 +18,9 @@ if (!cached) {
 }
 
 export async function connectDB() {
+  console.log(MONGODB_URI);
   if (cached.conn) {
+    console.log("Already done!")
     return cached.conn
   }
 

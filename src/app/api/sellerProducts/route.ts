@@ -1,8 +1,9 @@
 import { connectDB2 } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { Category, categorySchema } from '@/app/api/categories/route';
-import { SubCategory, subCategorySchema } from '../sub_categories/route';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'gyuhiuhthoju2596rfyjhtfykjb';
 
 interface Product {
   product_id: number;
@@ -62,9 +63,18 @@ const db2 = await connectDB2();
 
 const ProductModel = db2.models.Product || db2.model<Product>('Product', productSchema);
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const token = request.headers.get('Authorization')?.split(' ')[1];
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; type: string };
+    const sellerId = decoded.userId;
+
     const products = await ProductModel.aggregate([
+      { $match: { seller_id: sellerId } },
       {
         $lookup: {
           from: "sellers",
@@ -75,7 +85,7 @@ export async function GET() {
       },
       {
         $lookup: {
-          from: "categories",        // Collection name for categories
+          from: "categories",
           localField: "category_id",
           foreignField: "category_id",
           as: "category"
@@ -83,7 +93,7 @@ export async function GET() {
       },
       {
         $lookup: {
-          from: "subcategories",    // Collection name for sub-categories
+          from: "subcategories",
           localField: "sub_category_id",
           foreignField: "sub_category_id",
           as: "sub_category"
@@ -99,11 +109,13 @@ export async function GET() {
       },
       {
         $project: {
-          category: 0,              // Remove the temporary category array
-          sub_category: 0           // Remove the temporary sub_category array
+          seller: 0,
+          category: 0,
+          sub_category: 0
         }
       }
     ]);
+
     return NextResponse.json(products, { status: 200 });
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -111,16 +123,29 @@ export async function GET() {
   }
 }
 
-
 export async function POST(request: Request) {
-  try {
-    await connectDB2();
-    const productData = await request.json();
-    const newProduct = new ProductModel(productData);
-    await newProduct.save();
-    return NextResponse.json(newProduct, { status: 201 });
-  } catch (error) {
-    console.error('Error posting product:', error);
-    return NextResponse.json({ error: 'Error posting product' }, { status: 500 });
+    try {
+      const token = request.headers.get('Authorization')?.split(' ')[1];
+      if (!token) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+  
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; type: string };
+      const sellerId = decoded.userId;
+  
+      const body = await request.json();
+      const newProduct = new ProductModel({
+        ...body,
+        seller_id: sellerId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+  
+      await newProduct.save();
+  
+      return NextResponse.json(newProduct, { status: 201 });
+    } catch (error) {
+      console.error('Error adding product:', error);
+      return NextResponse.json({ error: 'Error adding product' }, { status: 500 });
+    }
   }
-}

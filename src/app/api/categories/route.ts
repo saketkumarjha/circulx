@@ -1,4 +1,4 @@
-import { connectDB } from '@/lib/prod_db';
+import { connectDB2 } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 
@@ -14,11 +14,13 @@ export const categorySchema = new mongoose.Schema<Category>({
   created_at: { type: String }
 });
 
-const CategoryModel = mongoose.models.Category || mongoose.model<Category>('Category', categorySchema);
+const db2 = await connectDB2();
+
+const CategoryModel = db2.models.Category || db2.model<Category>('Category', categorySchema);
 
 export async function GET() {
   try {
-    await connectDB();
+    await connectDB2();
     const categories = await CategoryModel.aggregate([
       {
         $lookup: {
@@ -49,7 +51,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
+    await connectDB2();
     const categoryData = await request.json();
     const newCategory = new CategoryModel(categoryData);
     await newCategory.save();
