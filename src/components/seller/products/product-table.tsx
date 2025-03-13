@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Filter, Pencil, Plus, Trash2 } from 'lucide-react'
+import Cookies from 'js-cookie'
 
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -154,6 +155,32 @@ export function ProductTable() {
   const [showAddForm, setShowAddForm] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const token = Cookies.get('auth-token');
+        if (!token) {
+          throw new Error('No auth token found')
+        }
+        const response = await fetch('/api/sellerProducts', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        const data = await response.json()
+        if (response.ok) {
+          setProducts(data)
+        } else {
+          console.error('Error fetching products:', data.error)
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      }
+    }
+
+    fetchProducts()
+  }, [])
   
   const categories: CategoryType[] = ['All', 'Metal', 'Wood', 'Plastic', 'Electronics']
   
@@ -192,40 +219,31 @@ export function ProductTable() {
     })
   }
 
-  const handleAddProduct = (formData: ProductFormData) => {
-    const productWithId: Product = {
-      id: (products.length + 1).toString(),
-      name: formData.productName,
-      productName: formData.productName,
-      category: formData.category,
-      description: formData.description,
-      skuCode: formData.skuCode,
-      stock: parseInt(formData.availableQuantity),
-      price: parseInt(formData.pricePerUnit),
-      status: true,
-      image: formData.image || '/placeholder.svg',
-      weight: formData.weight,
-      length: formData.length,
-      width: formData.width,
-      breadth: formData.breadth,
-      availableQuantity: formData.availableQuantity,
-      pricePerUnit: formData.pricePerUnit,
-      discount: formData.discount || '',
-      discountType: formData.discountType || '',
-      dimensions: {
-        length: parseFloat(formData.length),
-        width: parseFloat(formData.width),
-        height: parseFloat(formData.breadth)
+  const handleAddProduct = async (formData: ProductFormData) => {
+    try {
+      const response = await fetch('/api/sellerProducts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${document.cookie.split('auth-token=')[1]}`
+        },
+        body: JSON.stringify(formData)
+      })
+
+      const newProduct = await response.json()
+      if (response.ok) {
+        setProducts(prevProducts => [...prevProducts, newProduct])
+        setShowAddForm(false)
+        toast({
+          title: "Product Uploaded Successfully",
+          description: `${formData.productName} has been added to your inventory.`,
+        })
+      } else {
+        console.error('Error adding product:', newProduct.error)
       }
+    } catch (error) {
+      console.error('Error adding product:', error)
     }
-    
-    setProducts(prevProducts => [...prevProducts, productWithId])
-    setShowAddForm(false)
-    toast({
-      title: "Product Uploaded Successfully",
-      description: `${formData.productName} has been added to your inventory.`,
-     
-    })
   }
 
   return (

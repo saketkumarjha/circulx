@@ -2,18 +2,21 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { connectDB } from '@/lib/db'
+import { connectDB1 } from '@/lib/db'
 import { User, IUser } from '@/models/user'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'gyuhiuhthoju2596rfyjhtfykjb'
 
+async function getUserModel() {
+  const db1 = await connectDB1();
+  return db1.models.User || db1.model<IUser>('User', User.schema);
+}
+
 export async function signIn(formData: FormData) {
   try {
-    await connectDB()
-    console.log("MongoDB connected successfully")
-    
+    const User = await getUserModel();     
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     
@@ -45,7 +48,7 @@ export async function signIn(formData: FormData) {
       success: true,
       message: 'Signed in successfully',
       user: {
-        id: user._id,
+        id: user._id.toString(),
         name: user.name,
         email: user.email,
         type: user.type,
@@ -59,8 +62,7 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   try {
-    await connectDB()
-    console.log("MongoDB connected successfully")
+    await connectDB1()
     
     const name = formData.get('name') as string
     const email = formData.get('email') as string
@@ -104,8 +106,7 @@ export async function signOut() {
 
 export async function getCurrentUser() {
   try {
-    await connectDB()
-    console.log("MongoDB connected successfully")
+    const User = await getUserModel();
 
     const cookieStore = await cookies()
     const token = cookieStore.get('auth-token')
@@ -121,7 +122,6 @@ export async function getCurrentUser() {
     
     if (!user) return null
     
-    // Convert MongoDB document to a plain object
     const plainUser = {
       id: user._id.toString(),
       name: user.name,
@@ -138,8 +138,7 @@ export async function getCurrentUser() {
 
 export async function updateUserType(userId: string, newType: 'admin' | 'seller' | 'customer') {
   try {
-    await connectDB()
-    console.log("MongoDB connected successfully")
+    const User = await getUserModel();
 
     const user = await User.findByIdAndUpdate(userId, { type: newType }, { new: true })
 
