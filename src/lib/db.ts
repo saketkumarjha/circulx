@@ -1,61 +1,62 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose"
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error("Please define the MONGODB_URI environment variable inside .env.local")
 }
 
 interface Cached {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
+  conn: typeof mongoose | null
+  promise: Promise<typeof mongoose> | null
 }
 
-interface CachedConnections {
-  conn1: typeof mongoose | null;
-  promise1: Promise<typeof mongoose> | null;
-  conn2: typeof mongoose | null;
-  promise2: Promise<typeof mongoose> | null;
+let cached: Cached = (global as any).mongoose
+
+if (!cached) {
+  cached = (global as any).mongoose = { conn: null, promise: null }
 }
 
-const globalWithMongo = global as typeof globalThis & {
-  mongoConnections?: CachedConnections;
-};
-
-const cached: CachedConnections = globalWithMongo.mongoConnections || {
-  conn1: null,
-  promise1: null,
-  conn2: null,
-  promise2: null,
-};
-
+// Original connectDB function
 export async function connectDB() {
-  if (cached.conn1) {
-    return cached.conn1;
+  if (cached.conn) {
+    return cached.conn
   }
 
-  if (!cached.promise1) {
+  if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-    };
+      maxPoolSize: 10, // Limit concurrent connections
+      serverSelectionTimeoutMS: 5000, // Timeout for server selection
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
+      family: 4, // Use IPv4, skip trying IPv6
+    }
 
-    cached.promise1 = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      console.log('MongoDB connected successfully');
-      return mongoose;
-    });
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+      console.log("MongoDB connected successfully")
+      return mongoose
+    })
   }
 
   try {
-    cached.conn2 = await cached.promise1;
+    cached.conn = await cached.promise
   } catch (e) {
-    cached.promise1 = null;
-    throw e;
+    cached.promise = null
+    console.error("Error connecting to MongoDB:", e)
+    throw e
   }
 
-  return cached.conn2;
+  return cached.conn
 }
 
-
-if (process.env.NODE_ENV !== 'production') {
-  globalWithMongo.mongoConnections = cached;
+// Add connectDB1 - same implementation as connectDB
+export async function connectDB1() {
+  return connectDB() // Reuse the same implementation
 }
+
+// Add connectDB2 - same implementation as connectDB
+export async function connectDB2() {
+  return connectDB() // Reuse the same implementation
+}
+

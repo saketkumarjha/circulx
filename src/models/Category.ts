@@ -12,6 +12,8 @@ export const categorySchema = new mongoose.Schema<Category>({
   created_at: { type: String },
 })
 
-// Export the model - check if it's already been compiled
-export const CategoryModel = mongoose.models.Category || mongoose.model<Category>("Category", categorySchema)
+// Export the model
+const CategoryModel = mongoose.models.Category || mongoose.model<Category>("Category", categorySchema)
+
+export default CategoryModel
 

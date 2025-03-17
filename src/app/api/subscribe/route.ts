@@ -1,29 +1,31 @@
-'use server'
+import { connectDB } from "@/lib/db" // Changed from connectDB2 to connectDB
+import { Subscriber } from "@/models/Subscriber"
+import { NextResponse } from "next/server"
 
-import { NextResponse } from "next/server";
-import { connectDB } from '@/lib/db'
-import Subscriber from "@/models/Subscriber";
+export async function POST(request: Request) {
+  try {
+    await connectDB()
+    const { email } = await request.json()
 
-export async function POST(req: Request) {
-    const { email } = await req.json();
-    console.log('email:', email);
-    if (!email || typeof email !== 'string') {
-        return NextResponse.json({ message: 'Invalid email address' }, { status: 403 });
+    // Validate email
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 })
     }
 
-    try {
-        await connectDB();
-        const existingSubscriber = await Subscriber.findOne({ email });
-        if (existingSubscriber) {
-            return NextResponse.json({ message: 'Email is already subscribed' }, { status: 400 });
-        }
-
-        const newSubscriber = new Subscriber({ email });
-        await newSubscriber.save();
-
-        return NextResponse.json({ message: 'Subscription successful' }, { status: 200 });
-    } catch (error) {
-        console.error('Mongodb error:', error);
-        return NextResponse.json({ message: 'Subscription failed' }, { status: 500 });
+    // Check if already subscribed
+    const existingSubscriber = await Subscriber.findOne({ email })
+    if (existingSubscriber) {
+      return NextResponse.json({ message: "Email already subscribed" }, { status: 200 })
     }
+
+    // Create new subscriber
+    const newSubscriber = new Subscriber({ email })
+    await newSubscriber.save()
+
+    return NextResponse.json({ message: "Subscribed successfully" }, { status: 201 })
+  } catch (error) {
+    console.error("Error in subscribe:", error)
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
+  }
 }
+

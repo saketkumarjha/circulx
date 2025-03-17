@@ -1,6 +1,6 @@
-import { connectDB } from "@/lib/prod_db"
+import { connectDB } from "@/lib/db" // Changed from connectDB2 to connectDB
+import CategoryModel from "@/models/Category" // Import from the model file
 import { NextResponse } from "next/server"
-import { CategoryModel } from "@/models/Category"
 
 export async function GET() {
   try {
