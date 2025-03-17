@@ -2,14 +2,14 @@ import { connectDB2 } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 
-export interface SubCategory {
+interface SubCategory {
   sub_category_id: number;
   category_id: number;
   sub_category_name: string;
   created_at?: string;
 }
 
-export const subCategorySchema = new mongoose.Schema<SubCategory>({
+const subCategorySchema = new mongoose.Schema<SubCategory>({
   sub_category_id: { type: Number, required: true },
   category_id: { type: Number, required: true },
   sub_category_name: { type: String, required: true },
