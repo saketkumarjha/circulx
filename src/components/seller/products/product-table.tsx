@@ -164,9 +164,7 @@ export function ProductTable() {
           throw new Error('No auth token found')
         }
         const response = await fetch('/api/sellerProducts', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          credentials: 'include'
         })
         const data = await response.json()
         if (response.ok) {

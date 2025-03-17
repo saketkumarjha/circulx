@@ -38,8 +38,8 @@ export async function signIn(formData: FormData) {
     
     const cookieStore = await cookies()
     cookieStore.set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false,
+      secure: false,
       sameSite: 'strict',
       maxAge: 60 * 60 * 24 * 1, // 1 days
     })

@@ -1,7 +1,8 @@
 import { connectDB2 } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import { NextApiRequest } from 'next';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'gyuhiuhthoju2596rfyjhtfykjb';
 
@@ -63,9 +64,10 @@ const db2 = await connectDB2();
 
 const ProductModel = db2.models.Product || db2.model<Product>('Product', productSchema);
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get('Authorization')?.split(' ')[1];
+    const token = request.cookies.get('access_token')?.value;
+    console.log(token);
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

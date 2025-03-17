@@ -1,7 +1,5 @@
 import { connectDB2 } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { Category, categorySchema } from '@/app/api/categories/route';
-import { SubCategory, subCategorySchema } from '../sub_categories/route';
 import mongoose from 'mongoose';
 
 interface Product {
