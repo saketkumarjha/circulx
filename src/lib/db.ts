@@ -1,7 +1,7 @@
 import mongoose, { Connection } from 'mongoose';
 
-const MONGODB_URI1 = process.env.MONGODB_URI;
-const MONGODB_URI2 = process.env.PROD_DB;
+const MONGODB_URI1 = process.env.MONGODB_URI!;
+const MONGODB_URI2 = process.env.PROD_DB!;
 
 interface CachedConnections {
   conn1: Connection | null;
