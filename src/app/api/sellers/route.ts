@@ -1,4 +1,4 @@
-import { connectDB } from '@/lib/prod_db';
+import { connectDB2 } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 
@@ -28,7 +28,7 @@ const SellerModel = mongoose.models.Seller || mongoose.model<Seller>('Seller', s
 
 export async function GET() {
   try {
-    await connectDB();
+    await connectDB2();
     const sellers = await SellerModel.find().lean();
     return NextResponse.json(sellers, { status: 200 });
   } catch (error) {
@@ -39,7 +39,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
+    await connectDB2();
     const sellerData = await request.json();
     const newSeller = new SellerModel(sellerData);
     await newSeller.save();
