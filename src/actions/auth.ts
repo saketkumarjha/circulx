@@ -1,8 +1,7 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
-import { connectDB } from "@/lib/db" // Changed from connectDB1 to connectDB
+import { connectDB } from "@/lib/db"
 import { User } from "@/models/user"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
@@ -190,7 +189,8 @@ export async function signUp(formData: FormData) {
 export async function signOut() {
   const cookieStore = await cookies()
   cookieStore.delete("auth-token")
-  redirect("/")
+  // Don't redirect here, just return success
+  return { success: true }
 }
 
 export async function getCurrentUser() {
@@ -202,24 +202,30 @@ export async function getCurrentUser() {
 
     if (!token || !token.value) return null
 
-    const decoded = jwt.verify(token.value, JWT_SECRET) as {
-      userId: string
-      type: string
+    try {
+      const decoded = jwt.verify(token.value, JWT_SECRET) as {
+        userId: string
+        type: string
+      }
+
+      const user = await User.findById(decoded.userId).select("-password")
+
+      if (!user) return null
+
+      // Convert MongoDB document to a plain object
+      const plainUser = {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        type: user.type,
+      }
+
+      return plainUser
+    } catch (jwtError) {
+      // If token is invalid, clear it and return null
+      cookieStore.delete("auth-token")
+      return null
     }
-
-    const user = await User.findById(decoded.userId).select("-password")
-
-    if (!user) return null
-
-    // Convert MongoDB document to a plain object
-    const plainUser = {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      type: user.type,
-    }
-
-    return plainUser
   } catch (error) {
     console.error("Error in getCurrentUser:", error)
     return null
