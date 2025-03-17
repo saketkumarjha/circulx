@@ -1,14 +1,21 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
+  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
 interface Cached {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
+}
+
+interface CachedConnections {
+  conn1: typeof mongoose | null;
+  promise1: Promise<typeof mongoose> | null;
+  conn2: typeof mongoose | null;
+  promise2: Promise<typeof mongoose> | null;
 }
 
 const globalWithMongo = global as typeof globalThis & {
@@ -19,36 +26,36 @@ const cached: CachedConnections = globalWithMongo.mongoConnections || {
   conn1: null,
   promise1: null,
   conn2: null,
-  promise2: null
+  promise2: null,
 };
 
 export async function connectDB() {
-  if (cached.conn) {
-    return cached.conn
+  if (cached.conn1) {
+    return cached.conn1;
   }
 
-  if (!cached.promise) {
+  if (!cached.promise1) {
     const opts = {
       bufferCommands: false,
-    }
+    };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      console.log("MongoDB connected successfully")
-      return mongoose
-    })
+    cached.promise1 = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+      console.log('MongoDB connected successfully');
+      return mongoose;
+    });
   }
 
   try {
-    cached.conn2 = await cached.promise2;
+    cached.conn2 = await cached.promise1;
   } catch (e) {
-    cached.promise2 = null;
+    cached.promise1 = null;
     throw e;
   }
 
   return cached.conn2;
 }
 
-// Store in global scope for HMR (Hot Module Replacement)
+
 if (process.env.NODE_ENV !== 'production') {
   globalWithMongo.mongoConnections = cached;
 }
