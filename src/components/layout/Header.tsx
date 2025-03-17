@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { signOut } from '@/app/actions/auth'
+import { signOut } from '@/actions/auth'
 import Searchbar from '@/components/layout/searchbar';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';

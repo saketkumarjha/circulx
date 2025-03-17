@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/db'
+import { connectDB1 } from '@/lib/db'
 import { User, IUser } from '@/models/user'
-import { getCurrentUser } from '@/app/actions/auth'
+import { getCurrentUser } from '@/actions/auth'
 
 export async function GET() {
   try {
@@ -10,7 +10,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    await connectDB()
+    await connectDB1()
     const users: IUser[] = await User.find({}).select('-password')
     
     const sanitizedUsers = users.map(user => ({

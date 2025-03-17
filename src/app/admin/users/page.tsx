@@ -1,7 +1,7 @@
-import { getCurrentUser, updateUserType } from '@/app/actions/auth'
+import { getCurrentUser, updateUserType } from '@/actions/auth'
 import { redirect } from 'next/navigation'
 import { User } from '@/models/user'
-import { connectDB } from '@/lib/db'
+import { connectDB1 } from '@/lib/db'
 import { UserTable } from '@/components/admin/user-table'
 
 // Helper function to serialize user data
@@ -17,7 +17,7 @@ function serializeUser(user: any, index: number) {
 
 export default async function UserManagementPage() {
   try {
-    await connectDB()
+    await connectDB1()
     const currentUser = await getCurrentUser()
     
     if (!currentUser) {
