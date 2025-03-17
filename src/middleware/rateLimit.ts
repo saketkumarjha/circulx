@@ -16,8 +16,9 @@ const RATE_LIMIT_MAX = 100 // Maximum requests per window
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute in milliseconds
 
 export async function rateLimiter(req: NextRequest) {
-  // Get IP address
-  const ip = req.ip || req.headers.get("x-forwarded-for") || "unknown"
+  // Get IP address - Next.js doesn't have req.ip directly
+  const forwardedFor = req.headers.get("x-forwarded-for")
+  const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "unknown"
   const now = Date.now()
 
   // Initialize or reset if window has passed
