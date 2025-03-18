@@ -1,35 +1,55 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import ProductCard from './product-card'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import axios from 'axios'
+import { useState, useEffect } from "react"
+import ProductCard from "./product-card"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import axios from "axios"
 
-interface Product {
-  product_id: number;
-  title: string;
-  model?: string;
-  description?: string;
-  category_id?: number;
-  sub_category_id?: number;
-  units?: string;
-  weight?: number;
-  dimensions?: object;
-  image_link: string;
-  stock: number;
-  price: number;
-  discount: number;
-  SKU: string;
-  seller_id?: number;
-  created_at?: string;
-  rating: number;
-  seller_name: string;
-  location: string;
-  category_name: string;
-  sub_category_name: string;
+// Loading skeleton component
+const Skeleton = ({ className = "", ...props }: { className?: string; [key: string]: any }) => {
+  return <div className={`animate-pulse rounded-md bg-gray-200 ${className}`} {...props} />
 }
 
-function ProductCarousel({ products, title }: { products: Product[], title: string }) {
+// Loading placeholder component
+function ProductCardSkeleton() {
+  return (
+    <div className="border rounded-lg p-4 h-[350px] flex flex-col">
+      <Skeleton className="w-full h-40 rounded-md mb-4" />
+      <Skeleton className="w-3/4 h-5 mb-2" />
+      <Skeleton className="w-1/2 h-4 mb-2" />
+      <Skeleton className="w-1/4 h-4 mb-4" />
+      <div className="mt-auto">
+        <Skeleton className="w-2/3 h-6" />
+      </div>
+    </div>
+  )
+}
+
+interface Product {
+  product_id: number
+  title: string
+  model?: string
+  description?: string
+  category_id?: number
+  sub_category_id?: number
+  units?: string
+  weight?: number
+  dimensions?: object
+  image_link: string
+  stock: number
+  price: number
+  discount: number
+  SKU: string
+  seller_id?: number
+  created_at?: string
+  rating: number
+  seller_name: string
+  location: string
+  category_name: string
+  sub_category_name: string
+}
+
+function ProductCarousel({ products, title, isLoading }: { products: Product[]; title: string; isLoading: boolean }) {
   const [startIndex, setStartIndex] = useState(0)
   const [visibleProducts, setVisibleProducts] = useState(6)
 
@@ -49,94 +69,242 @@ function ProductCarousel({ products, title }: { products: Product[], title: stri
     }
 
     handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
   }, [])
 
   const handlePrevious = () => {
-    setStartIndex((prevIndex) => (prevIndex === 0 ? products.length - visibleProducts : prevIndex - visibleProducts))
+    setStartIndex((prevIndex) =>
+      prevIndex === 0 ? Math.max(0, products.length - visibleProducts) : prevIndex - visibleProducts,
+    )
   }
 
   const handleNext = () => {
     setStartIndex((prevIndex) => (prevIndex + visibleProducts >= products.length ? 0 : prevIndex + visibleProducts))
   }
 
-  const currentProducts = products.slice(startIndex, startIndex + visibleProducts)
+  // Ensure we don't go out of bounds
+  const safeStartIndex = Math.min(startIndex, Math.max(0, products.length - visibleProducts))
+  const currentProducts = products.slice(safeStartIndex, safeStartIndex + visibleProducts)
 
   return (
     <div className="mb-12">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">{title}</h2>
       <div className="relative">
         <div className="flex overflow-hidden">
-          {currentProducts.map((product) => (
-            <div key={product.product_id} className={`w-full px-2 ${
-              visibleProducts === 1 ? 'sm:w-full' :
-              visibleProducts === 2 ? 'sm:w-1/2' :
-              visibleProducts === 3 ? 'sm:w-1/2 md:w-1/3' :
-              visibleProducts === 4 ? 'sm:w-1/2 md:w-1/3 lg:w-1/4' :
-              'sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/6'
-            }`}>
-              <ProductCard
-                title={product.title}
-                company={product.seller_name}
-                location={product.location}
-                price={product.price}
-                discount={product.discount}
-                image_link={product.image_link}
-                href={`/product/${product.product_id}`}
-                rating={product.rating}
-                originalPrice={product.price + product.discount}
-                hoverImage={product.image_link}
-              />
+          {isLoading ? (
+            // Show skeletons when loading
+            Array(visibleProducts)
+              .fill(0)
+              .map((_, index) => (
+                <div
+                  key={`skeleton-${index}`}
+                  className={`w-full px-2 ${
+                    visibleProducts === 1
+                      ? "sm:w-full"
+                      : visibleProducts === 2
+                        ? "sm:w-1/2"
+                        : visibleProducts === 3
+                          ? "sm:w-1/2 md:w-1/3"
+                          : visibleProducts === 4
+                            ? "sm:w-1/2 md:w-1/3 lg:w-1/4"
+                            : "sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/6"
+                  }`}
+                >
+                  <ProductCardSkeleton />
+                </div>
+              ))
+          ) : products.length > 0 ? (
+            // Show actual products when loaded
+            currentProducts.map((product) => (
+              <div
+                key={product.product_id}
+                className={`w-full px-2 ${
+                  visibleProducts === 1
+                    ? "sm:w-full"
+                    : visibleProducts === 2
+                      ? "sm:w-1/2"
+                      : visibleProducts === 3
+                        ? "sm:w-1/2 md:w-1/3"
+                        : visibleProducts === 4
+                          ? "sm:w-1/2 md:w-1/3 lg:w-1/4"
+                          : "sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/6"
+                }`}
+              >
+                <ProductCard
+                  title={product.title}
+                  company={product.seller_name}
+                  location={product.location}
+                  price={product.price}
+                  discount={product.discount}
+                  image_link={product.image_link || "/placeholder.svg?height=200&width=200"}
+                  href={`/product/${product.product_id}`}
+                  rating={product.rating}
+                  originalPrice={product.price + product.discount}
+                  hoverImage={product.image_link || "/placeholder.svg?height=200&width=200"}
+                />
+              </div>
+            ))
+          ) : (
+            // Show message when no products
+            <div className="w-full text-center py-8">
+              <p className="text-gray-500">No products available in this category</p>
             </div>
-          ))}
+          )}
         </div>
-        <button
-          onClick={handlePrevious}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none z-10"
-          aria-label="Previous product"
-        >
-          <ChevronLeft className="w-6 h-6 text-gray-800" />
-        </button>
-        <button
-          onClick={handleNext}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none z-10"
-          aria-label="Next product"
-        >
-          <ChevronRight className="w-6 h-6 text-gray-800" />
-        </button>
+        {!isLoading && products.length > visibleProducts && (
+          <>
+            <button
+              onClick={handlePrevious}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none z-10"
+              aria-label="Previous product"
+            >
+              <ChevronLeft className="w-6 h-6 text-gray-800" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none z-10"
+              aria-label="Next product"
+            >
+              <ChevronRight className="w-6 h-6 text-gray-800" />
+            </button>
+          </>
+        )}
       </div>
     </div>
   )
 }
 
 export default function ProductGrid() {
-  const [solarWaterHeaters, setSolarWaterHeaters] = useState<Product[]>([])
-  const [solarPanels, setSolarPanels] = useState<Product[]>([])
+  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [categoryProducts, setCategoryProducts] = useState<Record<string, Product[]>>({})
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('/api/products')
-        const products: Product[] = response.data;
-        
-        const waterHeaters = products.filter((product) => product.sub_category_name === 'Printers')
-        const panels = products.filter((product) => product.sub_category_name === 'Power Saws')
+        setIsLoading(true)
+        setError(null)
 
-        setSolarWaterHeaters(waterHeaters)
-        setSolarPanels(panels)
+        console.log("Fetching products from API...")
+        const response = await axios.get("/api/products")
+        console.log(`Received ${response.data.length} products from API`)
+
+        // Check if we got an error response
+        if (response.data.error) {
+          throw new Error(response.data.error)
+        }
+
+        // Ensure we have an array of products
+        if (!Array.isArray(response.data)) {
+          throw new Error("Invalid response format from API")
+        }
+
+        const products: Product[] = response.data
+
+        // Add fallback values for missing fields
+        const processedProducts = products.map((product) => ({
+          ...product,
+          seller_name: product.seller_name || "Unknown Seller",
+          location: product.location || "Unknown Location",
+          rating: product.rating || 0,
+          discount: product.discount || 0,
+          image_link: product.image_link || "/placeholder.svg?height=200&width=200",
+        }))
+
+        setAllProducts(processedProducts)
+
+        // Group products by category and subcategory
+        const groupedProducts: Record<string, Product[]> = {}
+
+        // Get unique categories and subcategories
+        const categories = [...new Set(processedProducts.map((p) => p.category_name).filter(Boolean))]
+        const subcategories = [...new Set(processedProducts.map((p) => p.sub_category_name).filter(Boolean))]
+
+        console.log("Available categories:", categories)
+        console.log("Available subcategories:", subcategories)
+
+        // Group by subcategory first (more specific)
+        subcategories.forEach((subcat) => {
+          if (subcat) {
+            groupedProducts[subcat] = processedProducts.filter((p) => p.sub_category_name === subcat)
+          }
+        })
+
+        // Then group by category
+        categories.forEach((cat) => {
+          if (cat) {
+            groupedProducts[cat] = processedProducts.filter((p) => p.category_name === cat)
+          }
+        })
+
+        // If we have no categorized products, create a "Featured Products" category with all products
+        if (Object.keys(groupedProducts).length === 0) {
+          groupedProducts["Featured Products"] = processedProducts
+        }
+
+        setCategoryProducts(groupedProducts)
       } catch (error) {
-        console.error('Error fetching products:', error)
+        console.error("Error fetching products:", error)
+        const errorMessage = error instanceof Error ? error.message : "Unknown error"
+        setError(`Failed to load products: ${errorMessage}. Retrying...`)
+
+        // Retry up to 3 times with increasing delay
+        if (retryCount < 3) {
+          const delay = Math.pow(2, retryCount) * 1000 // Exponential backoff
+          setTimeout(() => {
+            setRetryCount((prev) => prev + 1)
+          }, delay)
+        } else {
+          setError("Failed to load products after multiple attempts. Please refresh the page or try again later.")
+        }
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchProducts()
-  }, [])
+  }, [retryCount])
+
+  // Render product carousels for each category
+  const renderProductCarousels = () => {
+    if (Object.keys(categoryProducts).length === 0) {
+      if (isLoading) {
+        return (
+          <>
+            <ProductCarousel products={[]} title="Loading Products..." isLoading={true} />
+            <ProductCarousel products={[]} title="Loading More..." isLoading={true} />
+          </>
+        )
+      }
+
+      return (
+        <div className="text-center py-8">
+          <p className="text-gray-500">No products available</p>
+        </div>
+      )
+    }
+
+    return Object.entries(categoryProducts)
+      .filter(([_, products]) => products.length > 0)
+      .slice(0, 4) // Limit to 4 categories to avoid overwhelming the page
+      .map(([category, products]) => (
+        <ProductCarousel key={category} products={products} title={category} isLoading={isLoading} />
+      ))
+  }
 
   return (
     <div className="w-full px-4 py-8">
-      <ProductCarousel products={solarWaterHeaters} title="Printers" />
-      <ProductCarousel products={solarPanels} title="Power Saws" />
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
+          {retryCount < 3 && <span className="ml-2">Retrying...</span>}
+        </div>
+      )}
+
+      {renderProductCarousels()}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import type React from "react"
+import type { Metadata, Viewport } from "next"
 import "./globals.css"
 import { Inter } from "next/font/google"
 import Header from "@/components/layout/Header"
@@ -6,16 +7,18 @@ import Footer from "@/components/layout/Footer"
 import { getCurrentUser } from "../actions/auth"
 import Providers from "./providers"
 
-// Load the Inter font with proper subsets
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap", // Optimize font loading
-})
+const inter = Inter({ subsets: ["latin"] })
 
-export const metadata = {
-  title: "Circulx - Your one-stop shop",
+export const metadata: Metadata = {
+  title: "Circulx",
   description: "Your one-stop shop for all your needs",
-  viewport: "width=device-width, initial-scale=1",
+  // Remove viewport from here if it exists
+}
+
+// Add this export for viewport configuration
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 }
 
 export default async function RootLayout({
@@ -23,14 +26,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Get the current user for the header
-  let user = null
-  try {
-    user = await getCurrentUser()
-  } catch (error) {
-    console.error("Error getting current user:", error)
-    // Continue without user data
-  }
+  const user = await getCurrentUser()
 
   return (
     <html lang="en">
