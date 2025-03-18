@@ -1,17 +1,22 @@
-import mongoose, { Schema, Document } from 'mongoose'
+import mongoose, { Schema, type Document } from "mongoose"
 
 export interface ISubscriber extends Document {
-    email: String;
+  email: string
 }
 
 const subscriberSchema: Schema<ISubscriber> = new Schema({
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    }
-});
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+})
 
-const Subscriber = mongoose.models.Subscriber || mongoose.model<ISubscriber>('Subscriber', subscriberSchema);
+const SubscriberModel = mongoose.models.Subscriber || mongoose.model<ISubscriber>("Subscriber", subscriberSchema)
 
-export default Subscriber;
+// Add named export
+export { SubscriberModel as Subscriber }
+
+// Keep default export for backward compatibility
+export default SubscriberModel
+

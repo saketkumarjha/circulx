@@ -10,7 +10,7 @@ export default function CartPage() {
         <Card className="p-4">
           <div className="flex gap-4 items-center">
             <div className="relative w-20 h-20">
-              <Image src="/placeholder.svg" alt="Product" fill className="rounded-lg object-cover" />
+              <Image src="/login.png" alt="Product" fill className="rounded-lg object-cover" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold">Product Name</h3>
