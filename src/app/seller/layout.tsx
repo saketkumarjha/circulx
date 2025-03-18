@@ -1,4 +1,3 @@
-import type React from "react"
 import { Sidebar } from "@/components/seller/sidebar"
 import { Header } from "@/components/seller/header"
 
