@@ -18,25 +18,16 @@ export default function SellerHelpPage() {
               Help & Support
             </h1>
             <HelpSearch />
-            <Button 
-              size="lg"
-              className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white px-8 py-3 rounded-full text-lg"
-            >
+            <Button size="lg" className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white px-8 py-3 rounded-full text-lg">
               Try your Luck
             </Button>
           </div>
         </div>
         <div className="relative h-[400px] lg:h-[500px]">
-          <Image
-            src="/image.png"
-            alt="Help and Support Illustration"
-            fill
-            className="object-contain"
-            priority
-          />
+          <Image src="/image.png" alt="Help and Support Illustration" fill className="object-contain" priority />
         </div>
       </div>
-      
+
       {/* Tutorial Section */}
       <div className="mt-16 border-t pt-8">
         <h2 className="text-3xl md:text-4xl font-medium mb-8">Tutorials</h2>

@@ -1,4 +1,4 @@
-import DashboardContent from './dashboard-content'
+import DashboardContent from "./dashboard-content"
 
 // Main dashboard page component
 export default function SellerDashboard() {

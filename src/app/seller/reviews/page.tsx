@@ -10,7 +10,7 @@ const ratingStats: RatingStats = {
   total: 10000,
   average: 4.5,
   growth: 8.5,
-  distribution: [75, 15, 5, 3, 2]
+  distribution: [75, 15, 5, 3, 2],
 }
 
 const productDetails: IProductDetails = {
@@ -19,31 +19,32 @@ const productDetails: IProductDetails = {
   category: "Metal",
   pricePerUnit: 250,
   availableStock: 150,
-  description: "Aluminum sheet compound is a lightweight, durable, and corrosion-resistant sheet compound. Used in a variety of applications. Known for its excellent strength-to-weight ratio, aluminum is ideal for applications in aerospace, automotive, construction, packaging, and electronics. In today's industrial world, it can be formed into different formats such as sheets, foils, and extrusions. Aluminum is also 100% recyclable, offering an environmentally-friendly option for sustainable manufacturing.",
-  imageUrl: "/image.png"
+  description:
+    "Aluminum sheet compound is a lightweight, durable, and corrosion-resistant sheet compound. Used in a variety of applications. Known for its excellent strength-to-weight ratio, aluminum is ideal for applications in aerospace, automotive, construction, packaging, and electronics. In today's industrial world, it can be formed into different formats such as sheets, foils, and extrusions. Aluminum is also 100% recyclable, offering an environmentally-friendly option for sustainable manufacturing.",
+  imageUrl: "/image.png",
 }
 
 const productMetrics: ProductMetrics = {
   totalSales: {
     value: 500,
-    growth: 2.5
+    growth: 2.5,
   },
   revenue: {
     value: 25000,
-    growth: -4.5
+    growth: -4.5,
   },
   conversionRate: {
     value: 15,
-    growth: 2.5
+    growth: 2.5,
   },
   totalViews: {
     value: 2700,
-    growth: 2.9
+    growth: 2.9,
   },
   averageReview: {
     value: 4.5,
-    distribution: [75, 15, 5, 3, 2]
-  }
+    distribution: [75, 15, 5, 3, 2],
+  },
 }
 
 const reviews: Review[] = [
@@ -55,7 +56,7 @@ const reviews: Review[] = [
     rating: 2.5,
     text: "A type of fake review specifically designed to spread false information about a product or service. Disinformation reviews are often coordinated campaigns aimed at misleading consumers by presenting fabricated or manipulated facts.",
     date: "24th Dec 2023",
-    imageUrl: "/image.png"
+    imageUrl: "/image.png",
   },
   {
     id: "2",
@@ -65,7 +66,7 @@ const reviews: Review[] = [
     rating: 4.5,
     text: "A type of fake review specifically designed to spread false information about a product or service. Disinformation reviews are often coordinated campaigns aimed at misleading consumers by presenting fabricated or manipulated facts.",
     date: "14th Dec 2022",
-    imageUrl: "/image.png"
+    imageUrl: "/image.png",
   },
   {
     id: "3",
@@ -75,8 +76,8 @@ const reviews: Review[] = [
     rating: 4.5,
     text: "A type of fake review specifically designed to spread false information about a product or service. Disinformation reviews are often coordinated campaigns aimed at misleading consumers by presenting fabricated or manipulated facts.",
     date: "24th Dec 2023",
-    imageUrl: "/image.png"
-  }
+    imageUrl: "/image.png",
+  },
 ]
 
 export default function RatingAndReview() {
@@ -98,14 +99,14 @@ export default function RatingAndReview() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <StatsCard 
-              title="Total Review" 
+            <StatsCard
+              title="Total Review"
               value={`${(ratingStats.total / 1000).toFixed(1)}K`}
               subtitle="Growth in reviews"
               growth={ratingStats.growth}
             />
-            <StatsCard 
-              title="Average Review" 
+            <StatsCard
+              title="Average Review"
               value={ratingStats.average}
               subtitle="Average rating of this year"
               showStars={true}
@@ -120,7 +121,7 @@ export default function RatingAndReview() {
           </div>
 
           <div className="bg-card rounded-lg border divide-y">
-            {reviews.map(review => (
+            {reviews.map((review) => (
               <ReviewItem key={review.id} review={review} />
             ))}
           </div>
@@ -145,32 +146,32 @@ export default function RatingAndReview() {
           <div>
             <h2 className="text-xl font-semibold mb-4">Product Key Metrics Summary</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <StatsCard 
+              <StatsCard
                 title="Total Sales"
                 value={productMetrics.totalSales.value}
                 subtitle="Total units sold"
                 growth={productMetrics.totalSales.growth}
               />
-              <StatsCard 
+              <StatsCard
                 title="Revenue Generated"
                 value={`$${productMetrics.revenue.value.toLocaleString()}`}
                 subtitle="Revenue from product"
                 growth={productMetrics.revenue.growth}
               />
-              <StatsCard 
+              <StatsCard
                 title="Conversion Rate"
                 value={`${productMetrics.conversionRate.value}%`}
                 subtitle="% of views resulted in purchase"
                 growth={productMetrics.conversionRate.growth}
               />
-              <StatsCard 
+              <StatsCard
                 title="Total Views"
                 value={`${(productMetrics.totalViews.value / 1000).toFixed(1)}K`}
                 subtitle="No. of views"
                 growth={productMetrics.totalViews.growth}
               />
               <div className="sm:col-span-2 lg:col-span-2">
-                <StatsCard 
+                <StatsCard
                   title="Average Review"
                   value={productMetrics.averageReview.value}
                   subtitle="Average rating of this year"

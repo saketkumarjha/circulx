@@ -1,17 +1,9 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { Home, ShoppingCart, Clock, Settings, User, CreditCard, HelpCircle, BarChart } from 'lucide-react'
-import { Switch } from "@/components/ui/switch"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import type React from "react"
+
+import { useState } from "react"
+import { BarChart } from "lucide-react"
 import YouTubePlayer from "./video-player"
 
 export default function TutorialDashboard() {
@@ -20,33 +12,19 @@ export default function TutorialDashboard() {
 
   return (
     <div className="flex flex-col lg:flex-row">
-      
       <div className="flex-1  lg:p-0">
-        <div className="">
-         
-         
-        </div>
+        <div className=""></div>
 
         {/* B2B Sales Performance */}
         <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-           
-            
-          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4"></div>
           <div className="relative aspect-video bg-white rounded-lg border p-2">
-            <YouTubePlayer 
-              videoId={videoId}
-              isPlaying={isPlaying}
-              onPlayClick={() => setIsPlaying(true)}
-            />
+            <YouTubePlayer videoId={videoId} isPlaying={isPlaying} onPlayClick={() => setIsPlaying(true)} />
           </div>
         </div>
 
         {/* B2B Data Feed Activity */}
-        <div>
-          
-          
-        </div>
+        <div></div>
       </div>
     </div>
   )

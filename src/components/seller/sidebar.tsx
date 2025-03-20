@@ -1,9 +1,11 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package2, ClipboardList, Star, UserCircle, HelpCircle, Menu } from 'lucide-react'
+import { usePathname } from "next/navigation"
+import { LayoutDashboard, Package2, ClipboardList, Star, UserCircle, HelpCircle, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Sidebar() {
@@ -20,9 +22,9 @@ export function Sidebar() {
       }
     }
 
-    document.addEventListener('mousedown', handleOutsideClick)
+    document.addEventListener("mousedown", handleOutsideClick)
     return () => {
-      document.removeEventListener('mousedown', handleOutsideClick)
+      document.removeEventListener("mousedown", handleOutsideClick)
     }
   }, [isOpen])
 
@@ -45,18 +47,18 @@ export function Sidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className={`md:hidden absolute top-4 left-4 z-30 ${isOpen ? 'invisible' : 'visible'}`}
+        className={`md:hidden absolute top-4 left-4 z-30 ${isOpen ? "invisible" : "visible"}`}
         onClick={toggleSidebar}
       >
         <Menu className="h-6 w-6" />
       </Button>
-      <div 
+      <div
         ref={sidebarRef}
         className={`
           fixed inset-y-0 left-0 z-40 w-64 
           bg-white shadow-lg
           transform transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} 
           md:translate-x-0 md:static md:shadow-none
         `}
       >
@@ -66,7 +68,7 @@ export function Sidebar() {
           </div>
           <nav className="flex-1 overflow-y-auto px-4 py-1">
             {navItems.map((item) => (
-              <SidebarLink 
+              <SidebarLink
                 key={item.href}
                 href={item.href}
                 icon={<item.icon className="h-5 w-5" />}
@@ -90,14 +92,12 @@ interface SidebarLinkProps {
 
 function SidebarLink({ href, icon, label, isActive }: SidebarLinkProps) {
   return (
-    <Link 
+    <Link
       href={href}
       className={`
         flex items-center gap-3 rounded-md px-3 py-2 mb-1
         text-sm font-medium transition-colors duration-200
-        ${isActive 
-          ? 'bg-green-900 text-white' 
-          : 'text-black hover:bg-green-900'}
+        ${isActive ? "bg-green-900 text-white" : "text-black hover:bg-green-900"}
       `}
     >
       {icon}

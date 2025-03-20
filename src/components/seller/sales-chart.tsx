@@ -12,15 +12,7 @@ import {
   Filler,
 } from "chart.js"
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler
-)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
 
 export function SalesChart() {
   const data = {
@@ -32,16 +24,16 @@ export function SalesChart() {
         data: [45000, 48000, 42000, 38000, 35000, 30000, 32000],
         borderColor: "rgb(255, 98, 0)",
         backgroundColor: (context: any) => {
-          const ctx = context.chart.ctx;
-          const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-          gradient.addColorStop(0, "rgba(255, 98, 0, 0.3)");
-          gradient.addColorStop(1, "rgba(255, 98, 0, 0)");
-          return gradient;
+          const ctx = context.chart.ctx
+          const gradient = ctx.createLinearGradient(0, 0, 0, 200)
+          gradient.addColorStop(0, "rgba(255, 98, 0, 0.3)")
+          gradient.addColorStop(1, "rgba(255, 98, 0, 0)")
+          return gradient
         },
         borderWidth: 2,
         tension: 0.3,
         pointRadius: 0,
-      }
+      },
     ],
   }
 
@@ -53,20 +45,20 @@ export function SalesChart() {
         display: false,
       },
       tooltip: {
-        mode: 'index' as const,
+        mode: "index" as const,
         intersect: false,
         callbacks: {
-          label: function(context: any) {
-            let label = context.dataset.label || '';
+          label: (context: any) => {
+            let label = context.dataset.label || ""
             if (label) {
-              label += ': ';
+              label += ": "
             }
             if (context.parsed.y !== null) {
-              label += '₹' + context.parsed.y.toLocaleString('en-IN');
+              label += "₹" + context.parsed.y.toLocaleString("en-IN")
             }
-            return label;
-          }
-        }
+            return label
+          },
+        },
       },
     },
     scales: {
@@ -77,11 +69,11 @@ export function SalesChart() {
           color: "rgba(0, 0, 0, 0.05)",
         },
         ticks: {
-          callback: function(value: number | string) {
-            if (typeof value === 'number') {
-              return '₹' + value.toLocaleString('en-IN', { maximumSignificantDigits: 3 });
+          callback: (value: number | string) => {
+            if (typeof value === "number") {
+              return "₹" + value.toLocaleString("en-IN", { maximumSignificantDigits: 3 })
             }
-            return value;
+            return value
           },
         },
       },
@@ -92,9 +84,9 @@ export function SalesChart() {
       },
     },
     interaction: {
-      mode: 'nearest' as const,
-      axis: 'x' as const,
-      intersect: false
+      mode: "nearest" as const,
+      axis: "x" as const,
+      intersect: false,
     },
   }
 

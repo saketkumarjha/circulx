@@ -1,7 +1,7 @@
-import SimpleSlider from '@/components/home/SimpleSlider'
-import ProductGrid from '@/components/layout/product-grid'
-import { BrandCarousel } from '@/components/layout/brand-carousel'
-import FeatureCard from '@/components/layout/features-section'
+import SimpleSlider from "@/components/home/SimpleSlider"
+import ProductGrid from "@/components/layout/product-grid"
+import { BrandCarousel } from "@/components/layout/brand-carousel"
+import FeatureCard from "@/components/layout/features-section"
 
 export default function Home() {
   return (
@@ -10,9 +10,9 @@ export default function Home() {
       <BrandCarousel />
       <ProductGrid />
       <FeatureCard />
-      <ProductGrid />  
-      
+
       {/* Add more sections here */}
     </main>
   )
 }
+

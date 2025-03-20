@@ -47,4 +47,3 @@ export function SellerDetailsCard({ seller, isOpen, onClose }: SellerDetailsCard
   )
 }
 
-

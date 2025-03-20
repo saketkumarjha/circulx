@@ -1,23 +1,19 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { Plus, Upload, X } from 'lucide-react'
+import type React from "react"
+
+import { useState } from "react"
+import { Plus, Upload, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { ProductFormData } from '@/types'
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import type { ProductFormData } from "@/types"
 
 const formSchema = z.object({
   productName: z.string().min(1, "Product name is required"),
@@ -44,22 +40,27 @@ interface ProductFormProps {
 export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
   const [images, setImages] = useState<string[]>([])
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-  const [newCategory, setNewCategory] = useState('')
-  const [categories, setCategories] = useState<string[]>(['Metal', 'Wood', 'Plastic', 'Electronics'])
+  const [newCategory, setNewCategory] = useState("")
+  const [categories, setCategories] = useState<string[]>(["Metal", "Wood", "Plastic", "Electronics"])
   const [showCategoryInput, setShowCategoryInput] = useState(false)
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(formSchema)
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
   })
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files && images.length < 4) {
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file) => {
         if (images.length < 4) {
           const reader = new FileReader()
           reader.onloadend = () => {
-            setImages(prev => [...prev, reader.result as string])
+            setImages((prev) => [...prev, reader.result as string])
           }
           reader.readAsDataURL(file)
         }
@@ -68,7 +69,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
   }
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index))
+    setImages((prev) => prev.filter((_, i) => i !== index))
     if (selectedImageIndex >= index) {
       setSelectedImageIndex(Math.max(0, selectedImageIndex - 1))
     }
@@ -76,9 +77,9 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
 
   const handleAddCategory = () => {
     if (newCategory.trim()) {
-      setCategories(prev => [...prev, newCategory.trim()])
-      setValue('category', newCategory.trim())
-      setNewCategory('')
+      setCategories((prev) => [...prev, newCategory.trim()])
+      setValue("category", newCategory.trim())
+      setNewCategory("")
       setShowCategoryInput(false)
     }
   }
@@ -98,9 +99,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
           <Button variant="outline" onClick={onCancel}>
             Delete
           </Button>
-          <Button variant="outline">
-            Save Draft
-          </Button>
+          <Button variant="outline">Save Draft</Button>
         </div>
       </div>
 
@@ -114,7 +113,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                   <Label htmlFor="productName" className="text-base">
                     Product Name*
                   </Label>
-                  <Input 
+                  <Input
                     {...register("productName")}
                     id="productName"
                     placeholder="ABC Industries Pvt Ltd"
@@ -126,7 +125,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                   <Label htmlFor="skuCode" className="text-base">
                     SKU Code*
                   </Label>
-                  <Input 
+                  <Input
                     {...register("skuCode")}
                     id="skuCode"
                     placeholder="TSH-FFF-M"
@@ -138,7 +137,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                   <Label htmlFor="description" className="text-base">
                     Product Description*
                   </Label>
-                  <Textarea 
+                  <Textarea
                     {...register("description")}
                     id="description"
                     placeholder="Enter product description"
@@ -167,21 +166,14 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                     </div>
                     <div className="flex items-center gap-2 h-[80px]">
                       {images.map((img, index) => (
-                        <div
-                          key={index}
-                          className="relative w-[80px] h-[80px]"
-                        >
-                          <div 
+                        <div key={index} className="relative w-[80px] h-[80px]">
+                          <div
                             className={`relative w-full h-full cursor-pointer ${
-                              selectedImageIndex === index ? 'ring-2 ring-[#10b981]' : 'ring-1 ring-gray-200'
+                              selectedImageIndex === index ? "ring-2 ring-[#10b981]" : "ring-1 ring-gray-200"
                             }`}
                             onClick={() => setSelectedImageIndex(index)}
                           >
-                            <img
-                              src={img}
-                              alt={`Thumbnail ${index + 1}`}
-                              className="object-cover w-full h-full"
-                            />
+                            <img src={img} alt={`Thumbnail ${index + 1}`} className="object-cover w-full h-full" />
                             <button
                               type="button"
                               onClick={(e) => {
@@ -226,13 +218,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                     </label>
                   </div>
                 )}
-                <input
-                  type="file"
-                  id="imageUpload"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                />
+                <input type="file" id="imageUpload" className="hidden" accept="image/*" onChange={handleImageUpload} />
               </div>
             </CardContent>
           </Card>
@@ -245,7 +231,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                   <Label htmlFor="pricePerUnit" className="text-base">
                     Price Per Unit*
                   </Label>
-                  <Input 
+                  <Input
                     {...register("pricePerUnit")}
                     id="pricePerUnit"
                     placeholder="Enter price per unit"
@@ -264,7 +250,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                   <Label htmlFor="availableQuantity" className="text-base">
                     Available Quantity*
                   </Label>
-                  <Input 
+                  <Input
                     {...register("availableQuantity")}
                     id="availableQuantity"
                     placeholder="Enter available quantity"
@@ -277,13 +263,15 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                       }
                     }}
                   />
-                  {errors.availableQuantity && <p className="text-red-500 text-sm">{errors.availableQuantity.message}</p>}
+                  {errors.availableQuantity && (
+                    <p className="text-red-500 text-sm">{errors.availableQuantity.message}</p>
+                  )}
                 </div>
                 <div className="grid gap-1.5">
                   <Label htmlFor="discount" className="text-base">
                     Discount
                   </Label>
-                  <Input 
+                  <Input
                     {...register("discount")}
                     id="discount"
                     placeholder="Enter discount"
@@ -324,7 +312,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                     <Label htmlFor="weight" className="text-base">
                       Item Weight (in Kg)*
                     </Label>
-                    <Input 
+                    <Input
                       {...register("weight")}
                       id="weight"
                       placeholder="Enter item weight"
@@ -342,7 +330,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                   <div className="grid grid-cols-3 gap-4">
                     <div className="grid gap-1.5">
                       <Label htmlFor="length">Length*</Label>
-                      <Input 
+                      <Input
                         {...register("length")}
                         id="length"
                         placeholder="Length"
@@ -359,7 +347,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                     </div>
                     <div className="grid gap-1.5">
                       <Label htmlFor="breadth">Breadth*</Label>
-                      <Input 
+                      <Input
                         {...register("breadth")}
                         id="breadth"
                         placeholder="Breadth"
@@ -376,7 +364,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                     </div>
                     <div className="grid gap-1.5">
                       <Label htmlFor="width">Width*</Label>
-                      <Input 
+                      <Input
                         {...register("width")}
                         id="width"
                         placeholder="Width"
@@ -412,7 +400,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                           placeholder="Enter new category"
                           className="bg-white h-10"
                         />
-                        <Button 
+                        <Button
                           type="button"
                           onClick={handleAddCategory}
                           className="bg-[#10b981] hover:bg-[#10b981]/90 text-white"
@@ -422,7 +410,7 @@ export default function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <Select 
+                        <Select
                           onValueChange={(value) => {
                             if (value === "add_new") {
                               setShowCategoryInput(true)

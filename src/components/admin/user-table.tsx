@@ -1,15 +1,8 @@
-'use client'
+"use client"
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 interface User {
   id: string
@@ -21,18 +14,18 @@ interface User {
 
 interface UserTableProps {
   users: User[]
-  updateUserType: (userId: string, newType: 'admin' | 'seller' | 'customer') => Promise<any>
+  updateUserType: (userId: string, newType: "admin" | "seller" | "customer") => Promise<any>
 }
 
 export function UserTable({ users, updateUserType }: UserTableProps) {
   const router = useRouter()
 
-  const handleRoleChange = async (userId: string, newRole: 'admin' | 'seller' | 'customer') => {
+  const handleRoleChange = async (userId: string, newRole: "admin" | "seller" | "customer") => {
     try {
       await updateUserType(userId, newRole)
       router.refresh()
     } catch (error) {
-      console.error('Error updating user role:', error)
+      console.error("Error updating user role:", error)
     }
   }
 
@@ -63,9 +56,9 @@ export function UserTable({ users, updateUserType }: UserTableProps) {
               <TableCell className="text-center">
                 <div className="flex justify-center">
                   <Checkbox
-                    checked={user.role === 'admin'}
+                    checked={user.role === "admin"}
                     onCheckedChange={(checked) => {
-                      if (checked) handleRoleChange(user.id, 'admin')
+                      if (checked) handleRoleChange(user.id, "admin")
                     }}
                     className="border-emerald-600 data-[state=checked]:bg-emerald-600"
                   />
@@ -74,9 +67,9 @@ export function UserTable({ users, updateUserType }: UserTableProps) {
               <TableCell className="text-center">
                 <div className="flex justify-center">
                   <Checkbox
-                    checked={user.role === 'seller'}
+                    checked={user.role === "seller"}
                     onCheckedChange={(checked) => {
-                      if (checked) handleRoleChange(user.id, 'seller')
+                      if (checked) handleRoleChange(user.id, "seller")
                     }}
                     className="border-emerald-600 data-[state=checked]:bg-emerald-600"
                   />
@@ -85,9 +78,9 @@ export function UserTable({ users, updateUserType }: UserTableProps) {
               <TableCell className="text-center">
                 <div className="flex justify-center">
                   <Checkbox
-                    checked={user.role === 'customer'}
+                    checked={user.role === "customer"}
                     onCheckedChange={(checked) => {
-                      if (checked) handleRoleChange(user.id, 'customer')
+                      if (checked) handleRoleChange(user.id, "customer")
                     }}
                     className="border-emerald-600 data-[state=checked]:bg-emerald-600"
                   />

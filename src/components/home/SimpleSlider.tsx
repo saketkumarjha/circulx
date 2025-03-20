@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import { useState, useEffect } from "react"
+import Image from "next/image"
 
 const slides = [
   {
@@ -44,7 +44,7 @@ export default function SimpleSlider() {
         <div
           key={slide.id}
           className={`absolute top-0 left-0 w-full h-full transition-opacity duration-500 ${
-            index === currentSlide ? 'opacity-100' : 'opacity-0'
+            index === currentSlide ? "opacity-100" : "opacity-0"
           }`}
         >
           <div className="container mx-auto px-4 h-full flex flex-col sm:flex-row items-center">
@@ -54,13 +54,7 @@ export default function SimpleSlider() {
               <p className="text-lg sm:text-xl">👍 {slide.description}</p>
             </div>
             <div className="w-full sm:w-1/2">
-              <Image
-                src={slide.image}
-                alt={slide.title}
-                width={800}
-                height={400}
-                className="object-contain"
-              />
+              <Image src={slide.image} alt={slide.title} width={800} height={400} className="object-contain" />
             </div>
           </div>
         </div>
@@ -70,12 +64,11 @@ export default function SimpleSlider() {
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full ${
-              currentSlide === index ? 'bg-[#004D40]' : 'bg-gray-300'
-            }`}
+            className={`w-3 h-3 rounded-full ${currentSlide === index ? "bg-[#004D40]" : "bg-gray-300"}`}
           />
         ))}
       </div>
     </div>
   )
 }
+

@@ -29,12 +29,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         <p className="text-sm text-muted-foreground">{product.description}</p>
       </div>
       <div className="relative h-[200px] md:h-[300px]">
-        <Image
-          src={product.imageUrl || "/placeholder.svg"}
-          alt={product.name}
-          fill
-          className="object-contain"
-        />
+        <Image src={product.imageUrl || "/placeholder.svg"} alt={product.name} fill className="object-contain" />
       </div>
     </div>
   )

@@ -1,3 +1,57 @@
+export const ACCOUNT_TYPES = ["Savings", "Current"] as const
+export type AccountType = (typeof ACCOUNT_TYPES)[number]
+
+export type TabType = "business" | "contact" | "category" | "addresses" | "bank" | "documents"
+
+export const TAB_ORDER: TabType[] = ["business", "contact", "category", "addresses", "bank", "documents"]
+
+// Add the missing category and brand constants
+export const AVAILABLE_CATEGORIES = [
+  "Electronics",
+  "Fashion",
+  "Home & Kitchen",
+  "Beauty & Personal Care",
+  "Books",
+  "Toys & Games",
+  "Sports & Outdoors",
+  "Automotive",
+  "Health & Wellness",
+  "Grocery & Gourmet Food",
+] as const
+
+export const AVAILABLE_BRANDS = [
+  "Apple",
+  "Samsung",
+  "Sony",
+  "Nike",
+  "Adidas",
+  "Puma",
+  "H&M",
+  "Zara",
+  "IKEA",
+  "Philips",
+  "Bosch",
+  "L'Oreal",
+  "Maybelline",
+  "Dove",
+  "Penguin Books",
+  "HarperCollins",
+  "LEGO",
+  "Mattel",
+  "Wilson",
+  "Spalding",
+] as const
+
+export interface CategoryAndBrand {
+  // Fix: Add the missing properties
+  categories: string[]
+  authorizedBrands: string[]
+  // Keep these for backward compatibility
+  id?: string
+  name?: string
+  selected?: boolean
+}
+
 export interface BusinessDetails {
   legalEntityName: string
   tradeName: string
@@ -16,47 +70,28 @@ export interface ContactDetails {
   pickupTime: string
 }
 
-export type TabType = "business" | "contact" | "category" | "addresses" | "bank" | "documents"
-
-export interface CategoryAndBrand {
+export interface CategoryBrandDetails {
   categories: string[]
   authorizedBrands: string[]
 }
 
-export const AVAILABLE_CATEGORIES = [
-  "Agrochemicals",
-  "Material Handling & Packagings",
-  "Office Furniture & Decor",
-  "Packaging Bags",
-  "Raw Materials",
-  "Plumbing & Bathroom Fittings",
-  "Custom Manufacturing",
-  "Gardening & Landscaping",
-] as string[]
-
-export const AVAILABLE_BRANDS = [
-  "AS Medisteel",
-  "Aerospace",
-  "Aeropress",
-  "Agni Devices",
-  "Ajay Syscon",
-  "Aktion Aarvee",
-  "Allen-Bradley",
-  "Amar Transformers",
-] as string[]
-
-export interface Address {
-  country: string
-  state: string
-  city: string
-  addressLine1: string
-  addressLine2?: string
-  phoneNumber: string
-}
-
 export interface AddressDetails {
-  billingAddress: Address
-  pickupAddress: Address
+  billingAddress: {
+    country: string
+    state: string
+    city: string
+    addressLine1: string
+    addressLine2?: string
+    phoneNumber: string
+  }
+  pickupAddress: {
+    country: string
+    state: string
+    city: string
+    addressLine1: string
+    addressLine2?: string
+    phoneNumber: string
+  }
 }
 
 export interface BankDetails {
@@ -66,31 +101,12 @@ export interface BankDetails {
   bankName: string
   branch: string
   city: string
-  bankLetter?: File
-  accountType: string
+  accountType: AccountType | undefined
+  bankLetterFile?: File
 }
-
-export const ACCOUNT_TYPES = [
-  "Escrow Account",
-  "Current Account",
-  "Saving Account",
-  "Joint Account",
-  "Cash Credit/Overdraft",
-] as const
 
 export interface DocumentDetails {
-  panCard?: File
-  gstin?: File
-  bankLetter?: File
-  bankStatement?: File
-  corporationCertificate?: File
-  businessAddress?: File
-  pickupAddressProof?: File
-  signature?: File
-  balanceSheet2223?: File
-  balanceSheet2324?: File
+  aadharCard?: string
+  panCard?: string
 }
-
-// Update TabType to be more specific for navigation
-export const TAB_ORDER: TabType[] = ["business", "contact", "category", "addresses", "bank", "documents"] as const
 

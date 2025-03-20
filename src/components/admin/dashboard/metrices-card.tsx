@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { TypeIcon as type, type LucideIcon } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 interface MetricCardProps {
   title: string

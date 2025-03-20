@@ -1,12 +1,12 @@
-import mongoose, { Document, Model, Schema } from 'mongoose'
+import mongoose, { type Document, type Model, Schema } from "mongoose"
 
 export interface IUser extends Document {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  email: string;
-  password: string;
-  type: 'admin' | 'seller' | 'customer';
-  createdAt: Date;
+  _id: mongoose.Types.ObjectId
+  name: string
+  email: string
+  password: string
+  type: "admin" | "seller" | "customer"
+  createdAt: Date
 }
 
 const userSchema = new Schema<IUser>({
@@ -25,8 +25,8 @@ const userSchema = new Schema<IUser>({
   },
   type: {
     type: String,
-    enum: ['admin', 'seller', 'customer'],
-    default: 'customer',
+    enum: ["admin", "seller", "customer"],
+    default: "customer",
   },
   createdAt: {
     type: Date,
@@ -34,5 +34,5 @@ const userSchema = new Schema<IUser>({
   },
 })
 
-export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema)
+export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>("User", userSchema)
 

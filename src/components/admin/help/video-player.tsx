@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react"
 
 interface YouTubePlayerProps {
   videoId: string
@@ -13,30 +13,27 @@ export default function YouTubePlayer({ videoId, isPlaying, onPlayClick }: YouTu
 
   useEffect(() => {
     if (isPlaying && playerRef.current) {
-      const iframe = document.createElement('iframe')
+      const iframe = document.createElement("iframe")
       iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`
-      iframe.width = '100%'
-      iframe.height = '100%'
-      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+      iframe.width = "100%"
+      iframe.height = "100%"
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       iframe.allowFullscreen = true
-      iframe.style.position = 'absolute'
-      iframe.style.top = '0'
-      iframe.style.left = '0'
-      iframe.style.width = '100%'
-      iframe.style.height = '100%'
-      iframe.style.border = 'none'
+      iframe.style.position = "absolute"
+      iframe.style.top = "0"
+      iframe.style.left = "0"
+      iframe.style.width = "100%"
+      iframe.style.height = "100%"
+      iframe.style.border = "none"
 
-      playerRef.current.innerHTML = ''
+      playerRef.current.innerHTML = ""
       playerRef.current.appendChild(iframe)
     }
   }, [isPlaying, videoId])
 
   if (!isPlaying) {
     return (
-      <div 
-        className="absolute inset-0 cursor-pointer group"
-        onClick={onPlayClick}
-      >
+      <div className="absolute inset-0 cursor-pointer group" onClick={onPlayClick}>
         <img
           src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
           alt="Video thumbnail"

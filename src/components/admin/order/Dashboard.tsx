@@ -1,6 +1,4 @@
 "use client"
-
-import { useState } from "react"
 import StatsSection from "./StatsSection"
 import ChartsSection from "./ChartsSection"
 import OrdersTable from "./OrdersTable"

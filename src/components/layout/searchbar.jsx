@@ -1,40 +1,42 @@
-import { Search } from "lucide-react";
-import React, { useState, useEffect } from "react";
+"use client"
+
+import { Search } from "lucide-react"
+import { useState, useEffect } from "react"
 
 const SearchBar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredSuggestions, setFilteredSuggestions] = useState([])
+  const [products, setProducts] = useState([])
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("/api/products");
-        const data = await response.json();
-        setProducts(data);
+        const response = await fetch("/api/products")
+        const data = await response.json()
+        setProducts(data)
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching products:", error)
       }
-    };
+    }
 
-    fetchProducts();
-  }, []);
+    fetchProducts()
+  }, [])
 
   const handleInputChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
+    const query = e.target.value
+    setSearchQuery(query)
 
     if (query.trim()) {
       const matches = products.filter((product) => {
-        const titleMatch = product.title.toLowerCase().includes(query.toLowerCase());
-        const descriptionMatch = product.description?.toLowerCase().includes(query.toLowerCase());
-        return titleMatch || descriptionMatch;
-      });
-      setFilteredSuggestions(matches);
+        const titleMatch = product.title.toLowerCase().includes(query.toLowerCase())
+        const descriptionMatch = product.description?.toLowerCase().includes(query.toLowerCase())
+        return titleMatch || descriptionMatch
+      })
+      setFilteredSuggestions(matches)
     } else {
-      setFilteredSuggestions([]);
+      setFilteredSuggestions([])
     }
-  };
+  }
 
   return (
     <div className="hidden md:block flex-1 max-w-2xl mx-8">
@@ -55,8 +57,8 @@ const SearchBar = () => {
                   key={product.product_id}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                   onClick={() => {
-                    setSearchQuery(product.title);
-                    setFilteredSuggestions([]);
+                    setSearchQuery(product.title)
+                    setFilteredSuggestions([])
                   }}
                 >
                   {product.title}
@@ -67,7 +69,8 @@ const SearchBar = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SearchBar;
+export default SearchBar
+

@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { StatCardProps } from "@/types/dashboard"
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import type { StatCardProps } from "@/types/dashboard"
+import { ArrowDown, ArrowUp } from "lucide-react"
 
 export function StatCard({ title, value, change, icon }: StatCardProps) {
   return (
@@ -17,27 +17,24 @@ export function StatCard({ title, value, change, icon }: StatCardProps) {
             {/* Change indicator section */}
             <div className="flex items-center mt-1">
               {/* Conditional rendering of increase/decrease arrow */}
-              {change.type === 'increase' ? (
+              {change.type === "increase" ? (
                 <ArrowUp className="w-4 h-4 text-green-500" />
               ) : (
                 <ArrowDown className="w-4 h-4 text-red-500" />
               )}
               {/* Change value with conditional color */}
-              <span className={`text-sm ${change.type === 'increase' ? 'text-green-500' : 'text-red-500'}`}>
+              <span className={`text-sm ${change.type === "increase" ? "text-green-500" : "text-red-500"}`}>
                 {change.value}
               </span>
               {/* Time period text */}
-              <span className="text-sm text-muted-foreground ml-1">
-                {change.period}
-              </span>
+              <span className="text-sm text-muted-foreground ml-1">{change.period}</span>
             </div>
           </div>
           {/* Right side - Icon container */}
-          <div className="p-3 bg-primary/10 rounded-full">
-            {icon}
-          </div>
+          <div className="p-3 bg-primary/10 rounded-full">{icon}</div>
         </div>
       </CardContent>
     </Card>
   )
 }
+

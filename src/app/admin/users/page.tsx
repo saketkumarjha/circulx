@@ -1,8 +1,8 @@
-import { getCurrentUser, updateUserType } from '@/actions/auth'
-import { redirect } from 'next/navigation'
-import { User } from '@/models/user'
-import { connectDB1 } from '@/lib/db'
-import { UserTable } from '@/components/admin/user-table'
+import { getCurrentUser, updateUserType } from "@/actions/auth"
+import { redirect } from "next/navigation"
+import { User } from "@/models/user"
+import { connectDB1 } from "@/lib/db"
+import { UserTable } from "@/components/admin/user-table"
 
 // Helper function to serialize user data
 function serializeUser(user: any, index: number) {
@@ -19,16 +19,16 @@ export default async function UserManagementPage() {
   try {
     await connectDB1()
     const currentUser = await getCurrentUser()
-    
+
     if (!currentUser) {
-      return redirect('/login')
+      return redirect("/login")
     }
 
-    if (currentUser.type !== 'admin') {
-      return redirect('/')
+    if (currentUser.type !== "admin") {
+      return redirect("/")
     }
 
-    const users = await User.find({}).select('-password')
+    const users = await User.find({}).select("-password")
     const serializedUsers = users.map(serializeUser)
 
     return (
@@ -40,8 +40,7 @@ export default async function UserManagementPage() {
       </div>
     )
   } catch (error) {
-    console.error('Error in UserManagementPage:', error)
-    
+    console.error("Error in UserManagementPage:", error)
   }
 }
 

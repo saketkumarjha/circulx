@@ -7,43 +7,43 @@ interface Product {
   dateTime: string
   piece: string
   amount: string
-  status: 'delivered' | 'pending' | 'rejected'
+  status: "delivered" | "pending" | "rejected"
 }
 
 const recentProducts: Product[] = [
   {
-    name: 'Aluminium Sheets',
-    icon: '/audi.jpeg',
-    submittedBy: 'ABD Industry Pvt Ltd',
-    dateTime: '12.09.2019 - 12:53 PM',
-    piece: '423',
-    amount: '$34,295',
-    status: 'delivered',
+    name: "Aluminium Sheets",
+    icon: "/audi.jpeg",
+    submittedBy: "ABD Industry Pvt Ltd",
+    dateTime: "12.09.2019 - 12:53 PM",
+    piece: "423",
+    amount: "$34,295",
+    status: "delivered",
   },
   {
-    name: 'Wires',
-    icon: '/cart.png',
-    submittedBy: 'Pawar Factory Pvt Ltd',
-    dateTime: '12.09.2019 - 12:53 PM',
-    piece: '423',
-    amount: '$34,295',
-    status: 'pending',
+    name: "Wires",
+    icon: "/cart.png",
+    submittedBy: "Pawar Factory Pvt Ltd",
+    dateTime: "12.09.2019 - 12:53 PM",
+    piece: "423",
+    amount: "$34,295",
+    status: "pending",
   },
   {
-    name: 'Apple Watch',
-    icon: '/login.png',
-    submittedBy: '6096 Maryplane Landing',
-    dateTime: '12.09.2019 - 12:53 PM',
-    piece: '423',
-    amount: '$34,295',
-    status: 'rejected',
+    name: "Apple Watch",
+    icon: "/login.png",
+    submittedBy: "6096 Maryplane Landing",
+    dateTime: "12.09.2019 - 12:53 PM",
+    piece: "423",
+    amount: "$34,295",
+    status: "rejected",
   },
 ]
 
 const statusStyles = {
-  delivered: 'bg-emerald-100 text-emerald-800',
-  pending: 'bg-yellow-100 text-yellow-800',
-  rejected: 'bg-red-100 text-red-800',
+  delivered: "bg-emerald-100 text-emerald-800",
+  pending: "bg-yellow-100 text-yellow-800",
+  rejected: "bg-red-100 text-red-800",
 }
 
 export function RecentProductsTable() {
@@ -64,17 +64,10 @@ export function RecentProductsTable() {
           </thead>
           <tbody>
             {recentProducts.map((product, index) => (
-              <tr
-                key={index}
-                className="border-t bg-white hover:bg-gray-50"
-              >
+              <tr key={index} className="border-t bg-white hover:bg-gray-50">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={product.icon}
-                      alt={product.name}
-                      className="h-10 w-10 rounded-md object-cover"
-                    />
+                    <img src={product.icon} alt={product.name} className="h-10 w-10 rounded-md object-cover" />
                     <span className="font-medium">{product.name}</span>
                   </div>
                 </td>

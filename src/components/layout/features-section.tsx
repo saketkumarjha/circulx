@@ -1,4 +1,5 @@
-import { Truck, RefreshCw, Lock, Phone } from 'lucide-react'
+import type React from "react"
+import { Truck, RefreshCw, Lock, Phone } from "lucide-react"
 
 interface FeatureCardProps {
   icon: React.ReactNode
@@ -10,10 +11,10 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon, title, description, iconColor, hoverColor }: FeatureCardProps) {
   return (
-    <div className={`flex flex-col items-center justify-center p-4 bg-white bg-opacity-80 rounded-2xl shadow-md w-full max-w-[200px] h-[180px] transition-all duration-300 ${hoverColor}`}>
-      <div className={`mb-3 ${iconColor}`}>
-        {icon}
-      </div>
+    <div
+      className={`flex flex-col items-center justify-center p-4 bg-white bg-opacity-80 rounded-2xl shadow-md w-full max-w-[200px] h-[180px] transition-all duration-300 ${hoverColor}`}
+    >
+      <div className={`mb-3 ${iconColor}`}>{icon}</div>
       <h3 className="mb-1 text-base font-medium text-gray-900 text-center">{title}</h3>
       <p className="text-xs text-gray-500 text-center">{description}</p>
     </div>

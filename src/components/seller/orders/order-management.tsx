@@ -1,15 +1,12 @@
 "use client"
 
 import * as React from "react"
+import { CaretSortIcon } from "@radix-ui/react-icons"
 import {
-  CaretSortIcon,
-  ChevronDownIcon,
-} from "@radix-ui/react-icons"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -19,30 +16,9 @@ import {
 } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 
 type Order = {
   id: string
@@ -54,21 +30,119 @@ type Order = {
 }
 
 const initialData: Order[] = [
-  { id: "1234", orderDate: "10 Dec 2024", buyerName: "ABC Industries", status: "Delivered", amount: 25000, payment: "Paid" },
-  { id: "1235", orderDate: "09 Dec 2024", buyerName: "XYZ Pvt Ltd", status: "Delivered", amount: 45000, payment: "Paid" },
-  { id: "1236", orderDate: "04 Dec 2024", buyerName: "DEF Enterprises", status: "Pending", amount: 30000, payment: "Pending" },
-  { id: "1237", orderDate: "03 Dec 2024", buyerName: "A.D Industries", status: "Delivered", amount: 25000, payment: "Paid" },
-  { id: "1238", orderDate: "06 Dec 2024", buyerName: "Aditya Industries", status: "Pending", amount: 30000, payment: "Pending" },
-  { id: "1239", orderDate: "18 Dec 2024", buyerName: "E.S Enterprises", status: "Delivered", amount: 45000, payment: "Paid" },
-  { id: "1240", orderDate: "28 Dec 2024", buyerName: "Dilip Enterprises", status: "Delivered", amount: 25000, payment: "Paid" },
+  {
+    id: "1234",
+    orderDate: "10 Dec 2024",
+    buyerName: "ABC Industries",
+    status: "Delivered",
+    amount: 25000,
+    payment: "Paid",
+  },
+  {
+    id: "1235",
+    orderDate: "09 Dec 2024",
+    buyerName: "XYZ Pvt Ltd",
+    status: "Delivered",
+    amount: 45000,
+    payment: "Paid",
+  },
+  {
+    id: "1236",
+    orderDate: "04 Dec 2024",
+    buyerName: "DEF Enterprises",
+    status: "Pending",
+    amount: 30000,
+    payment: "Pending",
+  },
+  {
+    id: "1237",
+    orderDate: "03 Dec 2024",
+    buyerName: "A.D Industries",
+    status: "Delivered",
+    amount: 25000,
+    payment: "Paid",
+  },
+  {
+    id: "1238",
+    orderDate: "06 Dec 2024",
+    buyerName: "Aditya Industries",
+    status: "Pending",
+    amount: 30000,
+    payment: "Pending",
+  },
+  {
+    id: "1239",
+    orderDate: "18 Dec 2024",
+    buyerName: "E.S Enterprises",
+    status: "Delivered",
+    amount: 45000,
+    payment: "Paid",
+  },
+  {
+    id: "1240",
+    orderDate: "28 Dec 2024",
+    buyerName: "Dilip Enterprises",
+    status: "Delivered",
+    amount: 25000,
+    payment: "Paid",
+  },
   { id: "1241", orderDate: "29 Dec 2024", buyerName: "GHI Corp", status: "Pending", amount: 35000, payment: "Pending" },
-  { id: "1242", orderDate: "30 Dec 2024", buyerName: "JKL Limited", status: "Delivered", amount: 28000, payment: "Paid" },
-  { id: "1243", orderDate: "31 Dec 2024", buyerName: "MNO Systems", status: "Delivered", amount: 42000, payment: "Paid" },
-  { id: "1244", orderDate: "01 Jan 2025", buyerName: "PQR Solutions", status: "Pending", amount: 33000, payment: "Pending" },
-  { id: "1245", orderDate: "02 Jan 2025", buyerName: "STU Technologies", status: "Delivered", amount: 38000, payment: "Paid" },
-  { id: "1246", orderDate: "03 Jan 2025", buyerName: "VWX Industries", status: "Pending", amount: 27000, payment: "Pending" },
-  { id: "1247", orderDate: "04 Jan 2025", buyerName: "YZA Corporation", status: "Delivered", amount: 51000, payment: "Paid" },
-  { id: "1248", orderDate: "05 Jan 2025", buyerName: "BCD Enterprises", status: "Delivered", amount: 44000, payment: "Paid" },
+  {
+    id: "1242",
+    orderDate: "30 Dec 2024",
+    buyerName: "JKL Limited",
+    status: "Delivered",
+    amount: 28000,
+    payment: "Paid",
+  },
+  {
+    id: "1243",
+    orderDate: "31 Dec 2024",
+    buyerName: "MNO Systems",
+    status: "Delivered",
+    amount: 42000,
+    payment: "Paid",
+  },
+  {
+    id: "1244",
+    orderDate: "01 Jan 2025",
+    buyerName: "PQR Solutions",
+    status: "Pending",
+    amount: 33000,
+    payment: "Pending",
+  },
+  {
+    id: "1245",
+    orderDate: "02 Jan 2025",
+    buyerName: "STU Technologies",
+    status: "Delivered",
+    amount: 38000,
+    payment: "Paid",
+  },
+  {
+    id: "1246",
+    orderDate: "03 Jan 2025",
+    buyerName: "VWX Industries",
+    status: "Pending",
+    amount: 27000,
+    payment: "Pending",
+  },
+  {
+    id: "1247",
+    orderDate: "04 Jan 2025",
+    buyerName: "YZA Corporation",
+    status: "Delivered",
+    amount: 51000,
+    payment: "Paid",
+  },
+  {
+    id: "1248",
+    orderDate: "05 Jan 2025",
+    buyerName: "BCD Enterprises",
+    status: "Delivered",
+    amount: 44000,
+    payment: "Paid",
+  },
 ]
 
 export function OrderManagement() {
@@ -85,10 +159,7 @@ export function OrderManagement() {
       accessorKey: "id",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
             Order ID
             <CaretSortIcon className="ml-2 h-4 w-4" />
           </Button>
@@ -100,10 +171,7 @@ export function OrderManagement() {
       accessorKey: "orderDate",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
             Order Date
             <CaretSortIcon className="ml-2 h-4 w-4" />
           </Button>
@@ -114,10 +182,7 @@ export function OrderManagement() {
       accessorKey: "buyerName",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
             Buyer Name
             <CaretSortIcon className="ml-2 h-4 w-4" />
           </Button>
@@ -140,11 +205,13 @@ export function OrderManagement() {
               console.log(`Updating status for order ${row.getValue("id")} to ${value}`)
             }}
           >
-            <SelectTrigger className={`w-[110px] h-8 ${
-              status === "Delivered" 
-                ? "bg-green-100 text-green-800 border-green-200" 
-                : "bg-yellow-100 text-yellow-800 border-yellow-200"
-            }`}>
+            <SelectTrigger
+              className={`w-[110px] h-8 ${
+                status === "Delivered"
+                  ? "bg-green-100 text-green-800 border-green-200"
+                  : "bg-yellow-100 text-yellow-800 border-yellow-200"
+              }`}
+            >
               <SelectValue>{status}</SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -159,17 +226,14 @@ export function OrderManagement() {
       accessorKey: "amount",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
             Amount
             <CaretSortIcon className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"))
+        const amount = Number.parseFloat(row.getValue("amount"))
         const formatted = new Intl.NumberFormat("en-IN", {
           style: "currency",
           currency: "INR",
@@ -193,11 +257,13 @@ export function OrderManagement() {
               console.log(`Updating payment for order ${row.getValue("id")} to ${value}`)
             }}
           >
-            <SelectTrigger className={`w-[110px] h-8 ${
-              payment === "Paid" 
-                ? "bg-green-100 text-green-800 border-green-200" 
-                : "bg-gray-100 text-gray-800 border-gray-200"
-            }`}>
+            <SelectTrigger
+              className={`w-[110px] h-8 ${
+                payment === "Paid"
+                  ? "bg-green-100 text-green-800 border-green-200"
+                  : "bg-gray-100 text-gray-800 border-gray-200"
+              }`}
+            >
               <SelectValue>{payment}</SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -273,9 +339,7 @@ export function OrderManagement() {
           <Input
             placeholder="Search by Buyer Name/Company Name"
             value={(table.getColumn("buyerName")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("buyerName")?.setFilterValue(event.target.value)
-            }
+            onChange={(event) => table.getColumn("buyerName")?.setFilterValue(event.target.value)}
             className="pl-10 pr-4 w-full"
           />
         </div>
@@ -331,13 +395,11 @@ export function OrderManagement() {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                  <TableHead
+                    key={header.id}
+                    className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -346,10 +408,7 @@ export function OrderManagement() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-2 py-3 whitespace-nowrap">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

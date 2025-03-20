@@ -1,29 +1,28 @@
-import { ReactNode } from 'react'
-import { Package2, ClipboardList, Wallet, TrendingUp, ArrowRight } from 'lucide-react'
+import type { ReactNode } from "react"
+import { Package2, ClipboardList, Wallet, TrendingUp, ArrowRight } from "lucide-react"
 import { Card } from "@/components/ui/card"
-import { SalesChart } from '@/components/seller/sales-chart'
+import { SalesChart } from "@/components/seller/sales-chart"
 import { Button } from "@/components/ui/button"
 
 interface PerformanceCardProps {
-  icon: ReactNode;
-  label: string;
-  value: string | number;
-  prefix?: string;
+  icon: ReactNode
+  label: string
+  value: string | number
+  prefix?: string
 }
 
-function PerformanceCard({ icon, label, value, prefix = '' }: PerformanceCardProps) {
+function PerformanceCard({ icon, label, value, prefix = "" }: PerformanceCardProps) {
   return (
     <Card className="p-6">
       <div className="flex items-center">
         <div className="flex-shrink-0 mr-4">
-          <div className="bg-gray-100 rounded-full p-3">
-            {icon}
-          </div>
+          <div className="bg-gray-100 rounded-full p-3">{icon}</div>
         </div>
         <div>
           <p className="text-sm text-gray-600 mb-1">{label}</p>
           <p className="text-2xl font-semibold">
-            {prefix}{value}
+            {prefix}
+            {value}
           </p>
         </div>
       </div>
@@ -33,11 +32,11 @@ function PerformanceCard({ icon, label, value, prefix = '' }: PerformanceCardPro
 
 export default function DashboardContent() {
   const orders = [
-    { id: '1234', product: 'Scrap Paper', customer: 'ABC Industries', status: 'Completed', amount: '₹25,000' },
-    { id: '1235', product: 'Glass Sheets', customer: 'XYZ Pvt Ltd', status: 'Completed', amount: '₹45,000' },
-    { id: '1236', product: 'Aluminum Scrap', customer: 'GHI Enterprises', status: 'Pending', amount: '₹35,000' },
-    { id: '1237', product: 'Scrap Paper', customer: 'A.P Industries', status: 'Completed', amount: '₹22,000' },
-    { id: '1238', product: 'Aluminum Scrap', customer: 'Amiya Industries', status: 'Pending', amount: '₹55,000' },
+    { id: "1234", product: "Scrap Paper", customer: "ABC Industries", status: "Completed", amount: "₹25,000" },
+    { id: "1235", product: "Glass Sheets", customer: "XYZ Pvt Ltd", status: "Completed", amount: "₹45,000" },
+    { id: "1236", product: "Aluminum Scrap", customer: "GHI Enterprises", status: "Pending", amount: "₹35,000" },
+    { id: "1237", product: "Scrap Paper", customer: "A.P Industries", status: "Completed", amount: "₹22,000" },
+    { id: "1238", product: "Aluminum Scrap", customer: "Amiya Industries", status: "Pending", amount: "₹55,000" },
   ]
 
   return (
@@ -50,11 +49,7 @@ export default function DashboardContent() {
 
       {/* Performance Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <PerformanceCard
-          icon={<Package2 className="h-6 w-6 text-blue-600" />}
-          label="Products Listed"
-          value="120"
-        />
+        <PerformanceCard icon={<Package2 className="h-6 w-6 text-blue-600" />} label="Products Listed" value="120" />
         <PerformanceCard
           icon={<ClipboardList className="h-6 w-6 text-green-600" />}
           label="Orders Pending"
@@ -81,9 +76,15 @@ export default function DashboardContent() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
               <h2 className="text-lg font-semibold mb-2 sm:mb-0">Recent Orders</h2>
               <div className="flex flex-wrap items-center gap-2">
-                <Button variant="ghost" size="sm">Share</Button>
-                <Button variant="ghost" size="sm">Filter</Button>
-                <Button variant="ghost" size="sm">Export</Button>
+                <Button variant="ghost" size="sm">
+                  Share
+                </Button>
+                <Button variant="ghost" size="sm">
+                  Filter
+                </Button>
+                <Button variant="ghost" size="sm">
+                  Export
+                </Button>
               </div>
             </div>
             <div className="overflow-x-auto -mx-4 sm:-mx-6">
@@ -91,12 +92,42 @@ export default function DashboardContent() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order #</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">View</th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Order #
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Product
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Customer
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Status
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Amount
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        View
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -106,17 +137,21 @@ export default function DashboardContent() {
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{order.product}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{order.customer}</td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 text-xs font-semibold leading-5 rounded-full ${
-                            order.status === 'Completed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
+                          <span
+                            className={`inline-flex px-2 text-xs font-semibold leading-5 rounded-full ${
+                              order.status === "Completed"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
                             {order.status}
                           </span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{order.amount}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-900">View</Button>
+                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-900">
+                            View
+                          </Button>
                         </td>
                       </tr>
                     ))}

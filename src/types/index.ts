@@ -24,7 +24,7 @@ export interface Product {
   }
 }
 
-export type CategoryType = 'All' | 'Metal' | 'Wood' | 'Plastic' | 'Electronics'
+export type CategoryType = "All" | "Metal" | "Wood" | "Plastic" | "Electronics"
 
 export interface ProductFormData {
   productName: string

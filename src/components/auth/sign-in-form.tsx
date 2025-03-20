@@ -1,11 +1,10 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { signIn } from '@/actions/auth'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
+import { useState } from "react"
+import { signIn } from "@/actions/auth"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface SignInFormProps {
   onSuccess: () => void
@@ -13,12 +12,12 @@ interface SignInFormProps {
 }
 
 export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
-  const [error, setError] = useState('')
+  const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true)
-    setError('')
+    setError("")
 
     const result = await signIn(formData)
 
@@ -34,9 +33,7 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-4xl px-20 font-semibold text-white">
-          Login
-        </h1>
+        <h1 className="text-4xl px-20 font-semibold text-white">Login</h1>
         <p className="text-gray-200 px-16">Glad you're back!</p>
       </div>
       <form action={handleSubmit} className="space-y-4">
@@ -63,34 +60,25 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
           />
         </div>
         <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="remember" 
-            name="remember" 
-            className="border-gray-100 data-[state=checked]:bg-purple-600"
-          />
-          <label
-            htmlFor="remember"
-            className="text-sm text-gray-100"
-          >
+          <Checkbox id="remember" name="remember" className="border-gray-100 data-[state=checked]:bg-purple-600" />
+          <label htmlFor="remember" className="text-sm text-gray-100">
             Remember me
           </label>
         </div>
-        {error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
-        <Button 
-          type="submit" 
-          className="w-full h-9 text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 rounded-lg" 
+        {error && <p className="text-sm text-red-500">{error}</p>}
+        <Button
+          type="submit"
+          className="w-full h-9 text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 rounded-lg"
           disabled={isLoading}
         >
-          {isLoading ? 'Signing in...' : 'Login'}
+          {isLoading ? "Signing in..." : "Login"}
         </Button>
         <div className="text-center ">
           <a href="#" className="text-sm text-gray-50 hover:text-white">
             Forgot password?
           </a>
         </div>
-        
+
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-gray-800"></span>
@@ -125,15 +113,21 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
         </div>
       </form>
       <div className="text-center text-sm text-gray-200">
-        Don't have an account?{' '}
+        Don't have an account?{" "}
         <button onClick={onSignUp} className="text-purple-400 hover:text-gray-200">
           Signup
         </button>
       </div>
       <div className="flex justify-between text-xs text-gray-200 py-2">
-        <a href="#" className="hover:text-gray-400">Terms & Conditions</a>
-        <a href="#" className="hover:text-gray-400">Support</a>
-        <a href="#" className="hover:text-gray-400">Customer Care</a>
+        <a href="#" className="hover:text-gray-400">
+          Terms & Conditions
+        </a>
+        <a href="#" className="hover:text-gray-400">
+          Support
+        </a>
+        <a href="#" className="hover:text-gray-400">
+          Customer Care
+        </a>
       </div>
     </div>
   )

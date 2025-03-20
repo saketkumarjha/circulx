@@ -1,13 +1,13 @@
-import { connectDB2 } from '@/lib/db';
-import mongoose from 'mongoose';
+import { connectDB } from "@/lib/prod_db"
+import mongoose from "mongoose"
 
 interface Payment {
-  payment_id: number;
-  status: string;
-  method: string;
-  amount: number;
-  created_at?: string;
-  updated_at?: string;
+  payment_id: number
+  status: string
+  method: string
+  amount: number
+  created_at?: string
+  updated_at?: string
 }
 
 const paymentSchema = new mongoose.Schema<Payment>({
@@ -16,10 +16,11 @@ const paymentSchema = new mongoose.Schema<Payment>({
   method: { type: String, required: true },
   amount: { type: Number, required: true },
   created_at: { type: String },
-  updated_at: { type: String }
-});
+  updated_at: { type: String },
+})
 
-const db = await connectDB2();
-const PaymentModel = db.models.Payment || db.model<Payment>('Payment', paymentSchema);
+const db = await connectDB()
+const PaymentModel = db.models.Payment || db.model<Payment>("Payment", paymentSchema)
 
-export { PaymentModel, paymentSchema };
+export { PaymentModel, paymentSchema }
+

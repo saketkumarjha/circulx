@@ -1,17 +1,11 @@
-'use client'
+"use client"
 
 import { useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { sendContactEmail } from "@/actions/contact"
 
 export default function ContactForm() {
@@ -28,7 +22,7 @@ export default function ContactForm() {
         setError(result.error || "Failed to send message. Please try again.")
       }
     } catch (err) {
-      console.error('Form submission error:', err)
+      console.error("Form submission error:", err)
       setError("An unexpected error occurred. Please try again.")
     }
   }
@@ -49,13 +43,7 @@ export default function ContactForm() {
           <label htmlFor="name" className="text-sm font-medium">
             Name<span className="text-red-500">*</span>
           </label>
-          <Input
-            id="name"
-            name="name"
-            placeholder="e.g., ABC Industries Pvt Ltd"
-            required
-            className="w-full"
-          />
+          <Input id="name" name="name" placeholder="e.g., ABC Industries Pvt Ltd" required className="w-full" />
         </div>
         <div className="space-y-2">
           <label htmlFor="email" className="text-sm font-medium">
@@ -76,12 +64,7 @@ export default function ContactForm() {
         <label htmlFor="description" className="text-sm font-medium">
           Description of the issue<span className="text-red-500">*</span>
         </label>
-        <Textarea
-          id="description"
-          name="description"
-          required
-          className="min-h-[150px]"
-        />
+        <Textarea id="description" name="description" required className="min-h-[150px]" />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -89,12 +72,7 @@ export default function ContactForm() {
           <label htmlFor="orderId" className="text-sm font-medium">
             Order ID
           </label>
-          <Input
-            id="orderId"
-            name="orderId"
-            placeholder="e.g., ABC Industries Pvt Ltd"
-            className="w-full"
-          />
+          <Input id="orderId" name="orderId" placeholder="e.g., ABC Industries Pvt Ltd" className="w-full" />
         </div>
         <div className="space-y-2">
           <label htmlFor="queryType" className="text-sm font-medium">
@@ -113,9 +91,7 @@ export default function ContactForm() {
         </div>
       </div>
 
-      {error && (
-        <div className="text-red-500 text-sm">{error}</div>
-      )}
+      {error && <div className="text-red-500 text-sm">{error}</div>}
 
       <SubmitButton />
     </form>
@@ -124,14 +100,10 @@ export default function ContactForm() {
 
 function SubmitButton() {
   const { pending } = useFormStatus()
-  
+
   return (
-    <Button 
-      type="submit" 
-      disabled={pending}
-      className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white px-8"
-    >
-      {pending ? 'Sending...' : 'Submit'}
+    <Button type="submit" disabled={pending} className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white px-8">
+      {pending ? "Sending..." : "Submit"}
     </Button>
   )
 }

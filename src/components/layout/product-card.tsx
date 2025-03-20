@@ -1,11 +1,11 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Building2, MapPin, ShoppingCart, Star } from 'lucide-react'
-import { useDispatch } from 'react-redux'
-import { addItem } from '@/store/slices/cartSlice'
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Building2, MapPin, ShoppingCart, Star } from "lucide-react"
+import { useDispatch } from "react-redux"
+import { addItem } from "@/store/slices/cartSlice"
 
 interface ProductCardProps {
   title: string
@@ -30,7 +30,7 @@ export default function ProductCard({
   image_link,
   hoverImage,
   href,
-  rating
+  rating,
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const dispatch = useDispatch()
@@ -39,9 +39,7 @@ export default function ProductCard({
     return Array.from({ length: 5 }, (_, index) => (
       <Star
         key={index}
-        className={`w-4 h-4 ${
-          index < Math.floor(rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
-        }`}
+        className={`w-4 h-4 ${index < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
       />
     ))
   }
@@ -51,13 +49,13 @@ export default function ProductCard({
   }
 
   return (
-    <div 
+    <div
       className="group transform transition-all duration-300 hover:scale-[0.98]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="bg-gray rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:border hover:border-gray-300">
-        <Link href={`/product/${href.split('/').pop()}`}>
+        <Link href={`/product/${href.split("/").pop()}`}>
           <div className="relative aspect-square overflow-hidden p-4 bg-white-100">
             {/* Discount Badge */}
             <div className="absolute top-6 left-6 z-10">
@@ -65,7 +63,7 @@ export default function ProductCard({
                 {discount}% OFF
               </span>
             </div>
-            
+
             {/* Product Images */}
             <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500">
               <Image
@@ -81,7 +79,10 @@ export default function ProductCard({
 
         <div className="p-3 space-y-2">
           {/* Product Title with href */}
-          <Link href={`/product/${href.split('/').pop()}`} className="block hover:text-emerald-600 transition-colors duration-300">
+          <Link
+            href={`/product/${href.split("/").pop()}`}
+            className="block hover:text-emerald-600 transition-colors duration-300"
+          >
             <h3 className="text-white-800 font-medium text-sm line-clamp-2 min-h-[2.5rem] hover:text-gray-800">
               {title}
             </h3>
@@ -107,7 +108,7 @@ export default function ProductCard({
 
           {/* Cart Button and Pricing */}
           <div className="flex items-center justify-between mt-3">
-            <button 
+            <button
               onClick={handleAddToCart}
               className="px-3 py-1 bg-green-900 text-white text-xs font-medium rounded hover:bg-blue-500 transition-colors duration-300 flex items-center gap-1"
             >
@@ -116,9 +117,7 @@ export default function ProductCard({
             </button>
             <div className="text-right">
               <span className="text-sm font-bold text-blue-600">₹{price.toLocaleString()}</span>
-              <span className="block text-xs text-gray-500 line-through">
-                ₹{originalPrice.toLocaleString()}
-              </span>
+              <span className="block text-xs text-gray-500 line-through">₹{originalPrice.toLocaleString()}</span>
             </div>
           </div>
         </div>

@@ -1,14 +1,14 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose"
 
 const MONGODB_URI = process.env.PROD_DB
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
+  throw new Error("Please define the MONGODB_URI environment variable inside .env.local")
 }
 
 interface Cached {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
+  conn: typeof mongoose | null
+  promise: Promise<typeof mongoose> | null
 }
 
 let cached: Cached = (global as any).mongoose
@@ -18,7 +18,7 @@ if (!cached) {
 }
 
 export async function connectDB() {
-  console.log(MONGODB_URI);
+  console.log(MONGODB_URI)
   if (cached.conn) {
     console.log("Already done!")
     return cached.conn

@@ -3,11 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { toast } from "sonner"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import type { AddressDetails } from "@/types/profile"
+import { saveAddressDetails } from "@/actions/profile"
 
 const addressSchema = z.object({
   billingAddress: z.object({
@@ -28,10 +29,12 @@ const addressSchema = z.object({
   }),
 })
 
-export function AddressForm() {
+export function AddressForm({ initialData }: { initialData?: AddressDetails }) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<AddressDetails>({
     resolver: zodResolver(addressSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       billingAddress: {
         country: "",
         state: "",
@@ -51,8 +54,38 @@ export function AddressForm() {
     },
   })
 
-  function onSubmit(data: AddressDetails) {
-    console.log(data)
+  async function onSubmit(data: AddressDetails) {
+    try {
+      setIsSubmitting(true)
+
+      const formData = new FormData()
+
+      // Add billing address fields
+      Object.entries(data.billingAddress).forEach(([key, value]) => {
+        if (value) formData.append(`billingAddress.${key}`, value)
+      })
+
+      // Add pickup address fields
+      Object.entries(data.pickupAddress).forEach(([key, value]) => {
+        if (value) formData.append(`pickupAddress.${key}`, value)
+      })
+
+      console.log("Submitting address form data")
+      const result = await saveAddressDetails(formData)
+
+      if (result.success) {
+        toast.success(result.message || "Address details saved successfully")
+        // Force a page reload to update the UI with the latest progress
+        window.location.reload()
+      } else {
+        toast.error(result.error || "Failed to save address details")
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error)
+      toast.error("An unexpected error occurred")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const AddressFields = ({ prefix }: { prefix: "billingAddress" | "pickupAddress" }) => (
@@ -66,7 +99,7 @@ export function AddressForm() {
               Country<span className="text-red-500">*</span>
             </FormLabel>
             <FormControl>
-              <Input placeholder="e.g., ABC Industries Pvt Ltd" {...field} />
+              <Input placeholder="e.g., India" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -81,7 +114,7 @@ export function AddressForm() {
               State<span className="text-red-500">*</span>
             </FormLabel>
             <FormControl>
-              <Input placeholder="e.g., ABC Industries Pvt Ltd" {...field} />
+              <Input placeholder="e.g., Maharashtra" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -96,7 +129,7 @@ export function AddressForm() {
               City<span className="text-red-500">*</span>
             </FormLabel>
             <FormControl>
-              <Input placeholder="e.g., ABC Industries Pvt Ltd" {...field} />
+              <Input placeholder="e.g., Mumbai" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -111,7 +144,7 @@ export function AddressForm() {
               Address Line 1<span className="text-red-500">*</span>
             </FormLabel>
             <FormControl>
-              <Input placeholder="e.g., ABC Industries Pvt Ltd" {...field} />
+              <Input placeholder="e.g., 123 Main Street" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -124,7 +157,7 @@ export function AddressForm() {
           <FormItem>
             <FormLabel>Address Line 2</FormLabel>
             <FormControl>
-              <Input placeholder="e.g., ABC Industries Pvt Ltd" {...field} />
+              <Input placeholder="e.g., Apartment 4B" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -139,7 +172,7 @@ export function AddressForm() {
               Phone Number<span className="text-red-500">*</span>
             </FormLabel>
             <FormControl>
-              <Input placeholder="e.g., ABC Industries Pvt Ltd" {...field} />
+              <Input placeholder="e.g., 9876543210" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -150,7 +183,7 @@ export function AddressForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form id="addresses-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div>
             <h3 className="text-lg font-medium mb-4">Add Billing Address</h3>
@@ -161,8 +194,6 @@ export function AddressForm() {
             <AddressFields prefix="pickupAddress" />
           </div>
         </div>
-
-        
       </form>
     </Form>
   )

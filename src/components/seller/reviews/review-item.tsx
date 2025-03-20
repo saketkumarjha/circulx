@@ -23,9 +23,7 @@ export function ReviewItem({ review }: ReviewItemProps) {
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
             <div>
               <h3 className="font-medium truncate">{review.productName}</h3>
-              <p className="text-sm text-muted-foreground">
-                (SKU: {review.sku})
-              </p>
+              <p className="text-sm text-muted-foreground">(SKU: {review.sku})</p>
               <p className="text-sm text-muted-foreground">{review.company}</p>
             </div>
             <StarRating rating={review.rating} size="sm" />

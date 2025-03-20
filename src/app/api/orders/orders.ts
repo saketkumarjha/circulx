@@ -1,16 +1,16 @@
-import { connectDB2 } from '@/lib/db';
-import mongoose from 'mongoose';
+import { connectDB2 } from "@/lib/db"
+import mongoose from "mongoose"
 
 interface Order {
-  order_id: number;
-  order_date: string;
-  buyer_id: number;
-  seller_id: number;
-  status: string;
-  amount: number;
-  payment_id: number;
-  created_at?: string;
-  updated_at?: string;
+  order_id: number
+  order_date: string
+  buyer_id: number
+  seller_id: number
+  status: string
+  amount: number
+  payment_id: number
+  created_at?: string
+  updated_at?: string
 }
 
 const orderSchema = new mongoose.Schema<Order>({
@@ -22,10 +22,11 @@ const orderSchema = new mongoose.Schema<Order>({
   amount: { type: Number, required: true },
   payment_id: { type: Number, required: true },
   created_at: { type: String },
-  updated_at: { type: String }
-});
+  updated_at: { type: String },
+})
 
-const db = await connectDB2();
-const OrderModel = db.models.Order || db.model<Order>('Order', orderSchema);
+const db = await connectDB2()
+const OrderModel = db.models.Order || db.model<Order>("Order", orderSchema)
 
-export { OrderModel, orderSchema };
+export { OrderModel, orderSchema }
+

@@ -1,39 +1,34 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Search, Mail, ShoppingBag, User, Menu, LogOut } from 'lucide-react'
+import { useState } from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { Search, Mail, ShoppingBag, Menu, LogOut } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { AuthModal } from '../auth/auth-modal'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { signOut } from '@/actions/auth'
-import Searchbar from '@/components/layout/searchbar';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
+import { AuthModal } from "../auth/auth-modal"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { signOut } from "@/actions/auth"
+import Searchbar from "@/components/layout/searchbar"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store"
 
 interface HeaderProps {
   user?: {
     id: string
     name: string
     email: string
-    type: 'admin' | 'seller' | 'customer'
+    type: "admin" | "seller" | "customer"
   } | null
 }
 
 export default function Header({ user }: HeaderProps) {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState("")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const cartItemsCount = useSelector((state: RootState) => state.cart.items.length);
-  
+  const cartItemsCount = useSelector((state: RootState) => state.cart.items.length)
+
   const categories = [
     "Storage Tanks, Drums",
     "Oils, Grease & Lubricants",
@@ -89,16 +84,12 @@ export default function Header({ user }: HeaderProps) {
                       <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} />
                       <AvatarFallback>{user.name[0]}</AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:inline">{user.name.split(' ')[0]}</span>
+                    <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link href={
-                      user.type === 'admin' ? '/admin' :
-                      user.type === 'seller' ? '/seller' :
-                      '/dashboard'
-                    }>
+                    <Link href={user.type === "admin" ? "/admin" : user.type === "seller" ? "/seller" : "/dashboard"}>
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
@@ -109,17 +100,11 @@ export default function Header({ user }: HeaderProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button 
-                onClick={() => setIsAuthModalOpen(true)}
-                className="hidden sm:block px-6 py-2 rounded-full"
-              >
+              <Button onClick={() => setIsAuthModalOpen(true)} className="hidden sm:block px-6 py-2 rounded-full">
                 Sign In
               </Button>
             )}
-            <button
-              className="sm:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
+            <button className="sm:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <Menu className="w-6 h-6 text-gray-600" />
             </button>
           </div>
@@ -140,10 +125,7 @@ export default function Header({ user }: HeaderProps) {
                 />
               </div>
               {!user && (
-                <Button 
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="px-6 py-2 rounded-full w-full"
-                >
+                <Button onClick={() => setIsAuthModalOpen(true)} className="px-6 py-2 rounded-full w-full">
                   Sign In
                 </Button>
               )}
@@ -160,7 +142,7 @@ export default function Header({ user }: HeaderProps) {
             {categories.map((category, index) => (
               <Link
                 key={index}
-                href={`/category/${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                href={`/category/${category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                 className="text-sm whitespace-nowrap hover:text-gray-200 transition-colors"
               >
                 {category}
@@ -170,11 +152,8 @@ export default function Header({ user }: HeaderProps) {
         </div>
       </div>
 
-      <AuthModal 
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        onSuccess={handleAuthSuccess}
-      />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={handleAuthSuccess} />
     </header>
   )
 }
+

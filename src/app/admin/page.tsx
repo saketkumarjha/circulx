@@ -4,14 +4,14 @@ import { SalesChart } from "@/components/admin/sales-chart"
 import { RecentSellersTable } from "@/components/admin/recent-sellers-table"
 import { RecentIssuesTable } from "@/components/admin/recent-issues-table"
 import { RecentProductsTable } from "@/components/admin/recent-products-table"
-import { Users, Package, DollarSign, UserCheck, PackageCheck, AlertCircle } from 'lucide-react'
+import { Users, Package, DollarSign, UserCheck, PackageCheck, AlertCircle } from "lucide-react"
 import { formatNumber, formatCurrency } from "@/lib/utils"
 
 export default function AdminDashboard() {
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">
       <h1 className="text-2xl md:text-3xl font-bold">Admin Dashboard</h1>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <StatCard
           title="Total Sellers"
@@ -19,7 +19,7 @@ export default function AdminDashboard() {
           change={{
             type: "increase",
             value: "8523",
-            period: "Active Seller"
+            period: "Active Seller",
           }}
           icon={<Users className="w-6 h-6 text-primary" />}
         />
@@ -29,7 +29,7 @@ export default function AdminDashboard() {
           change={{
             type: "increase",
             value: "1.3%",
-            period: "Up from past week"
+            period: "Up from past week",
           }}
           icon={<Package className="w-6 h-6 text-primary" />}
         />
@@ -39,7 +39,7 @@ export default function AdminDashboard() {
           change={{
             type: "decrease",
             value: "4.3%",
-            period: "Down from yesterday"
+            period: "Down from yesterday",
           }}
           icon={<DollarSign className="w-6 h-6 text-primary" />}
         />
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
           value={25}
           change={{
             value: "1.3%",
-            period: "Up from past week"
+            period: "Up from past week",
           }}
           icon={<UserCheck className="w-6 h-6" />}
         />
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
           value={10293}
           change={{
             value: "1.3%",
-            period: "Up from past week"
+            period: "Up from past week",
           }}
           icon={<PackageCheck className="w-6 h-6" />}
         />
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
           value={2040}
           change={{
             value: "1.8%",
-            period: "Up from yesterday"
+            period: "Up from yesterday",
           }}
           icon={<AlertCircle className="w-6 h-6" />}
         />
@@ -83,10 +83,11 @@ export default function AdminDashboard() {
         <RecentSellersTable />
         <RecentIssuesTable />
       </div>
-      
+
       <div>
         <RecentProductsTable />
       </div>
     </div>
   )
 }
+

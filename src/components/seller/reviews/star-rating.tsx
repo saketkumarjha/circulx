@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react'
+import { Star } from "lucide-react"
 
 interface StarRatingProps {
   rating: number
@@ -9,7 +9,7 @@ export function StarRating({ rating, size = "md" }: StarRatingProps) {
   const starSize = {
     sm: 16,
     md: 20,
-    lg: 24
+    lg: 24,
   }
 
   return (
@@ -21,8 +21,8 @@ export function StarRating({ rating, size = "md" }: StarRatingProps) {
             star <= rating
               ? "fill-primary text-primary"
               : star - 0.5 <= rating
-              ? "fill-primary/50 text-primary"
-              : "fill-muted text-muted-foreground"
+                ? "fill-primary/50 text-primary"
+                : "fill-muted text-muted-foreground"
           }`}
           size={starSize[size]}
         />
