@@ -24,6 +24,15 @@ export function formatDate(date: Date | string): string {
 }
 
 /**
+ * Format a number with thousands separators
+ * @param num - Number to format
+ * @returns Formatted number string
+ */
+export function formatNumber(num: number): string {
+  return new Intl.NumberFormat("en-US").format(num)
+}
+
+/**
  * Format currency value
  * @param amount - Amount to format
  * @param currency - Currency code (default: USD)
