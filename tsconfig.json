@@ -20,7 +20,7 @@
     ],
     "typeRoots": ["./node_modules/@types", "./types.d.ts"],
     "paths": {
-      "@/*": ["src/*"]
+     "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
