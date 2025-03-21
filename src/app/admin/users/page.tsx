@@ -33,13 +33,13 @@ async function getUsers() {
 export default async function UsersPage() {
   const currentUser = await getCurrentUser()
 
-  if (!currentUser) {
+  /*if (!currentUser) {
     return redirect("/login")
   }
 
   if (currentUser.type !== "admin") {
     return redirect("/")
-  }
+  }*/
 
   const users = await getUsers()
 
