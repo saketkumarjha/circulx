@@ -9,6 +9,8 @@ import { Form } from "@/components/ui/form"
 import { CheckboxList } from "./checkbox-list"
 import { AVAILABLE_CATEGORIES, AVAILABLE_BRANDS, type CategoryAndBrand } from "@/types/profile"
 import { saveCategoryAndBrand } from "@/actions/profile"
+import { Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 const categorySchema = z.object({
   categories: z.array(z.string()).min(1, "Select at least one category"),
@@ -27,8 +29,6 @@ export function CategoryBrandForm({ initialData }: { initialData?: CategoryAndBr
       authorizedBrands: [],
     },
   })
-
-  // Update the onSubmit function to include better error handling and feedback
 
   async function onSubmit(data: CategoryAndBrand) {
     try {
@@ -100,6 +100,22 @@ export function CategoryBrandForm({ initialData }: { initialData?: CategoryAndBr
             onItemToggle={toggleBrand}
           />
         </div>
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-orange-600 hover:bg-orange-700 text-white"
+          size="sm"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Changes"
+          )}
+        </Button>
       </form>
     </Form>
   )

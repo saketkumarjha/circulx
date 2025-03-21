@@ -7,10 +7,10 @@ import type { IBank } from "@/models/profile/bank"
 import type { IDocument } from "@/models/profile/document"
 import type { IProfileProgress } from "@/models/profile/progress"
 
-const PROFILE_DB_URI = process.env.PROFILE_DB || process.env.PROFILE_DB || ""
+const PROFILE_DB_URI = process.env.PROFILE_DB || process.env.MONGODB_URI || ""
 
 if (!PROFILE_DB_URI) {
-  throw new Error("Please define the PROFILE_DB  environment variable")
+  throw new Error("Please define the PROFILE_DB or MONGODB_URI environment variable")
 }
 
 let cached = (global as any).mongoose
@@ -119,9 +119,37 @@ const ProfileProgressSchema = new mongoose.Schema<IProfileProgress>(
   { timestamps: true },
 )
 
+// Function to register models
+function registerModels(mongoose: any) {
+  // Only register models if they don't already exist
+  if (!mongoose.models.Business) {
+    mongoose.model("Business", BusinessSchema)
+  }
+  if (!mongoose.models.Contact) {
+    mongoose.model("Contact", ContactSchema)
+  }
+  if (!mongoose.models.CategoryBrand) {
+    mongoose.model("CategoryBrand", CategoryBrandSchema)
+  }
+  if (!mongoose.models.Address) {
+    mongoose.model("Address", AddressSchema)
+  }
+  if (!mongoose.models.Bank) {
+    mongoose.model("Bank", BankSchema)
+  }
+  if (!mongoose.models.Document) {
+    mongoose.model("Document", DocumentSchema)
+  }
+  if (!mongoose.models.ProfileProgress) {
+    mongoose.model("ProfileProgress", ProfileProgressSchema)
+  }
+}
+
 export async function connectProfileDB() {
   if (cached.conn) {
     console.log("Using existing profile MongoDB connection")
+    // Register models even when using existing connection
+    registerModels(cached.conn)
     return cached.conn
   }
 
@@ -133,28 +161,7 @@ export async function connectProfileDB() {
     console.log("Connecting to profile MongoDB...")
     cached.promise = mongoose.connect(PROFILE_DB_URI, opts).then((mongoose) => {
       // Register models
-      if (!mongoose.models.Business) {
-        mongoose.model("Business", BusinessSchema)
-      }
-      if (!mongoose.models.Contact) {
-        mongoose.model("Contact", ContactSchema)
-      }
-      if (!mongoose.models.CategoryBrand) {
-        mongoose.model("CategoryBrand", CategoryBrandSchema)
-      }
-      if (!mongoose.models.Address) {
-        mongoose.model("Address", AddressSchema)
-      }
-      if (!mongoose.models.Bank) {
-        mongoose.model("Bank", BankSchema)
-      }
-      if (!mongoose.models.Document) {
-        mongoose.model("Document", DocumentSchema)
-      }
-      if (!mongoose.models.ProfileProgress) {
-        mongoose.model("ProfileProgress", ProfileProgressSchema)
-      }
-
+      registerModels(mongoose)
       console.log("Profile MongoDB connected successfully")
       return mongoose
     })

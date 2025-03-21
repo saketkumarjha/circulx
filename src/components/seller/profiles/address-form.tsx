@@ -9,6 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import type { AddressDetails } from "@/types/profile"
 import { saveAddressDetails } from "@/actions/profile"
+import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
 
 const addressSchema = z.object({
   billingAddress: z.object({
@@ -194,6 +196,22 @@ export function AddressForm({ initialData }: { initialData?: AddressDetails }) {
             <AddressFields prefix="pickupAddress" />
           </div>
         </div>
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-orange-600 hover:bg-orange-700 text-white"
+          size="sm"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Changes"
+          )}
+        </Button>
       </form>
     </Form>
   )

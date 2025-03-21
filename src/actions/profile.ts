@@ -18,31 +18,43 @@ function getNextTab(currentTab: TabType): TabType | null {
 // Helper to serialize MongoDB documents
 function serializeDocument(doc: any): any {
   if (!doc) return null
-  if (doc.toObject) {
-    return doc.toObject({ getters: true, virtuals: true })
-  } else if (doc._doc) {
-    return { ...doc._doc }
-  } else if (typeof doc === "object") {
-    // Handle arrays
-    if (Array.isArray(doc)) {
-      return doc.map((item) => serializeDocument(item))
-    }
 
-    // Handle plain objects
+  // Handle Date objects
+  if (doc instanceof Date) {
+    return doc.toISOString()
+  }
+
+  // Handle ObjectId
+  if (doc._id && typeof doc._id === "object" && doc._id.toString) {
+    return { ...doc, _id: doc._id.toString() }
+  }
+
+  // Handle Mongoose documents
+  if (doc.toObject) {
+    const plainObj = doc.toObject({ getters: true, virtuals: true })
+    return JSON.parse(JSON.stringify(plainObj))
+  }
+
+  // Handle objects with _doc property (Mongoose internals)
+  if (doc._doc) {
+    return JSON.parse(JSON.stringify(doc._doc))
+  }
+
+  // Handle arrays
+  if (Array.isArray(doc)) {
+    return doc.map((item) => serializeDocument(item))
+  }
+
+  // Handle plain objects
+  if (typeof doc === "object" && doc !== null) {
     const serialized: Record<string, any> = {}
     for (const [key, value] of Object.entries(doc)) {
-      if (key === "_id") {
-        serialized._id = doc._id.toString()
-      } else if (value instanceof Date) {
-        serialized[key] = value.toISOString()
-      } else if (typeof value === "object" && value !== null) {
-        serialized[key] = serializeDocument(value)
-      } else {
-        serialized[key] = value
-      }
+      serialized[key] = serializeDocument(value)
     }
     return serialized
   }
+
+  // Return primitive values as is
   return doc
 }
 
@@ -65,12 +77,18 @@ export async function getProfileProgress() {
       })
     }
 
+    // Ensure data is properly serialized
+    const serializedProgress = {
+      completedSteps: progress.completedSteps,
+      currentStep: progress.currentStep,
+    }
+
+    // Convert to plain JSON
+    const safeProgress = JSON.parse(JSON.stringify(serializedProgress))
+
     return {
       success: true,
-      progress: serializeDocument({
-        completedSteps: progress.completedSteps,
-        currentStep: progress.currentStep,
-      }),
+      progress: safeProgress,
     }
   } catch (error) {
     console.error("Error in getProfileProgress:", error)
@@ -448,13 +466,22 @@ export async function getProfileData() {
     if (!user) return { error: "Not authenticated" }
 
     const db = await connectProfileDB()
-    const Business = db.model("Business")
-    const Contact = db.model("Contact")
-    const CategoryBrand = db.model("CategoryBrand")
-    const Address = db.model("Address")
-    const Bank = db.model("Bank")
-    const Document = db.model("Document")
-    const ProfileProgress = db.model("ProfileProgress")
+
+    // Safely get models with error handling
+    let Business, Contact, CategoryBrand, Address, Bank, Document, ProfileProgress
+
+    try {
+      Business = db.model("Business")
+      Contact = db.model("Contact")
+      CategoryBrand = db.model("CategoryBrand")
+      Address = db.model("Address")
+      Bank = db.model("Bank")
+      Document = db.model("Document")
+      ProfileProgress = db.model("ProfileProgress")
+    } catch (error) {
+      console.error("Error getting models:", error)
+      return { error: "Failed to access profile models. Please try again." }
+    }
 
     const business = await Business.findOne({ userId: user.id })
     const contact = await Contact.findOne({ userId: user.id })
@@ -464,25 +491,31 @@ export async function getProfileData() {
     const document = await Document.findOne({ userId: user.id })
     const progress = await ProfileProgress.findOne({ userId: user.id })
 
+    // Ensure all data is properly serialized
+    const serializedData = {
+      business: serializeDocument(business),
+      contact: serializeDocument(contact),
+      category: serializeDocument(category),
+      address: serializeDocument(address),
+      bank: serializeDocument(bank),
+      document: serializeDocument(document),
+      progress: progress
+        ? {
+            completedSteps: progress.completedSteps,
+            currentStep: progress.currentStep,
+          }
+        : {
+            completedSteps: [],
+            currentStep: "business",
+          },
+    }
+
+    // Convert to plain JSON to ensure no methods are passed
+    const safeData = JSON.parse(JSON.stringify(serializedData))
+
     return {
       success: true,
-      data: {
-        business: serializeDocument(business),
-        contact: serializeDocument(contact),
-        category: serializeDocument(category),
-        address: serializeDocument(address),
-        bank: serializeDocument(bank),
-        document: serializeDocument(document),
-        progress: progress
-          ? serializeDocument({
-              completedSteps: progress.completedSteps,
-              currentStep: progress.currentStep,
-            })
-          : {
-              completedSteps: [],
-              currentStep: "business",
-            },
-      },
+      data: safeData,
     }
   } catch (error) {
     console.error("Error in getProfileData:", error)

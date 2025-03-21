@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { useState, useEffect } from "react"
+import { useState, useRef } from "react"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { BusinessDetails } from "../../../types/profile"
 import { saveBusinessDetails } from "@/actions/profile"
 import { Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 // Enhanced validation schema
 const businessSchema = z.object({
@@ -35,7 +36,8 @@ const businessSchema = z.object({
 export function BusinessForm({ initialData }: { initialData?: BusinessDetails }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved">("idle")
-  const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null)
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const lastSavedValuesRef = useRef<any>(initialData || {})
 
   const form = useForm<BusinessDetails>({
     resolver: zodResolver(businessSchema),
@@ -51,50 +53,54 @@ export function BusinessForm({ initialData }: { initialData?: BusinessDetails })
     },
   })
 
-  // Watch form values for auto-save
-  const formValues = form.watch()
+  // Function to handle form changes and trigger auto-save
+  const handleFormChange = () => {
+    if (isSubmitting) return
 
-  // Auto-save functionality
-  useEffect(() => {
-    // Clear previous timer
-    if (autoSaveTimer) {
-      clearTimeout(autoSaveTimer)
+    // Clear any existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current)
     }
-
-    // Don't auto-save if form is pristine
-    if (!form.formState.isDirty) return
 
     // Set a new timer for auto-save
-    const timer = setTimeout(() => {
-      autoSave()
-    }, 3000) // Auto-save after 3 seconds of inactivity
+    autoSaveTimerRef.current = setTimeout(() => {
+      const currentValues = form.getValues()
 
-    setAutoSaveTimer(timer)
+      // Check if values have changed since last save
+      const hasChanged = JSON.stringify(currentValues) !== JSON.stringify(lastSavedValuesRef.current)
 
-    // Cleanup on unmount
-    return () => {
-      if (timer) clearTimeout(timer)
-    }
-  }, [formValues])
+      if (hasChanged && form.formState.isDirty) {
+        autoSave(currentValues)
+      }
+    }, 3000)
+  }
 
-  const autoSave = async () => {
+  // Register the change handler on all form fields
+  form.register("legalEntityName", { onChange: handleFormChange })
+  form.register("tradeName", { onChange: handleFormChange })
+  form.register("gstin", { onChange: handleFormChange })
+  form.register("country", { onChange: handleFormChange })
+  form.register("pincode", { onChange: handleFormChange })
+  form.register("state", { onChange: handleFormChange })
+  form.register("city", { onChange: handleFormChange })
+  form.register("businessEntityType", { onChange: handleFormChange })
+
+  const autoSave = async (data: BusinessDetails) => {
     try {
-      if (!form.formState.isDirty) return
-
       setAutoSaveStatus("saving")
-
-      // Get current form data
-      const data = form.getValues()
 
       // Create FormData object
       const formData = new FormData()
       Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value)
+        if (value) formData.append(key, value)
       })
       formData.append("isAutoSave", "true")
 
       // Call the server action
       await saveBusinessDetails(formData)
+
+      // Update last saved values
+      lastSavedValuesRef.current = { ...data }
 
       setAutoSaveStatus("saved")
 
@@ -133,7 +139,7 @@ export function BusinessForm({ initialData }: { initialData?: BusinessDetails })
 
       const formData = new FormData()
       Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value)
+        if (value) formData.append(key, value)
       })
 
       const result = await saveBusinessDetails(formData)
@@ -302,7 +308,13 @@ export function BusinessForm({ initialData }: { initialData?: BusinessDetails })
                 <FormLabel>
                   Business Entity Type<span className="text-red-500">*</span>
                 </FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                    handleFormChange()
+                  }}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select Option" />
@@ -323,10 +335,11 @@ export function BusinessForm({ initialData }: { initialData?: BusinessDetails })
           />
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-md flex items-center justify-center"
+          className="bg-orange-600 hover:bg-orange-700 text-white"
+          size="sm"
         >
           {isSubmitting ? (
             <>
@@ -336,7 +349,7 @@ export function BusinessForm({ initialData }: { initialData?: BusinessDetails })
           ) : (
             "Save Changes"
           )}
-        </button>
+        </Button>
       </form>
     </Form>
   )

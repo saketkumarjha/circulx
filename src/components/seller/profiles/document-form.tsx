@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useRef } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 import { DocumentUpload } from "./document-upload"
 import { uploadToBlob } from "@/lib/blob-storage"
+import { Button } from "@/components/ui/button"
 
 // Define the form schema
 const formSchema = z.object({
@@ -27,7 +28,8 @@ interface DocumentFormProps {
 export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved">("idle")
-  const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null)
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const lastSavedValuesRef = useRef<any>(initialData || {})
 
   // Initialize the form with default values
   const form = useForm<DocumentFormValues>({
@@ -38,40 +40,35 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
     },
   })
 
-  // Watch form values for auto-save
-  const formValues = form.watch()
+  // Function to handle form changes and trigger auto-save
+  const handleFormChange = () => {
+    if (isSubmitting) return
 
-  // Auto-save functionality
-  useEffect(() => {
-    // Clear previous timer
-    if (autoSaveTimer) {
-      clearTimeout(autoSaveTimer)
+    // Clear any existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current)
     }
-
-    // Don't auto-save if form is pristine
-    if (!form.formState.isDirty) return
 
     // Set a new timer for auto-save
-    const timer = setTimeout(() => {
-      autoSave()
-    }, 3000) // Auto-save after 3 seconds of inactivity
+    autoSaveTimerRef.current = setTimeout(() => {
+      const currentValues = form.getValues()
 
-    setAutoSaveTimer(timer)
+      // Check if values have changed since last save
+      const hasChanged = JSON.stringify(currentValues) !== JSON.stringify(lastSavedValuesRef.current)
 
-    // Cleanup on unmount
-    return () => {
-      if (timer) clearTimeout(timer)
-    }
-  }, [formValues])
+      if (hasChanged && form.formState.isDirty) {
+        autoSave(currentValues)
+      }
+    }, 3000)
+  }
 
-  const autoSave = async () => {
+  // Register the change handler on all form fields
+  form.register("panCard", { onChange: handleFormChange })
+  form.register("aadharCard", { onChange: handleFormChange })
+
+  const autoSave = async (data: DocumentFormValues) => {
     try {
-      if (!form.formState.isDirty) return
-
       setAutoSaveStatus("saving")
-
-      // Get current form data
-      const data = form.getValues()
 
       // Create FormData object
       const formData = new FormData()
@@ -81,6 +78,9 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
 
       // Call the server action
       await saveDocumentDetails(formData)
+
+      // Update last saved values
+      lastSavedValuesRef.current = { ...data }
 
       setAutoSaveStatus("saved")
 
@@ -139,7 +139,7 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
 
   return (
     <Form {...form}>
-      <form id="documents-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form id="document-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Document Information</h2>
@@ -164,7 +164,10 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
                   <DocumentUpload
                     label="PAN Card"
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={(value) => {
+                      field.onChange(value)
+                      handleFormChange()
+                    }}
                     accept=".jpg,.jpeg,.png,.pdf"
                     description="Upload a clear image or PDF of your PAN Card"
                     required
@@ -187,7 +190,10 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
                   <DocumentUpload
                     label="Aadhar Card"
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={(value) => {
+                      field.onChange(value)
+                      handleFormChange()
+                    }}
                     accept=".jpg,.jpeg,.png,.pdf"
                     description="Upload a clear image or PDF of your Aadhar Card"
                     required
@@ -199,10 +205,11 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
           />
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-md flex items-center justify-center"
+          className="bg-orange-600 hover:bg-orange-700 text-white"
+          size="sm"
         >
           {isSubmitting ? (
             <>
@@ -212,7 +219,7 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
           ) : (
             "Save Changes"
           )}
-        </button>
+        </Button>
       </form>
     </Form>
   )

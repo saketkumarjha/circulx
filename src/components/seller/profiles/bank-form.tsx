@@ -14,6 +14,7 @@ import type { BankDetails } from "@/types/profile"
 import { ACCOUNT_TYPES } from "@/types/profile"
 import { saveBankDetails } from "@/actions/profile"
 import { uploadToBlob } from "@/lib/blob-storage"
+import { Button } from "@/components/ui/button"
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB
 
@@ -408,10 +409,11 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
           </div>
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-md flex items-center justify-center"
+          className="bg-orange-600 hover:bg-orange-700 text-white"
+          size="sm"
         >
           {isSubmitting ? (
             <>
@@ -421,7 +423,7 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
           ) : (
             "Save Changes"
           )}
-        </button>
+        </Button>
       </form>
     </Form>
   )
