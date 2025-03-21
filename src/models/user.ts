@@ -1,4 +1,5 @@
-import mongoose, { type Document, type Model, Schema } from "mongoose"
+import mongoose, { Schema, type Document, type Model } from "mongoose"
+import { connectDB1 } from "@/lib/db"
 
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId
@@ -7,32 +8,30 @@ export interface IUser extends Document {
   password: string
   type: "admin" | "seller" | "customer"
   createdAt: Date
+  updatedAt: Date
 }
 
-const userSchema = new Schema<IUser>({
-  name: {
-    type: String,
-    required: true,
+const userSchema = new Schema<IUser>(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    type: {
+      type: String,
+      enum: ["admin", "seller", "customer"],
+      default: "customer",
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    enum: ["admin", "seller", "customer"],
-    default: "customer",
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-})
+  { timestamps: true },
+)
 
-export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>("User", userSchema)
+// This function ensures we get the User model with the correct connection (connectDB1)
+export async function getUserModel(): Promise<Model<IUser>> {
+  const conn = await connectDB1()
+  return conn.models.User || conn.model<IUser>("User", userSchema)
+}
+
+// For backward compatibility - DO NOT USE THIS DIRECTLY
+// This might be using the wrong connection
+export const User = mongoose.models.User || mongoose.model<IUser>("User", userSchema)
 

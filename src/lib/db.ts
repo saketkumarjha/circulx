@@ -21,6 +21,26 @@ const cached: CachedConnections = globalWithMongo.mongoConnections || {
   promise2: null,
 }
 
+// Global variable to track the connection
+let isConnected = false
+
+export async function connectDB() {
+  // If already connected, return the existing connection
+  if (isConnected) {
+    console.log("Using existing database connection")
+    return
+  }
+
+  try {
+    const db = await mongoose.connect(process.env.MONGODB_URI as string)
+    isConnected = !!db.connections[0].readyState
+    console.log("New database connection established")
+  } catch (error) {
+    console.error("Error connecting to database:", error)
+    throw error
+  }
+}
+
 export async function connectDB1(): Promise<Connection> {
   if (cached.conn1) return cached.conn1
 

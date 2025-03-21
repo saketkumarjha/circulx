@@ -1,8 +1,10 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useToast } from "@/components/ui/use-toast"
 
 interface User {
   id: string
@@ -14,18 +16,45 @@ interface User {
 
 interface UserTableProps {
   users: User[]
-  updateUserType: (userId: string, newType: "admin" | "seller" | "customer") => Promise<any>
 }
 
-export function UserTable({ users, updateUserType }: UserTableProps) {
+export function UserTable({ users }: UserTableProps) {
   const router = useRouter()
+  const [updating, setUpdating] = useState<string | null>(null)
+  const { toast } = useToast()
 
   const handleRoleChange = async (userId: string, newRole: "admin" | "seller" | "customer") => {
     try {
-      await updateUserType(userId, newRole)
+      setUpdating(userId)
+
+      const response = await fetch("/api/admin/users/update-role", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, role: newRole }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to update user role")
+      }
+
+      toast({
+        title: "Success",
+        description: `User role updated to ${newRole}`,
+      })
+
       router.refresh()
     } catch (error) {
       console.error("Error updating user role:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update user role. Please try again.",
+      })
+    } finally {
+      setUpdating(null)
     }
   }
 
@@ -57,6 +86,7 @@ export function UserTable({ users, updateUserType }: UserTableProps) {
                 <div className="flex justify-center">
                   <Checkbox
                     checked={user.role === "admin"}
+                    disabled={updating === user.id}
                     onCheckedChange={(checked) => {
                       if (checked) handleRoleChange(user.id, "admin")
                     }}
@@ -68,6 +98,7 @@ export function UserTable({ users, updateUserType }: UserTableProps) {
                 <div className="flex justify-center">
                   <Checkbox
                     checked={user.role === "seller"}
+                    disabled={updating === user.id}
                     onCheckedChange={(checked) => {
                       if (checked) handleRoleChange(user.id, "seller")
                     }}
@@ -79,6 +110,7 @@ export function UserTable({ users, updateUserType }: UserTableProps) {
                 <div className="flex justify-center">
                   <Checkbox
                     checked={user.role === "customer"}
+                    disabled={updating === user.id}
                     onCheckedChange={(checked) => {
                       if (checked) handleRoleChange(user.id, "customer")
                     }}
