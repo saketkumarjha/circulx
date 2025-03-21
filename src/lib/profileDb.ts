@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose, { type Connection } from "mongoose"
 import type { IBusinessDetails } from "@/models/profile/business"
 import type { IContactDetails } from "@/models/profile/contact"
 import type { ICategoryBrand } from "@/models/profile/category"
@@ -7,16 +7,46 @@ import type { IBank } from "@/models/profile/bank"
 import type { IDocument } from "@/models/profile/document"
 import type { IProfileProgress } from "@/models/profile/progress"
 
-const PROFILE_DB_URI = process.env.PROFILE_DB || process.env.MONGODB_URI || ""
+const PROFILE_DB = process.env.PROFILE_DB!
 
-if (!PROFILE_DB_URI) {
-  throw new Error("Please define the PROFILE_DB or MONGODB_URI environment variable")
-}
+// Cache the database connection
+let cachedConnection: Connection | null = null
+let connectionPromise: Promise<Connection> | null = null
 
-let cached = (global as any).mongoose
+export async function connectProfileDB(): Promise<Connection> {
+  // If we already have a connection, return it
+  if (cachedConnection) {
+    console.log("Using existing profile database connection")
+    return cachedConnection
+  }
 
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null }
+  // If we're already connecting, return the promise
+  if (connectionPromise) {
+    console.log("Reusing profile database connection promise")
+    return connectionPromise
+  }
+
+  console.log("Creating new profile database connection")
+
+  // Create a new connection promise
+  connectionPromise = mongoose
+    .createConnection(PROFILE_DB, {
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+    })
+    .asPromise()
+    .then((conn) => {
+      console.log("Profile database connected successfully")
+      cachedConnection = conn
+      return conn
+    })
+    .catch((error) => {
+      console.error("Profile database connection error:", error)
+      connectionPromise = null
+      throw error
+    })
+
+  return connectionPromise
 }
 
 // Define schemas
@@ -143,38 +173,5 @@ function registerModels(mongoose: any) {
   if (!mongoose.models.ProfileProgress) {
     mongoose.model("ProfileProgress", ProfileProgressSchema)
   }
-}
-
-export async function connectProfileDB() {
-  if (cached.conn) {
-    console.log("Using existing profile MongoDB connection")
-    // Register models even when using existing connection
-    registerModels(cached.conn)
-    return cached.conn
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    }
-
-    console.log("Connecting to profile MongoDB...")
-    cached.promise = mongoose.connect(PROFILE_DB_URI, opts).then((mongoose) => {
-      // Register models
-      registerModels(mongoose)
-      console.log("Profile MongoDB connected successfully")
-      return mongoose
-    })
-  }
-
-  try {
-    cached.conn = await cached.promise
-  } catch (e) {
-    cached.promise = null
-    console.error("Error connecting to profile MongoDB:", e)
-    throw e
-  }
-
-  return cached.conn
 }
 
