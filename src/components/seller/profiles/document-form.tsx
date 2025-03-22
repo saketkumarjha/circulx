@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,9 +14,10 @@ interface DocumentFormProps {
     panCardUrl?: string | null
     aadharCardUrl?: string | null
   }
+  onSuccess?: () => void // Added this prop to fix the type error
 }
 
-export function DocumentForm({ initialData }: DocumentFormProps) {
+export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -28,7 +31,7 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
 
     try {
       const formDataObj = new FormData()
-      
+
       // Add form fields to FormData
       Object.entries(formData).forEach(([key, value]) => {
         formDataObj.append(key, value || "")
@@ -43,7 +46,12 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
           title: "Success",
           description: "Profile completed successfully",
         })
-        
+
+        // Call the onSuccess callback if provided
+        if (onSuccess) {
+          onSuccess()
+        }
+
         // Redirect to profile success page
         if (response.redirect) {
           router.push("/seller/profile/success")
@@ -60,7 +68,7 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
-        
+       
       })
     } finally {
       setIsLoading(false)
@@ -72,9 +80,7 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
       <Card>
         <CardHeader>
           <CardTitle>Documents</CardTitle>
-          <CardDescription>
-            Upload the required documents for your seller profile
-          </CardDescription>
+          <CardDescription>Upload the required documents for your seller profile</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
@@ -87,9 +93,7 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
                 maxSize={5}
                 label="Upload PAN Card"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Upload a clear scan or photo of your PAN Card
-              </p>
+              <p className="text-xs text-gray-500 mt-1">Upload a clear scan or photo of your PAN Card</p>
             </div>
 
             <div>
@@ -101,18 +105,12 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
                 maxSize={5}
                 label="Upload Aadhar Card"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Upload a clear scan or photo of your Aadhar Card
-              </p>
+              <p className="text-xs text-gray-500 mt-1">Upload a clear scan or photo of your Aadhar Card</p>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Button 
-            type="submit" 
-            disabled={isLoading}
-            className="bg-orange-500 hover:bg-orange-600 text-white"
-          >
+          <Button type="submit" disabled={isLoading} className="bg-orange-500 hover:bg-orange-600 text-white">
             {isLoading ? "Processing..." : "Complete Profile"}
           </Button>
         </CardFooter>
@@ -124,3 +122,4 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
 function toast(arg0: { title: string; description: string }) {
   throw new Error("Function not implemented.")
 }
+
