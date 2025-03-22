@@ -1,140 +1,126 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Upload, FileIcon, X } from "lucide-react"
+import { Loader2, Upload, X, FileText } from 'lucide-react'
+import { cn } from "@/lib/utils"
 
 interface DocumentUploadProps {
-  label: string
+  value: string
   onChange: (value: string) => void
-  value?: string
-  required?: boolean
   accept?: string
-  description?: string
+  maxSize?: number // in MB
+  label?: string
+  disabled?: boolean
 }
 
 export function DocumentUpload({
-  label,
-  onChange,
   value,
-  required = false,
+  onChange,
   accept = ".pdf,.jpg,.jpeg,.png",
-  description,
+  maxSize = 5,
+  label = "Upload Document",
+  disabled = false,
 }: DocumentUploadProps) {
-  const [fileName, setFileName] = useState<string | undefined>()
-  const [preview, setPreview] = useState<string | null>(null)
-
-  // Update fileName and preview when value changes
-  useEffect(() => {
-    if (value) {
-      if (typeof value === "string") {
-        if (value.startsWith("data:") || value.startsWith("http")) {
-          // For base64 data or URLs, extract filename or use placeholder
-          setPreview(value)
-
-          if (value.startsWith("data:")) {
-            setFileName("Uploaded file")
-          } else {
-            // Extract filename from URL
-            const urlParts = value.split("/")
-            setFileName(urlParts[urlParts.length - 1])
-          }
-        } else {
-          // Just a filename
-          setFileName(value)
-          setPreview(null)
-        }
-      } else {
-        setFileName(undefined)
-        setPreview(null)
-      }
-    } else {
-      setFileName(undefined)
-      setPreview(null)
-    }
-  }, [value])
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setFileName(file.name)
+    if (!file) return
 
-      // Convert file to base64 string for storage
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const base64String = reader.result as string
-        setPreview(base64String)
-        onChange(base64String)
-      }
-      reader.readAsDataURL(file)
+    // Check file size
+    const fileSizeInMB = file.size / (1024 * 1024)
+    if (fileSizeInMB > maxSize) {
+      setError(`File size exceeds ${maxSize}MB limit`)
+      return
+    }
+
+    setError(null)
+    setIsUploading(true)
+
+    // In a real app, you would upload the file to a storage service
+    // and then set the URL as the value
+    // For now, we'll simulate a delay and use a placeholder URL
+    setTimeout(() => {
+      // This would be the URL returned from your upload service
+      const fileUrl = URL.createObjectURL(file)
+      onChange(fileUrl)
+      setIsUploading(false)
+    }, 1000)
+  }
+
+  const handleRemove = () => {
+    onChange("")
+    setError(null)
+    if (inputRef.current) {
+      inputRef.current.value = ""
     }
   }
 
-  const clearFile = () => {
-    setFileName(undefined)
-    setPreview(null)
-    onChange("")
-  }
+  const uniqueId = `document-upload-${Math.random().toString(36).substring(2, 9)}`
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={`file-${label}`} className="flex items-center">
-        {label} {required && <span className="text-red-500 ml-1">*</span>}
-      </Label>
-
-      {description && <p className="text-sm text-gray-500">{description}</p>}
-
-      <div className="flex flex-col gap-2">
-        <Input id={`file-${label}`} type="file" onChange={handleFileChange} className="hidden" accept={accept} />
-
-        {fileName ? (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 p-2 border rounded-md w-full">
-              <FileIcon className="h-4 w-4 text-blue-500" />
-              <span className="text-sm truncate flex-1">{fileName}</span>
-              <Button type="button" variant="ghost" size="sm" onClick={clearFile} className="h-6 w-6 p-0">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Preview for image files */}
-            {preview && preview.startsWith("data:image") && (
-              <div className="mt-2 border rounded-md p-2 max-w-xs">
-                <img src={preview || "/placeholder.svg"} alt="Preview" className="max-h-32 object-contain mx-auto" />
-              </div>
+      {!value ? (
+        <div
+          className={cn(
+            "border-2 border-dashed rounded-md p-4 text-center hover:border-gray-400 transition-colors",
+            error ? "border-red-500" : "border-gray-300"
+          )}
+        >
+          <input
+            id={uniqueId}
+            type="file"
+            accept={accept}
+            onChange={handleFileChange}
+            className="hidden"
+            disabled={disabled || isUploading}
+            ref={inputRef}
+          />
+          <label
+            htmlFor={uniqueId}
+            className={cn(
+              "flex flex-col items-center justify-center cursor-pointer",
+              disabled && "opacity-50 cursor-not-allowed"
             )}
-
-            {/* Preview for URLs that might be images */}
-            {preview && preview.startsWith("http") && (
-              <div className="mt-2 border rounded-md p-2 max-w-xs">
-                <img
-                  src={preview || "/placeholder.svg"}
-                  alt="Preview"
-                  className="max-h-32 object-contain mx-auto"
-                  onError={(e) => {
-                    // Hide if not an image
-                    ;(e.target as HTMLImageElement).style.display = "none"
-                  }}
-                />
-              </div>
+          >
+            {isUploading ? (
+              <Loader2 className="h-10 w-10 text-gray-400 animate-spin" />
+            ) : (
+              <Upload className="h-10 w-10 text-gray-400" />
             )}
+            <span className="mt-2 text-sm font-medium text-gray-700">
+              {isUploading ? "Uploading..." : label}
+            </span>
+            <span className="mt-1 text-xs text-gray-500">
+              Max size: {maxSize}MB
+            </span>
+          </label>
+          {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+        </div>
+      ) : (
+        <div className="flex items-center justify-between p-3 border rounded-md">
+          <div className="flex items-center space-x-2">
+            <FileText className="h-5 w-5 text-blue-500" />
+            <span className="text-sm font-medium truncate max-w-[200px]">
+              {typeof value === "string" && value.includes("/") 
+                ? value.split("/").pop() 
+                : "Document uploaded"}
+            </span>
           </div>
-        ) : (
           <Button
             type="button"
-            variant="outline"
-            onClick={() => document.getElementById(`file-${label}`)?.click()}
-            className="w-full"
+            variant="ghost"
+            size="sm"
+            onClick={handleRemove}
+            disabled={disabled}
           >
-            <Upload className="h-4 w-4 mr-2" />
-            Choose File
+            <X className="h-4 w-4" />
           </Button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

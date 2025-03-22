@@ -11,6 +11,7 @@ import type { AddressDetails } from "@/types/profile"
 import { saveAddressDetails } from "@/actions/profile"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const addressSchema = z.object({
   billingAddress: z.object({
@@ -33,6 +34,7 @@ const addressSchema = z.object({
 
 export function AddressForm({ initialData }: { initialData?: AddressDetails }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
 
   const form = useForm<AddressDetails>({
     resolver: zodResolver(addressSchema),
@@ -77,8 +79,12 @@ export function AddressForm({ initialData }: { initialData?: AddressDetails }) {
 
       if (result.success) {
         toast.success(result.message || "Address details saved successfully")
-        // Force a page reload to update the UI with the latest progress
-        window.location.reload()
+        // Instead of reloading the page, use router.refresh() to update the UI
+        router.refresh()
+        // Wait a moment before navigating to the next tab
+        setTimeout(() => {
+          router.push("/seller/profile")
+        }, 1000)
       } else {
         toast.error(result.error || "Failed to save address details")
       }

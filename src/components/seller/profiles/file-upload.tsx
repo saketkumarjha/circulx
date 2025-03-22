@@ -1,82 +1,97 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Upload } from "lucide-react"
-import * as pdfjsLib from "pdfjs-dist"
+import { useState, useCallback } from "react"
+import { useDropzone } from "@uploadthing/react"
+import { generateClientDropzoneAccept } from "uploadthing/client"
+import { X } from "lucide-react"
+import Image from "next/image"
 
 interface FileUploadProps {
-  label: string
-  value?: File
-  onChange: (file: File | undefined) => void
-  className?: string
+  endpoint?: "profileImage" | "documentImage"
+  onChange: (url?: string) => void
+  value?: string | null | undefined
+  onRemove?: () => void
+  accept?: string
+  maxSize?: number
+  label?: string
 }
 
-export function FileUpload({ label, value, onChange, className }: FileUploadProps) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [fileType, setFileType] = useState<"image" | "pdf" | null>(null)
+export const FileUpload = ({
+  endpoint = "profileImage",
+  onChange,
+  value,
+  onRemove,
+  accept,
+  maxSize,
+  label,
+}: FileUploadProps) => {
+  const [isUploading, setIsUploading] = useState(false)
 
-  useEffect(() => {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
-  }, [])
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setIsUploading(true)
+      const file = acceptedFiles[0]
 
-  const handleFileChange = async (file: File | undefined) => {
-    if (file) {
-      onChange(file)
+      if (file) {
+        const formData = new FormData()
+        formData.append("file", file)
+        formData.append("uploadPreset", "profileImage")
 
-      if (file.type === "application/pdf") {
-        setFileType("pdf")
-        const pdfData = await file.arrayBuffer()
-        const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise
-        const page = await pdf.getPage(1)
-        const viewport = page.getViewport({ scale: 1 })
-        const canvas = document.createElement("canvas")
-        const context = canvas.getContext("2d")
-        canvas.height = viewport.height
-        canvas.width = viewport.width
-        await page.render({ canvasContext: context!, viewport: viewport }).promise
-        setPreviewUrl(canvas.toDataURL())
-      } else {
-        setFileType("image")
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          setPreviewUrl(reader.result as string)
-        }
-        reader.readAsDataURL(file)
+        fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            onChange(data.secure_url)
+          })
+          .catch((error) => {
+            console.error("Upload error:", error)
+          })
+          .finally(() => setIsUploading(false))
       }
-    }
-  }
+    },
+    [onChange],
+  )
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: accept ? { [accept]: [] } : generateClientDropzoneAccept([endpoint]),
+    multiple: false,
+    maxSize: maxSize ? maxSize * 1024 * 1024 : undefined,
+  })
+
+  // Only render the image if value is a non-empty string
+  const hasValidImage = typeof value === "string" && value.length > 0
 
   return (
-    <div className={className}>
-      <label className="text-sm font-medium">
-        {label}
-        <span className="text-red-500">*</span>
-      </label>
-      <div className="mt-2 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary">
-        <input
-          type="file"
-          accept=".pdf,.jpg,.jpeg,.png"
-          className="hidden"
-          id={`file-${label}`}
-          onChange={(e) => handleFileChange(e.target.files?.[0])}
-        />
-        <label htmlFor={`file-${label}`} className="cursor-pointer">
-          {previewUrl ? (
-            <div className="relative w-full aspect-video">
-              <img src={previewUrl || "/placeholder.svg"} alt="Preview" className="w-full h-full object-contain" />
-              <p className="text-xs text-muted-foreground mt-2">
-                {fileType === "pdf" ? "PDF Preview (First Page)" : "Image Preview"} - Click to change file
-              </p>
-            </div>
+    <div className="flex items-center">
+      {hasValidImage && (
+        <div className="relative h-20 w-20">
+          <Image fill alt="Upload" src={(value as string) || "/placeholder.svg"} className="rounded-full" />
+          <button
+            onClick={() => {
+              if (onRemove) onRemove()
+            }}
+            className="bg-rose-500 text-white p-1 rounded-full absolute top-0 right-0 shadow-sm"
+            type="button"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+      {!hasValidImage && (
+        <div {...getRootProps()} className="relative border-2 border-dashed border-sky-500/50 p-4 rounded-md">
+          <input {...getInputProps()} />
+          {isDragActive ? (
+            <p>Drop the files here ...</p>
           ) : (
-            <>
-              <Upload className="w-8 h-8 mx-auto mb-2 text-orange-600" />
-              <p className="text-sm text-muted-foreground">Click to Upload or drag and drop</p>
-              <p className="text-xs text-muted-foreground mt-1">(Max file size 25 MB)</p>
-            </>
+            <div className="text-muted-foreground text-sm">
+              {label || "Drag 'n' drop an image here, or click to select files"}
+            </div>
           )}
-        </label>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

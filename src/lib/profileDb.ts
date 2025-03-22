@@ -38,6 +38,8 @@ export async function connectProfileDB(): Promise<Connection> {
     .then((conn) => {
       console.log("Profile database connected successfully")
       cachedConnection = conn
+      // Register models with the connection
+      registerModels(conn)
       return conn
     })
     .catch((error) => {
@@ -150,28 +152,39 @@ const ProfileProgressSchema = new mongoose.Schema<IProfileProgress>(
 )
 
 // Function to register models
-function registerModels(mongoose: any) {
+function registerModels(connection: Connection) {
   // Only register models if they don't already exist
-  if (!mongoose.models.Business) {
-    mongoose.model("Business", BusinessSchema)
+  if (!connection.models.Business) {
+    connection.model("Business", BusinessSchema)
   }
-  if (!mongoose.models.Contact) {
-    mongoose.model("Contact", ContactSchema)
+  if (!connection.models.Contact) {
+    connection.model("Contact", ContactSchema)
   }
-  if (!mongoose.models.CategoryBrand) {
-    mongoose.model("CategoryBrand", CategoryBrandSchema)
+  if (!connection.models.CategoryBrand) {
+    connection.model("CategoryBrand", CategoryBrandSchema)
   }
-  if (!mongoose.models.Address) {
-    mongoose.model("Address", AddressSchema)
+  if (!connection.models.Address) {
+    connection.model("Address", AddressSchema)
   }
-  if (!mongoose.models.Bank) {
-    mongoose.model("Bank", BankSchema)
+  if (!connection.models.Bank) {
+    connection.model("Bank", BankSchema)
   }
-  if (!mongoose.models.Document) {
-    mongoose.model("Document", DocumentSchema)
+  if (!connection.models.Document) {
+    connection.model("Document", DocumentSchema)
   }
-  if (!mongoose.models.ProfileProgress) {
-    mongoose.model("ProfileProgress", ProfileProgressSchema)
+  if (!connection.models.ProfileProgress) {
+    connection.model("ProfileProgress", ProfileProgressSchema)
   }
+}
+
+// Export schemas for use in other files
+export {
+  BusinessSchema,
+  ContactSchema,
+  CategoryBrandSchema,
+  AddressSchema,
+  BankSchema,
+  DocumentSchema,
+  ProfileProgressSchema,
 }
 
