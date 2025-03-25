@@ -24,22 +24,30 @@ export interface Product {
   }
 }
 
-export type CategoryType = "All" | "Metal" | "Wood" | "Plastic" | "Electronics"
+export type CategoryType = "All" | "Electronics" | "Clothing" | "Home & Kitchen" | "Books" | string
 
 export interface ProductFormData {
-  productName: string
-  skuCode: string
-  description: string
-  pricePerUnit: string
-  availableQuantity: string
-  discount?: string
-  discountType?: string
-  weight: string
-  length: string
-  breadth: string
-  width: string
-  category: string
-  image?: string
-  images?: string[]
+  title: string
+  model?: string
+  description?: string
+  category_id?: number
+  sub_category_id?: number
+  units?: string
+  weight?: number
+  dimensions?: {
+    length?: number
+    width?: number
+    height?: number
+  }
+  image_link?: string
+  stock: number
+  price: number
+  discount?: number
+  SKU: string
+  seller_name: string
+  location: string
+  category_name: string
+  sub_category_name?: string
+  is_draft?: boolean
 }
 

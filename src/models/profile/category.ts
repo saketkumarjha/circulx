@@ -1,22 +1,33 @@
-import mongoose, { Schema } from "mongoose"
+import mongoose from "mongoose"
 
-export interface ICategoryBrand {
-  userId: string
-  categories: string[]
-  authorizedBrands: string[]
-  createdAt: Date
-  updatedAt: Date
-}
+const subCategorySchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+})
 
-const CategoryBrandSchema = new Schema<ICategoryBrand>(
+const categorySchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true, index: true },
-    categories: [{ type: String, required: true }],
-    authorizedBrands: [{ type: String, required: true }],
+    id: {
+      type: Number,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    sub_categories: [subCategorySchema],
   },
   { timestamps: true },
 )
 
-export const CategoryBrand =
-  mongoose.models.CategoryBrand || mongoose.model<ICategoryBrand>("CategoryBrand", CategoryBrandSchema)
+// Prevent duplicate model error in development with hot reloading
+const Category = mongoose.models.Category || mongoose.model("Category", categorySchema)
+
+export default Category
 

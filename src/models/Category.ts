@@ -1,19 +1,33 @@
 import mongoose from "mongoose"
 
-export interface Category {
-  category_id: number
-  category_name: string
-  created_at?: string
-}
-
-export const categorySchema = new mongoose.Schema<Category>({
-  category_id: { type: Number, required: true },
-  category_name: { type: String, required: true },
-  created_at: { type: String },
+const subCategorySchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
 })
 
-// Export the model
-const CategoryModel = mongoose.models.Category || mongoose.model<Category>("Category", categorySchema)
+const categorySchema = new mongoose.Schema(
+  {
+    id: {
+      type: Number,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    sub_categories: [subCategorySchema],
+  },
+  { timestamps: true },
+)
 
-export default CategoryModel
+// Prevent duplicate model error in development with hot reloading
+const Category = mongoose.models.Category || mongoose.model("Category", categorySchema)
+
+export default Category
 

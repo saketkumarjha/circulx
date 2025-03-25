@@ -3,252 +3,281 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { ChevronLeft, ChevronRight, Filter, Pencil, Plus, Trash2 } from "lucide-react"
-import Cookies from "js-cookie"
-
+import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
-import type { Product, CategoryType, ProductFormData } from "@/types"
 import ProductForm from "./product-form"
 
-const initialProducts: Product[] = [
-  {
-    id: "1",
-    image: "/audi.jpeg",
-    category: "Metal",
-    name: "Aluminum Sheets",
-    stock: 2500,
-    price: 25000,
-    status: true,
-    skuCode: "ALU001",
-    description: "High-quality aluminum sheets for various applications.",
-    weight: "10",
-    length: "100",
-    breadth: "50",
-    width: "0.5",
-    discountType: "",
-    discount: "",
-    productName: "Aluminum Sheets",
-    availableQuantity: "2500",
-    pricePerUnit: "25000",
-    dimensions: {
-      length: 100,
-      width: 0.5,
-      height: 50,
-    },
-  },
-  {
-    id: "2",
-    image: "/login.png",
-    category: "Metal",
-    name: "Steel Pipes",
-    stock: 1500,
-    price: 35000,
-    status: true,
-    skuCode: "STP001",
-    description: "Durable steel pipes for construction and industrial use.",
-    weight: "20",
-    length: "200",
-    breadth: "10",
-    width: "10",
-    discountType: "",
-    discount: "",
-    productName: "Steel Pipes",
-    availableQuantity: "1500",
-    pricePerUnit: "35000",
-    dimensions: {
-      length: 200,
-      width: 10,
-      height: 10,
-    },
-  },
-  {
-    id: "3",
-    image: "/audi.jpeg",
-    category: "Wood",
-    name: "Pine Plywood",
-    stock: 800,
-    price: 15000,
-    status: true,
-    skuCode: "PIN001",
-    description: "Pine plywood for various woodworking projects.",
-    weight: "5",
-    length: "120",
-    breadth: "60",
-    width: "1.5",
-    discountType: "",
-    discount: "",
-    productName: "Pine Plywood",
-    availableQuantity: "800",
-    pricePerUnit: "15000",
-    dimensions: {
-      length: 120,
-      width: 1.5,
-      height: 60,
-    },
-  },
-  {
-    id: "4",
-    image: "/login.png",
-    category: "Wood",
-    name: "Oak Boards",
-    stock: 1200,
-    price: 45000,
-    status: false,
-    skuCode: "OAK001",
-    description: "High-quality oak boards for furniture making.",
-    weight: "15",
-    length: "150",
-    breadth: "75",
-    width: "2",
-    discountType: "",
-    discount: "",
-    productName: "Oak Boards",
-    availableQuantity: "1200",
-    pricePerUnit: "45000",
-    dimensions: {
-      length: 150,
-      width: 2,
-      height: 75,
-    },
-  },
-  {
-    id: "5",
-    image: "/audi.jpeg",
-    category: "Plastic",
-    name: "PVC Pipes",
-    stock: 3000,
-    price: 12000,
-    status: true,
-    skuCode: "PVC001",
-    description: "PVC pipes for plumbing and irrigation.",
-    weight: "2",
-    length: "200",
-    breadth: "5",
-    width: "5",
-    discountType: "",
-    discount: "",
-    productName: "PVC Pipes",
-    availableQuantity: "3000",
-    pricePerUnit: "12000",
-    dimensions: {
-      length: 200,
-      width: 5,
-      height: 5,
-    },
-  },
-]
+// Define the product interface based on the entity structure
+interface Product {
+  product_id: number
+  title: string
+  model?: string
+  description?: string
+  category_id?: number
+  sub_category_id?: number
+  units?: string
+  weight?: number
+  dimensions?: {
+    length?: number
+    width?: number
+    height?: number
+  }
+  image_link?: string
+  stock: number
+  price: number
+  discount?: number
+  SKU: string
+  seller_id?: number
+  created_at?: string
+  rating?: number
+  updated_at?: string
+  seller_name: string
+  location: string
+  category_name: string
+  sub_category_name?: string
+  is_draft?: boolean
+  isActive?: boolean
+}
 
-export function ProductTable() {
-  const [products, setProducts] = useState<Product[]>(initialProducts)
+export default function ProductTable() {
+  const [products, setProducts] = useState<Product[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [selectedCategory, setSelectedCategory] = useState<CategoryType>("All")
+  const [selectedCategory, setSelectedCategory] = useState<string>("All")
   const [showAddForm, setShowAddForm] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { toast } = useToast()
 
+  // Fetch products on component mount
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const token = Cookies.get("auth-token")
-        if (!token) {
-          throw new Error("No auth token found")
-        }
-        const response = await fetch("/api/sellerProducts", {
-          credentials: "include",
-        })
-        const data = await response.json()
-        if (response.ok) {
-          setProducts(data)
-        } else {
-          console.error("Error fetching products:", data.error)
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error)
-      }
-    }
-
     fetchProducts()
   }, [])
 
-  const categories: CategoryType[] = ["All", "Metal", "Wood", "Plastic", "Electronics"]
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      setError(null)
 
-  const filteredProducts = products.filter((product) =>
-    selectedCategory === "All" ? true : product.category === selectedCategory,
-  )
+      const response = await fetch("/api/seller/products")
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || "Failed to fetch products")
+      }
+
+      const data = await response.json()
+      console.log("Fetched products data:", data)
+
+      if (data && Array.isArray(data.products)) {
+        setProducts(data.products)
+      } else if (Array.isArray(data)) {
+        setProducts(data)
+      } else {
+        console.error("Unexpected response format:", data)
+        setProducts([])
+      }
+    } catch (err: any) {
+      console.error("Error fetching products:", err)
+      setError(err.message || "Failed to load products. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmitProduct = async (formData: any, isDraft: boolean) => {
+    try {
+      const method = editingProduct ? "PUT" : "POST"
+      const endpoint = editingProduct ? `/api/seller/products?id=${editingProduct.product_id}` : "/api/seller/products"
+
+      const payload = {
+        ...formData,
+        is_draft: isDraft,
+      }
+
+      if (editingProduct) {
+        payload.product_id = editingProduct.product_id
+      }
+
+      console.log("Submitting product data:", payload)
+
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to save product")
+      }
+
+      const savedProduct = await response.json()
+      console.log("Saved product:", savedProduct)
+
+      // Close the form
+      setShowAddForm(false)
+      setEditingProduct(null)
+
+      // Show success message
+      toast({
+        title: isDraft ? "Draft saved" : "Product saved",
+        description: isDraft ? "Your product draft has been saved." : "Your product has been published successfully.",
+      })
+
+      // Refresh the product list
+      await fetchProducts()
+    } catch (error: any) {
+      console.error("Error saving product:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save product. Please try again.",
+        
+      })
+    }
+  }
+
+  const handleDeleteProduct = async (productId: number) => {
+    if (!confirm("Are you sure you want to delete this product?")) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/seller/products?id=${productId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete product")
+      }
+
+      // Remove the product from the local state
+      setProducts(products.filter((product) => product.product_id !== productId))
+
+      toast({
+        title: "Product deleted",
+        description: "The product has been successfully deleted.",
+      })
+    } catch (err) {
+      console.error("Error deleting product:", err)
+      toast({
+        title: "Error",
+        description: "Failed to delete product. Please try again.",
+       
+      })
+    }
+  }
+
+  const handleUpdateProductStatus = async (productId: number, isActive: boolean) => {
+    try {
+      const response = await fetch(`/api/seller/products?id=${productId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isActive }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update product status")
+      }
+
+      // Update the local state
+      setProducts(products.map((product) => (product.product_id === productId ? { ...product, isActive } : product)))
+
+      toast({
+        title: "Status updated",
+        description: `Product is now ${isActive ? "active" : "inactive"}.`,
+      })
+    } catch (err) {
+      console.error("Error updating product status:", err)
+      toast({
+        title: "Error",
+        description: "Failed to update product status. Please try again.",
+      })
+    }
+  }
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product)
+    setShowAddForm(true)
+  }
+
+  // Filter products by category
+  const filteredProducts =
+    selectedCategory === "All" ? products : products.filter((product) => product.category_name === selectedCategory)
+
+  // Pagination
   const productsPerPage = 10
   const totalProducts = filteredProducts.length
   const totalPages = Math.ceil(totalProducts / productsPerPage)
-
   const indexOfLastProduct = currentPage * productsPerPage
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
 
+  // Get unique categories for filter
+  const categories = ["All", ...new Set(products.map((product) => product.category_name))]
+
   const handlePreviousPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1))
   const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages))
 
-  const handleDeleteProduct = (id: string) => {
-    setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id))
-    toast({
-      title: "Product deleted",
-      description: "The product has been successfully deleted.",
-    })
+  if (loading) {
+    return <div className="text-center py-10">Loading products...</div>
   }
 
-  const handleUpdateProductStatus = (id: string, status: boolean) => {
-    setProducts((prevProducts) => prevProducts.map((product) => (product.id === id ? { ...product, status } : product)))
-    toast({
-      title: "Product status updated",
-      description: `The product status has been set to ${status ? "active" : "inactive"}.`,
-    })
-  }
-
-  const handleAddProduct = async (formData: ProductFormData) => {
-    try {
-      const response = await fetch("/api/sellerProducts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${document.cookie.split("auth-token=")[1]}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      const newProduct = await response.json()
-      if (response.ok) {
-        setProducts((prevProducts) => [...prevProducts, newProduct])
-        setShowAddForm(false)
-        toast({
-          title: "Product Uploaded Successfully",
-          description: `${formData.productName} has been added to your inventory.`,
-        })
-      } else {
-        console.error("Error adding product:", newProduct.error)
-      }
-    } catch (error) {
-      console.error("Error adding product:", error)
-    }
+  if (error) {
+    return (
+      <div className="text-center py-10">
+        <div className="text-red-500 mb-4">{error}</div>
+        <Button onClick={fetchProducts} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          Retry
+        </Button>
+      </div>
+    )
   }
 
   return (
     <div className="w-full p-4 sm:p-6">
       {showAddForm ? (
-        <ProductForm onSubmit={handleAddProduct} onCancel={() => setShowAddForm(false)} />
+        <ProductForm
+          onSubmit={handleSubmitProduct}
+          onCancel={() => {
+            setShowAddForm(false)
+            setEditingProduct(null)
+          }}
+          initialData={editingProduct || undefined}
+          productId={editingProduct?.product_id}
+        />
       ) : (
         <>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
             <h2 className="text-2xl font-semibold">Product Stock</h2>
-            <div className="flex items-center gap-2">
-              <Button onClick={() => setShowAddForm(true)} className="bg-black hover:bg-black/90">
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <div className="w-full sm:w-auto">
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value)
+                    setCurrentPage(1) // Reset to first page when changing category
+                  }}
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Button onClick={() => setShowAddForm(true)} className="bg-black hover:bg-black/90 w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Product
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                Filters
               </Button>
             </div>
           </div>
@@ -267,65 +296,91 @@ export function ProductTable() {
                 </tr>
               </thead>
               <tbody>
-                {currentProducts.map((product) => (
-                  <tr key={product.id} className="border-t">
-                    <td className="px-4 py-3">
-                      <Image
-                        src={product.image || "/placeholder.svg"}
-                        alt={product.name}
-                        width={80}
-                        height={80}
-                        className="rounded-lg border object-cover"
-                      />
-                    </td>
-                    <td className="px-4 py-3">{product.category}</td>
-                    <td className="px-4 py-3">{product.productName}</td>
-                    <td className="px-4 py-3">{product.availableQuantity}</td>
-                    <td className="px-4 py-3">₹{Number.parseInt(product.pricePerUnit).toLocaleString()}</td>
-                    <td className="px-4 py-3">
-                      <Switch
-                        checked={product.status}
-                        onCheckedChange={(checked) => handleUpdateProductStatus(product.id, checked)}
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleDeleteProduct(product.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
-                      </div>
+                {currentProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+                      No products found. Add your first product!
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  currentProducts.map((product) => (
+                    <tr key={product.product_id} className="border-t">
+                      <td className="px-4 py-3">
+                        <div className="h-16 w-16 relative">
+                          <Image
+                            src={product.image_link || "/placeholder.svg?height=80&width=80"}
+                            alt={product.title}
+                            fill
+                            className="object-contain rounded-md"
+                          />
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">{product.category_name}</td>
+                      <td className="px-4 py-3">
+                        {product.title}
+                        {product.is_draft && (
+                          <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                            Draft
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">{product.stock}</td>
+                      <td className="px-4 py-3">₹{product.price.toLocaleString()}</td>
+                      <td className="px-4 py-3">
+                        <Switch
+                          checked={product.isActive || false}
+                          onCheckedChange={(checked) => handleUpdateProductStatus(product.product_id, checked)}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleEditProduct(product)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleDeleteProduct(product.product_id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <span className="sr-only">Delete</span>
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
-          <div className="flex items-center justify-between mt-4 text-sm">
-            <div>
-              Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, totalProducts)} of {totalProducts}
+          {totalProducts > 0 && (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 text-sm gap-4">
+              <div>
+                Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, totalProducts)} of {totalProducts}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="sr-only">Previous page</span>
+                </Button>
+                <span>
+                  {currentPage} of {totalPages}
+                </span>
+                <Button variant="outline" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
+                  <ChevronRight className="h-4 w-4" />
+                  <span className="sr-only">Next page</span>
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
-                <ChevronLeft className="h-4 w-4" />
-                <span className="sr-only">Previous page</span>
-              </Button>
-              <Button variant="outline" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
-                <ChevronRight className="h-4 w-4" />
-                <span className="sr-only">Next page</span>
-              </Button>
-            </div>
-          </div>
+          )}
         </>
       )}
       <Toaster />
