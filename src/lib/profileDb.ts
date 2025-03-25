@@ -1,13 +1,21 @@
 import mongoose, { type Connection } from "mongoose"
 import type { IBusinessDetails } from "@/models/profile/business"
 import type { IContactDetails } from "@/models/profile/contact"
-import type { ICategoryBrand } from "@/models/profile/category"
+// Remove the problematic import entirely and use a direct interface definition
+// We'll define the interface structure based on how it's used in the schema
 import type { IAddress } from "@/models/profile/address"
 import type { IBank } from "@/models/profile/bank"
 import type { IDocument } from "@/models/profile/document"
 import type { IProfileProgress } from "@/models/profile/progress"
 
 const PROFILE_DB = process.env.PROFILE_DB!
+
+// Define the interface locally to avoid import issues
+interface ICategoryBrand {
+  userId: string
+  categories: string[]
+  authorizedBrands: string[]
+}
 
 // Cache the database connection
 let cachedConnection: Connection | null = null
