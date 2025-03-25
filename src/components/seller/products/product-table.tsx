@@ -138,7 +138,7 @@ export default function ProductTable() {
       toast({
         title: "Error",
         description: error.message || "Failed to save product. Please try again.",
-        
+      
       })
     }
   }
@@ -209,6 +209,12 @@ export default function ProductTable() {
     setShowAddForm(true)
   }
 
+  // Reset category filter
+  const resetCategoryFilter = () => {
+    setSelectedCategory("All")
+    setCurrentPage(1)
+  }
+
   // Filter products by category
   const filteredProducts =
     selectedCategory === "All" ? products : products.filter((product) => product.category_name === selectedCategory)
@@ -259,7 +265,7 @@ export default function ProductTable() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
             <h2 className="text-2xl font-semibold">Product Stock</h2>
             <div className="flex flex-col sm:flex-row items-center gap-2">
-              <div className="w-full sm:w-auto">
+              <div className="w-full sm:w-64">
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   value={selectedCategory}
@@ -270,7 +276,7 @@ export default function ProductTable() {
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
-                      {category}
+                      {category === "All" ? "All Categories" : category}
                     </option>
                   ))}
                 </select>
@@ -281,6 +287,19 @@ export default function ProductTable() {
               </Button>
             </div>
           </div>
+
+          {/* Display active category filter if not "All" */}
+          {selectedCategory !== "All" && (
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-sm text-gray-500">Filtering by category:</span>
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100">
+                {selectedCategory}
+              </span>
+              <button onClick={resetCategoryFilter} className="text-xs text-blue-600 hover:text-blue-800">
+                Clear filter
+              </button>
+            </div>
+          )}
 
           <div className="overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
@@ -299,7 +318,9 @@ export default function ProductTable() {
                 {currentProducts.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
-                      No products found. Add your first product!
+                      {products.length === 0
+                        ? "No products found. Add your first product!"
+                        : "No products found in this category."}
                     </td>
                   </tr>
                 ) : (
