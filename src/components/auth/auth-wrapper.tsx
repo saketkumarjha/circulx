@@ -36,7 +36,7 @@ export default function AuthWrapper({ children, requiredRole }: AuthWrapperProps
           if (currentUser.type === "admin") {
             router.push("/admin")
           } else if (currentUser.type === "seller") {
-            router.push("/seller")
+            router.push("/seller/profile")
           } else {
             router.push("/dashboard")
           }
@@ -68,13 +68,20 @@ export default function AuthWrapper({ children, requiredRole }: AuthWrapperProps
         if (currentUser.type === "admin") {
           window.location.href = "/admin"
         } else if (currentUser.type === "seller") {
-          window.location.href = "/seller"
+          // Redirect sellers to profile page instead of dashboard
+          window.location.href = "/seller/profile"
         } else {
           window.location.href = "/dashboard"
         }
       } else {
-        // User has the correct role, refresh the page
-        window.location.reload()
+        // User has the correct role
+        if (currentUser.type === "seller" && requiredRole === "seller") {
+          // Redirect sellers to profile page after login
+          window.location.href = "/seller/profile"
+        } else {
+          // For other roles, refresh the page
+          window.location.reload()
+        }
       }
     }
   }
