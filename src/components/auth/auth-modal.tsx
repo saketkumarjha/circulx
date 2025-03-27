@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { SignInForm } from "./sign-in-form"
 import { SignUpForm } from "./sign-up-form"
 import { ArrowLeft } from "lucide-react"
+import { getCurrentUser } from "@/actions/auth"
+import { useRouter } from "next/navigation"
 
 interface AuthModalProps {
   isOpen: boolean
@@ -15,6 +17,19 @@ interface AuthModalProps {
 export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [isSignIn, setIsSignIn] = useState(true)
   const [successMessage, setSuccessMessage] = useState("")
+  const router = useRouter()
+
+  // Close modal if user is already logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      const user = await getCurrentUser()
+      if (user && isOpen) {
+        onSuccess()
+      }
+    }
+
+    checkUser()
+  }, [isOpen, onSuccess])
 
   const handleBack = () => {
     if (!isSignIn) {
@@ -28,6 +43,23 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const handleSignUpSuccess = (message: string) => {
     setSuccessMessage(message)
     setIsSignIn(true)
+  }
+
+  const handleSignInSuccess = async () => {
+    const user = await getCurrentUser()
+
+    if (user) {
+      // Redirect based on user role
+      if (user.type === "admin") {
+        router.push("/admin")
+      } else if (user.type === "seller") {
+        router.push("/seller")
+      } else {
+        router.push("/dashboard")
+      }
+    }
+
+    onSuccess()
   }
 
   return (
@@ -46,7 +78,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             </div>
           )}
           {isSignIn ? (
-            <SignInForm onSuccess={onSuccess} onSignUp={() => setIsSignIn(false)} />
+            <SignInForm onSuccess={handleSignInSuccess} onSignUp={() => setIsSignIn(false)} />
           ) : (
             <SignUpForm onSuccess={handleSignUpSuccess} onSignIn={() => setIsSignIn(true)} />
           )}

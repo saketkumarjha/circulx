@@ -13,6 +13,7 @@ import { signOut } from "@/actions/auth"
 import Searchbar from "@/components/layout/searchbar"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store"
+import { useRouter } from "next/navigation"
 
 interface HeaderProps {
   user?: {
@@ -28,6 +29,7 @@ export default function Header({ user }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const cartItemsCount = useSelector((state: RootState) => state.cart.items.length)
+  const router = useRouter()
 
   const categories = [
     "Storage Tanks, Drums",
@@ -40,8 +42,34 @@ export default function Header({ user }: HeaderProps) {
 
   function handleAuthSuccess() {
     setIsAuthModalOpen(false)
-    // Refresh the page to update the user state
-    window.location.reload()
+
+    // Redirect to the appropriate dashboard based on user role
+    if (user) {
+      if (user.type === "admin") {
+        router.push("/admin")
+      } else if (user.type === "seller") {
+        router.push("/seller")
+      } else {
+        router.push("/dashboard")
+      }
+    } else {
+      // Refresh the page to update the user state
+      window.location.reload()
+    }
+  }
+
+  function navigateToDashboard() {
+    if (user) {
+      if (user.type === "admin") {
+        router.push("/admin")
+      } else if (user.type === "seller") {
+        router.push("/seller")
+      } else {
+        router.push("/dashboard")
+      }
+    } else {
+      setIsAuthModalOpen(true)
+    }
   }
 
   return (
@@ -88,11 +116,7 @@ export default function Header({ user }: HeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href={user.type === "admin" ? "/admin" : user.type === "seller" ? "/seller" : "/dashboard"}>
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={navigateToDashboard}>Dashboard</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => signOut()}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
