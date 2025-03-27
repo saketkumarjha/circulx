@@ -6,7 +6,6 @@ import { SignInForm } from "./sign-in-form"
 import { SignUpForm } from "./sign-up-form"
 import { ArrowLeft } from "lucide-react"
 import { getCurrentUser } from "@/actions/auth"
-import { useRouter } from "next/navigation"
 
 interface AuthModalProps {
   isOpen: boolean
@@ -17,14 +16,16 @@ interface AuthModalProps {
 export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [isSignIn, setIsSignIn] = useState(true)
   const [successMessage, setSuccessMessage] = useState("")
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   // Close modal if user is already logged in
   useEffect(() => {
     const checkUser = async () => {
-      const user = await getCurrentUser()
-      if (user && isOpen) {
-        onSuccess()
+      if (isOpen) {
+        const user = await getCurrentUser()
+        if (user) {
+          onSuccess()
+        }
       }
     }
 
@@ -46,27 +47,25 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   }
 
   const handleSignInSuccess = async () => {
-    const user = await getCurrentUser()
-
-    if (user) {
-      // Redirect based on user role
-      if (user.type === "admin") {
-        router.push("/admin")
-      } else if (user.type === "seller") {
-        router.push("/seller")
-      } else {
-        router.push("/dashboard")
-      }
-    }
-
+    setIsLoading(true)
+    // Let the parent component handle the redirect
     onSuccess()
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open && !isLoading) onClose()
+      }}
+    >
       <DialogContent className="sm:max-w-[400px] p-0 bg-[#004D41] border-0">
         <div className="px-14 py-3 relative">
-          <button onClick={handleBack} className="absolute top-2 left-2 text-white hover:text-gray-200">
+          <button
+            onClick={handleBack}
+            className="absolute top-2 left-2 text-white hover:text-gray-200"
+            disabled={isLoading}
+          >
             <ArrowLeft size={24} />
           </button>
           {successMessage && (
@@ -78,7 +77,11 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             </div>
           )}
           {isSignIn ? (
-            <SignInForm onSuccess={handleSignInSuccess} onSignUp={() => setIsSignIn(false)} />
+            <SignInForm
+              onSuccess={handleSignInSuccess}
+              onSignUp={() => setIsSignIn(false)}
+              setIsLoading={setIsLoading}
+            />
           ) : (
             <SignUpForm onSuccess={handleSignUpSuccess} onSignIn={() => setIsSignIn(true)} />
           )}

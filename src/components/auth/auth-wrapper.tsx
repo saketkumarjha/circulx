@@ -15,22 +15,24 @@ interface AuthWrapperProps {
 export default function AuthWrapper({ children, requiredRole }: AuthWrapperProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        setIsLoading(true)
         const currentUser = await getCurrentUser()
         setUser(currentUser)
 
         if (!currentUser) {
           // User is not logged in, show auth modal
           setIsAuthModalOpen(true)
+          setIsAuthenticated(false)
         } else if (requiredRole && currentUser.type !== requiredRole) {
           // User is logged in but doesn't have the required role
           // Redirect to the appropriate dashboard
+          setIsAuthenticated(false)
           if (currentUser.type === "admin") {
             router.push("/admin")
           } else if (currentUser.type === "seller") {
@@ -38,10 +40,14 @@ export default function AuthWrapper({ children, requiredRole }: AuthWrapperProps
           } else {
             router.push("/dashboard")
           }
+        } else {
+          // User is authenticated and has the correct role
+          setIsAuthenticated(true)
         }
       } catch (error) {
         console.error("Auth check failed:", error)
         setIsAuthModalOpen(true)
+        setIsAuthenticated(false)
       } finally {
         setIsLoading(false)
       }
@@ -50,22 +56,48 @@ export default function AuthWrapper({ children, requiredRole }: AuthWrapperProps
     checkAuth()
   }, [router, requiredRole])
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = async () => {
     setIsAuthModalOpen(false)
-    window.location.reload()
+    setIsLoading(true)
+
+    // Check user role after login
+    const currentUser = await getCurrentUser()
+    if (currentUser) {
+      if (requiredRole && currentUser.type !== requiredRole) {
+        // Redirect to the appropriate dashboard based on role
+        if (currentUser.type === "admin") {
+          window.location.href = "/admin"
+        } else if (currentUser.type === "seller") {
+          window.location.href = "/seller"
+        } else {
+          window.location.href = "/dashboard"
+        }
+      } else {
+        // User has the correct role, refresh the page
+        window.location.reload()
+      }
+    }
   }
 
+  // Show loading spinner while checking authentication
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     )
   }
 
+  // Only render children if authenticated and has correct role
   return (
     <>
-      {children}
+      {isAuthenticated ? (
+        children
+      ) : (
+        <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+          {/* This div ensures the dashboard is not visible at all */}
+        </div>
+      )}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => {
