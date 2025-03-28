@@ -9,13 +9,15 @@ import { Checkbox } from "@/components/ui/checkbox"
 interface SignInFormProps {
   onSuccess: () => void
   onSignUp: () => void
+  setIsLoading: (isLoading: boolean) => void
 }
 
-export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
+export function SignInForm({ onSuccess, onSignUp, setIsLoading }: SignInFormProps) {
   const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(formData: FormData) {
+    setIsSubmitting(true)
     setIsLoading(true)
     setError("")
 
@@ -23,10 +25,12 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
 
     if (result.error) {
       setError(result.error)
+      setIsSubmitting(false)
       setIsLoading(false)
       return
     }
 
+    // Call onSuccess to handle redirection
     onSuccess()
   }
 
@@ -46,6 +50,7 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
             required
             placeholder=""
             className="h-9 px-8 bg-white text-white-100 placeholder:text-gray-500 rounded-lg"
+            disabled={isSubmitting}
           />
         </div>
         <div>
@@ -57,10 +62,16 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
             required
             placeholder=""
             className="h-9 px-8 bg-white text-green placeholder:text-gray-500 rounded-lg"
+            disabled={isSubmitting}
           />
         </div>
         <div className="flex items-center space-x-2">
-          <Checkbox id="remember" name="remember" className="border-gray-100 data-[state=checked]:bg-purple-600" />
+          <Checkbox
+            id="remember"
+            name="remember"
+            className="border-gray-100 data-[state=checked]:bg-purple-600"
+            disabled={isSubmitting}
+          />
           <label htmlFor="remember" className="text-sm text-gray-100">
             Remember me
           </label>
@@ -69,9 +80,9 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
         <Button
           type="submit"
           className="w-full h-9 text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 rounded-lg"
-          disabled={isLoading}
+          disabled={isSubmitting}
         >
-          {isLoading ? "Signing in..." : "Login"}
+          {isSubmitting ? "Signing in..." : "Login"}
         </Button>
         <div className="text-center ">
           <a href="#" className="text-sm text-gray-50 hover:text-white">
@@ -93,6 +104,7 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
             type="button"
             variant="outline"
             className="bg-[#1a0b2e]/50 border-[#1a0b2e] hover:bg-[#1a0b2e] p-0 h-12"
+            disabled={isSubmitting}
           >
             <img src="https://authjs.dev/img/providers/google.svg" alt="Google" className="w-6 h-6" />
           </Button>
@@ -100,6 +112,7 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
             type="button"
             variant="outline"
             className="bg-[#1a0b2e]/50 border-[#1a0b2e] hover:bg-[#1a0b2e] p-0 h-12"
+            disabled={isSubmitting}
           >
             <img src="https://authjs.dev/img/providers/facebook.svg" alt="Facebook" className="w-6 h-6" />
           </Button>
@@ -107,6 +120,7 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
             type="button"
             variant="outline"
             className="bg-[#1a0b2e]/50 border-[#1a0b2e] hover:bg-[#1a0b2e] p-0 h-12"
+            disabled={isSubmitting}
           >
             <img src="https://authjs.dev/img/providers/github.svg" alt="GitHub" className="w-6 h-6" />
           </Button>
@@ -114,7 +128,7 @@ export function SignInForm({ onSuccess, onSignUp }: SignInFormProps) {
       </form>
       <div className="text-center text-sm text-gray-200">
         Don't have an account?{" "}
-        <button onClick={onSignUp} className="text-purple-400 hover:text-gray-200">
+        <button onClick={onSignUp} className="text-purple-400 hover:text-gray-200" disabled={isSubmitting}>
           Signup
         </button>
       </div>
