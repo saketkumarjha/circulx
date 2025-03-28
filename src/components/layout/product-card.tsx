@@ -45,7 +45,7 @@ export default function ProductCard({
   }
 
   const handleAddToCart = () => {
-    dispatch(addItem({ id: href, title, image_link, price, quantity: 1 }))
+    dispatch(addItem({ id: href, title, image_link, price, quantity: 1, discount }))
   }
 
   return (
@@ -91,7 +91,7 @@ export default function ProductCard({
           {/* Star Rating */}
           <div className="flex items-center">
             {renderStars(rating)}
-            <span className="ml-1 text-xs text-gray-600">({rating.toFixed(1)})</span>
+            <span className="ml-1 text-xs text-gray-600">({rating?.toFixed(1)})</span>
           </div>
 
           {/* Company and Location */}
