@@ -28,7 +28,7 @@ interface Product {
   price: number;
   discount: number;
   SKU: string;
-  seller_id?: number;
+  seller_id: number;
   created_at?: string;
   rating: number;
   seller_name: string;
@@ -322,6 +322,7 @@ export default function Cart() {
               rating={product.rating}
               originalPrice={product.price + product.discount}
               hoverImage={product.image_link}
+              seller_id={product.seller_id}
             />
           ))}
         </div>
