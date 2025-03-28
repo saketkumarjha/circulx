@@ -9,9 +9,10 @@ import img from "../img/motor.png";
 
 interface OrderSummaryProps {
   onPlaceOrder: () => void;
+  onTotalAmountChange: (amount: number) => void;
 }
 
-const OrderSummary: React.FC<OrderSummaryProps> = ({ onPlaceOrder }) => {
+const OrderSummary: React.FC<OrderSummaryProps> = ({ onPlaceOrder, onTotalAmountChange }) => {
 
   const cartItems = useSelector((state: RootState) => state.cart.items);
 
@@ -35,6 +36,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ onPlaceOrder }) => {
     const tax = calculateTax();
     return subTotal - discount + tax;
   };
+
+  React.useEffect(() => {
+    const totalAmount = calculateTotal();
+    onTotalAmountChange(totalAmount); // Pass the total amount to the parent
+  }, [cartItems]);
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md border border-gray-200">

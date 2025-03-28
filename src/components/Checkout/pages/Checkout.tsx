@@ -37,6 +37,7 @@ const CheckoutPage: React.FC = () => {
   });
 
   const cartItems = useSelector((state: RootState) => state.cart.items);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   const handleBillingDetailsSubmit = async (details: BillingDetails) => {
     setBillingDetails(details);
@@ -53,6 +54,10 @@ const CheckoutPage: React.FC = () => {
     const handleAdditionalInfoChange = (info: string) => {
       setAdditionalInfo(info);
     };
+
+    const handleTotalAmountChange = (amount: number) => {
+      setTotalAmount(amount);
+    }
   
     const handlePlaceOrder = async () => {
 
@@ -68,7 +73,7 @@ const CheckoutPage: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ amount: 5000, currency: "INR" }), // Replace with actual amount
+          body: JSON.stringify({ amount: totalAmount, currency: "INR" }),
         });
     
         const { razorpayOrderId } = await paymentResponse.json();
@@ -76,7 +81,7 @@ const CheckoutPage: React.FC = () => {
         // Step 2: Open Razorpay payment modal
         const options: RazorpayOptions = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-          amount: 500 * 100,
+          amount: totalAmount,
           currency: "INR",
           name: "Circulx",
           description: "Order Payment",
@@ -105,7 +110,7 @@ const CheckoutPage: React.FC = () => {
                   billingDetails,
                   paymentMethod,
                   additionalInfo,
-                  amount: 500, 
+                  amount: totalAmount, 
                   razorpayOrderId,
                   cartItems
                 }),
@@ -165,7 +170,9 @@ const CheckoutPage: React.FC = () => {
 
         {/* Right column: Order Summary */}
         <div className="lg:col-span-1">
-          <OrderSummary onPlaceOrder={handlePlaceOrder} />
+          <OrderSummary 
+            onPlaceOrder={handlePlaceOrder}
+            onTotalAmountChange={handleTotalAmountChange} />
 
           {/* Promotional sections */}
           <div className="mt-3 space-y-3">
