@@ -48,8 +48,8 @@ const TextField: React.FC<CombinedTextFieldProps> = ({
     );
   }
   
-  const { multiline, ...inputProps } = props as TextFieldProps;
-  return (
+  const { size: inputSize, fullWidth: inputFullWidth, error: inputError, ...inputProps } =
+  props as TextFieldProps;  return (
     <div className="w-full">
       <input
         className={classes}
