@@ -1,14 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react"
+import Image from "next/image"
+import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import ProductForm from "./product-form"
+import { fetchSellerEmail } from "@/lib/seller-utils"
 
 // Define the product interface based on the entity structure
 interface Product {
@@ -30,7 +32,8 @@ interface Product {
   price: number
   discount?: number
   SKU: string
-  seller_id?: number
+  seller_id?: string
+  emailId: string
   created_at?: string
   rating?: number
   updated_at?: string
@@ -50,13 +53,42 @@ export default function ProductTable() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [sellerEmail, setSellerEmail] = useState<string | null>(null)
+  const [profileError, setProfileError] = useState<string | null>(null)
   const router = useRouter()
   const { toast } = useToast()
 
+  // Fetch seller email first
+  const getSellerEmail = useCallback(async () => {
+    try {
+      const email = await fetchSellerEmail()
+      if (email) {
+        setSellerEmail(email)
+        return email
+      } else {
+        setProfileError("Your profile is incomplete. Please complete your contact details first.")
+        return null
+      }
+    } catch (error) {
+      console.error("Error fetching seller email:", error)
+      setProfileError("Failed to retrieve your profile information. Please complete your profile first.")
+      return null
+    }
+  }, [])
+
   // Fetch products on component mount
   useEffect(() => {
-    fetchProducts()
-  }, [])
+    const fetchData = async () => {
+      const email = await getSellerEmail()
+      if (email) {
+        fetchProducts()
+      } else {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [getSellerEmail])
 
   const fetchProducts = async () => {
     try {
@@ -138,7 +170,6 @@ export default function ProductTable() {
       toast({
         title: "Error",
         description: error.message || "Failed to save product. Please try again.",
-      
       })
     }
   }
@@ -169,7 +200,6 @@ export default function ProductTable() {
       toast({
         title: "Error",
         description: "Failed to delete product. Please try again.",
-       
       })
     }
   }
@@ -193,7 +223,9 @@ export default function ProductTable() {
 
       toast({
         title: "Status updated",
-        description: `Product is now ${isActive ? "active" : "inactive"}.`,
+        description: isActive
+          ? "Product is now visible on the landing page"
+          : "Product is now hidden from the landing page",
       })
     } catch (err) {
       console.error("Error updating product status:", err)
@@ -232,6 +264,21 @@ export default function ProductTable() {
 
   const handlePreviousPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1))
   const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+
+  if (profileError) {
+    return (
+      <div className="w-full p-4 sm:p-6">
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Profile Not Complete</AlertTitle>
+          <AlertDescription>{profileError}</AlertDescription>
+        </Alert>
+        <Button onClick={() => router.push("/seller/profile")} className="mt-4">
+          Complete Profile
+        </Button>
+      </div>
+    )
+  }
 
   if (loading) {
     return <div className="text-center py-10">Loading products...</div>
@@ -348,10 +395,14 @@ export default function ProductTable() {
                       <td className="px-4 py-3">{product.stock}</td>
                       <td className="px-4 py-3">₹{product.price.toLocaleString()}</td>
                       <td className="px-4 py-3">
-                        <Switch
-                          checked={product.isActive || false}
-                          onCheckedChange={(checked) => handleUpdateProductStatus(product.product_id, checked)}
-                        />
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={product.isActive || false}
+                            onCheckedChange={(checked) => handleUpdateProductStatus(product.product_id, checked)}
+                            className="data-[state=checked]:bg-black"
+                          />
+                          <span className="text-xs text-gray-500">{product.isActive ? "Visible" : "Hidden"}</span>
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">

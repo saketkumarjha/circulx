@@ -29,16 +29,20 @@ export async function GET() {
       }
     }
 
-    // Try to get all products
-    const products = await ProductModel.find({}).lean()
-    console.log(`Found ${products.length} products in PROFILE_DB`)
+    // Only fetch products that are active and not drafts
+    const products = await ProductModel.find({
+      isActive: true, // Only return active products
+      is_draft: false, // Don't return draft products
+    }).lean()
+
+    console.log(`Found ${products.length} active products in PROFILE_DB`)
 
     if (products.length > 0) {
       return NextResponse.json(products, { status: 200 })
     }
 
     // If no products found, return empty array
-    console.log("No products found in PROFILE_DB, returning empty array")
+    console.log("No active products found in PROFILE_DB, returning empty array")
     return NextResponse.json([], { status: 200 })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error"

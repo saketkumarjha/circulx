@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
-import { Plus, Upload, X, Save } from "lucide-react"
+import { Plus, Upload, X, Save, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,12 +11,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useToast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import debounce from "lodash/debounce"
+import { useRouter } from "next/navigation"
 
 // Define the product schema based on the entity structure
 const productSchema = z.object({
@@ -40,6 +42,7 @@ const productSchema = z.object({
   discount: z.number().optional(),
   SKU: z.string().min(1, "SKU is required"),
   seller_name: z.string().min(1, "Seller name is required"),
+  emailId: z.string().email("Invalid email format").min(1, "Seller email is required"),
   location: z.string().min(1, "Location is required"),
   category_name: z.string().min(1, "Category is required"),
   sub_category_name: z.string().optional(),
@@ -74,7 +77,11 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
   const [newSubCategoryName, setNewSubCategoryName] = useState("")
   const [addingCategory, setAddingCategory] = useState(false)
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+  const [sellerEmail, setSellerEmail] = useState<string | null>(null)
+  const [isLoadingEmail, setIsLoadingEmail] = useState(true)
+  const [emailError, setEmailError] = useState<string | null>(null)
   const { toast } = useToast()
+  const router = useRouter()
 
   const {
     register,
@@ -104,6 +111,7 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
       discount: undefined,
       SKU: "",
       seller_name: "",
+      emailId: "",
       location: "",
       category_name: "",
       sub_category_name: "",
@@ -235,14 +243,33 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
     setIsLoading(true)
 
     try {
+      // Debug: Log the form data
+      console.log("Form data before submission:", data)
+
+      // Make sure emailId is included in the form data
+      if (!data.emailId) {
+        toast({
+          title: "Error",
+          description: "Seller email is required. Please enter your email address.",
+        })
+        setIsLoading(false)
+        return
+      }
+
       // Add the primary image to the form data
       const formData = {
         ...data,
         image_link: images.length > 0 ? images[0] : undefined,
         is_draft: isDraft,
+        // Explicitly include emailId to ensure it's sent to the server
+        emailId: data.emailId,
       }
 
-      console.log("Submitting form data:", formData)
+      // Debug: Log the final form data
+      console.log("Final form data to submit:", formData)
+      console.log("Email ID being submitted:", formData.emailId)
+
+      // Submit the form data
       await onSubmit(formData, isDraft)
 
       if (!isDraft) {
@@ -400,6 +427,23 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
     }
   }
 
+  if (emailError) {
+    return (
+      <div className="w-full max-w-7xl mx-auto p-6">
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Profile Not Complete</AlertTitle>
+          <AlertDescription>
+            {emailError}. You need to complete your profile with contact information before adding products.
+          </AlertDescription>
+        </Alert>
+        <Button onClick={() => router.push("/seller/profile")} className="mt-4">
+          Complete Profile
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -420,6 +464,15 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
           </Button>
         </div>
       </div>
+
+      <Alert className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Important</AlertTitle>
+        <AlertDescription>
+          Please enter the same email address that you used in your profile management. Products are linked to your
+          seller account through this email.
+        </AlertDescription>
+      </Alert>
 
       <form onSubmit={handleSubmit((data) => handleFormSubmit(data, false))} className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -671,7 +724,56 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Category & Location</h3>
+                <h3 className="text-lg font-semibold mb-4">Seller Information</h3>
+                <div className="space-y-4">
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="seller_name" className="text-base">
+                      Seller Name*
+                    </Label>
+                    <Input
+                      {...register("seller_name")}
+                      id="seller_name"
+                      placeholder="Enter seller name"
+                      className="bg-white h-10"
+                    />
+                    {errors.seller_name && <p className="text-red-500 text-sm">{errors.seller_name.message}</p>}
+                  </div>
+
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="emailId" className="text-base">
+                      Seller Email*
+                    </Label>
+                    <Input
+                      {...register("emailId")}
+                      id="emailId"
+                      placeholder="Enter seller email"
+                      className="bg-white h-10"
+                    />
+                    {errors.emailId && <p className="text-red-500 text-sm">{errors.emailId.message}</p>}
+                    <p className="text-sm text-muted-foreground">
+                      Please use the same email address that you provided during profile management.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="location" className="text-base">
+                      Location*
+                    </Label>
+                    <Input
+                      {...register("location")}
+                      id="location"
+                      placeholder="Enter location"
+                      className="bg-white h-10"
+                    />
+                    {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Category</h3>
                 <div className="space-y-4">
                   <div className="grid gap-1.5">
                     <Label htmlFor="category_name" className="text-base">
@@ -771,32 +873,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
                         Add
                       </Button>
                     </div>
-                  </div>
-
-                  <div className="grid gap-1.5">
-                    <Label htmlFor="seller_name" className="text-base">
-                      Seller Name*
-                    </Label>
-                    <Input
-                      {...register("seller_name")}
-                      id="seller_name"
-                      placeholder="Enter seller name"
-                      className="bg-white h-10"
-                    />
-                    {errors.seller_name && <p className="text-red-500 text-sm">{errors.seller_name.message}</p>}
-                  </div>
-
-                  <div className="grid gap-1.5">
-                    <Label htmlFor="location" className="text-base">
-                      Location*
-                    </Label>
-                    <Input
-                      {...register("location")}
-                      id="location"
-                      placeholder="Enter location"
-                      className="bg-white h-10"
-                    />
-                    {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
                   </div>
                 </div>
               </CardContent>

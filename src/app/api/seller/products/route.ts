@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectProfileDB } from "@/lib/profileDb"
 import mongoose from "mongoose"
+import { getCurrentUser } from "@/actions/auth"
 
-// Define the Product schema
+// Update the product schema definition to ensure emailId is included
 const productSchema = new mongoose.Schema({
   product_id: { type: Number, required: true, unique: true },
   title: { type: String, required: true },
@@ -23,6 +24,7 @@ const productSchema = new mongoose.Schema({
   discount: Number,
   SKU: { type: String, required: true },
   seller_id: String, // Changed to String to match userId from profileDB
+  emailId: { type: String, required: true }, // Ensure emailId is required
   created_at: { type: Date, default: Date.now },
   rating: Number,
   updated_at: { type: Date, default: Date.now },
@@ -37,10 +39,55 @@ const productSchema = new mongoose.Schema({
 // Create or get the model
 let Product: mongoose.Model<any>
 
+// Helper function to get seller email from contacts
+async function getSellerEmail(connection: mongoose.Connection) {
+  try {
+    // Get session to identify the current user
+    const user = await getCurrentUser()
+
+    if (!user?.id) {
+      console.log("No user ID found in session")
+      return null
+    }
+
+    // Define Contact schema if it doesn't exist
+    if (!connection.models.Contact) {
+      const ContactSchema = new mongoose.Schema(
+        {
+          userId: { type: String, required: true, index: true },
+          contactName: { type: String, required: true },
+          phoneNumber: { type: String, required: true },
+          emailId: { type: String, required: true },
+          pickupTime: { type: String, required: true },
+        },
+        { timestamps: true },
+      )
+
+      connection.model("Contact", ContactSchema)
+    }
+
+    // Get Contact model
+    const Contact = connection.models.Contact
+
+    // Find contact details for the current user
+    const contactDetails = await Contact.findOne({ userId: user.id })
+
+    if (!contactDetails) {
+      console.log("No contact details found for user:", user.id)
+      return null
+    }
+
+    return contactDetails.emailId
+  } catch (error) {
+    console.error("Error fetching seller email:", error)
+    return null
+  }
+}
+
 // GET handler to fetch products
 export async function GET(req: NextRequest) {
   try {
-    // Connect to PROFILE_DB instead of PROD_DB
+    // Connect to PROFILE_DB
     const connection = await connectProfileDB()
 
     // Register the Product model with this connection if it doesn't exist
@@ -51,10 +98,22 @@ export async function GET(req: NextRequest) {
     // Get the Product model from this connection
     Product = connection.models.Product
 
-    // Get products
-    const products = await Product.find({}).sort({ created_at: -1 })
+    // Get seller email from contacts
+    const sellerEmail = await getSellerEmail(connection)
 
-    console.log("Fetched products from PROFILE_DB:", products.length)
+    if (!sellerEmail) {
+      return NextResponse.json(
+        {
+          error: "Seller email not found. Please complete your profile first.",
+        },
+        { status: 400 },
+      )
+    }
+
+    // Get products filtered by seller email
+    const products = await Product.find({ emailId: sellerEmail }).sort({ created_at: -1 })
+
+    console.log(`Fetched ${products.length} products for seller email: ${sellerEmail}`)
 
     return NextResponse.json({ products })
   } catch (error: any) {
@@ -66,7 +125,7 @@ export async function GET(req: NextRequest) {
 // POST handler to create a new product
 export async function POST(req: NextRequest) {
   try {
-    // Connect to PROFILE_DB instead of PROD_DB
+    // Connect to PROFILE_DB
     const connection = await connectProfileDB()
 
     // Register the Product model with this connection if it doesn't exist
@@ -79,18 +138,48 @@ export async function POST(req: NextRequest) {
 
     const data = await req.json()
     console.log("Received product data:", data)
+    console.log("Email ID from request:", data.emailId)
 
-    // Generate a new product_id (get the highest existing product_id and increment by 1)
+    // Validate emailId
+    if (!data.emailId) {
+      return NextResponse.json(
+        {
+          error: "Seller email is required",
+        },
+        { status: 400 },
+      )
+    }
+
+    // Get current user to associate with the product
+    const user = await getCurrentUser()
+    if (!user?.id) {
+      return NextResponse.json(
+        {
+          error: "User not authenticated",
+        },
+        { status: 401 },
+      )
+    }
+
+    // Add seller_id to the product data
+    data.seller_id = user.id
+
+    // Generate a new product_id
     const highestProduct = await Product.findOne().sort({ product_id: -1 })
     const nextProductId = highestProduct ? highestProduct.product_id + 1 : 1
 
-    // Create a new product
-    const product = new Product({
+    // Create a new product with explicit emailId
+    const productData = {
       ...data,
       product_id: nextProductId,
       created_at: new Date(),
       updated_at: new Date(),
-    })
+      emailId: data.emailId, // Explicitly set emailId
+    }
+
+    console.log("Final product data to save:", productData)
+
+    const product = new Product(productData)
 
     await product.save()
     console.log("Saved product to PROFILE_DB:", product)
@@ -105,7 +194,7 @@ export async function POST(req: NextRequest) {
 // PUT handler to update a product
 export async function PUT(req: NextRequest) {
   try {
-    // Connect to PROFILE_DB instead of PROD_DB
+    // Connect to PROFILE_DB
     const connection = await connectProfileDB()
 
     // Register the Product model with this connection if it doesn't exist
@@ -125,7 +214,34 @@ export async function PUT(req: NextRequest) {
 
     const data = await req.json()
 
-    // Update the product using product_id instead of _id
+    // Get current user
+    const user = await getCurrentUser()
+    if (!user?.id) {
+      return NextResponse.json(
+        {
+          error: "User not authenticated",
+        },
+        { status: 401 },
+      )
+    }
+
+    // Find the product first to check ownership
+    const existingProduct = await Product.findOne({ product_id: Number.parseInt(id) })
+
+    if (!existingProduct) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 })
+    }
+
+    if (existingProduct.seller_id !== user.id) {
+      return NextResponse.json(
+        {
+          error: "You don't have permission to update this product",
+        },
+        { status: 403 },
+      )
+    }
+
+    // Update the product
     const updatedProduct = await Product.findOneAndUpdate(
       { product_id: Number.parseInt(id) },
       {
@@ -134,10 +250,6 @@ export async function PUT(req: NextRequest) {
       },
       { new: true },
     )
-
-    if (!updatedProduct) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 })
-    }
 
     return NextResponse.json(updatedProduct)
   } catch (error: any) {
@@ -149,7 +261,7 @@ export async function PUT(req: NextRequest) {
 // PATCH handler to update product status
 export async function PATCH(req: NextRequest) {
   try {
-    // Connect to PROFILE_DB instead of PROD_DB
+    // Connect to PROFILE_DB
     const connection = await connectProfileDB()
 
     // Register the Product model with this connection if it doesn't exist
@@ -169,7 +281,34 @@ export async function PATCH(req: NextRequest) {
 
     const data = await req.json()
 
-    // Update only the specified fields using product_id instead of _id
+    // Get current user
+    const user = await getCurrentUser()
+    if (!user?.id) {
+      return NextResponse.json(
+        {
+          error: "User not authenticated",
+        },
+        { status: 401 },
+      )
+    }
+
+    // Find the product first to check ownership
+    const existingProduct = await Product.findOne({ product_id: Number.parseInt(id) })
+
+    if (!existingProduct) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 })
+    }
+
+    if (existingProduct.seller_id !== user.id) {
+      return NextResponse.json(
+        {
+          error: "You don't have permission to update this product",
+        },
+        { status: 403 },
+      )
+    }
+
+    // Update the product status
     const updatedProduct = await Product.findOneAndUpdate(
       { product_id: Number.parseInt(id) },
       {
@@ -178,10 +317,6 @@ export async function PATCH(req: NextRequest) {
       },
       { new: true },
     )
-
-    if (!updatedProduct) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 })
-    }
 
     return NextResponse.json(updatedProduct)
   } catch (error: any) {
@@ -193,7 +328,7 @@ export async function PATCH(req: NextRequest) {
 // DELETE handler to delete a product
 export async function DELETE(req: NextRequest) {
   try {
-    // Connect to PROFILE_DB instead of PROD_DB
+    // Connect to PROFILE_DB
     const connection = await connectProfileDB()
 
     // Register the Product model with this connection if it doesn't exist
@@ -211,12 +346,35 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 })
     }
 
-    // Delete the product using product_id instead of _id
-    const deletedProduct = await Product.findOneAndDelete({ product_id: Number.parseInt(id) })
+    // Get current user
+    const user = await getCurrentUser()
+    if (!user?.id) {
+      return NextResponse.json(
+        {
+          error: "User not authenticated",
+        },
+        { status: 401 },
+      )
+    }
 
-    if (!deletedProduct) {
+    // Find the product first to check ownership
+    const existingProduct = await Product.findOne({ product_id: Number.parseInt(id) })
+
+    if (!existingProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
+
+    if (existingProduct.seller_id !== user.id) {
+      return NextResponse.json(
+        {
+          error: "You don't have permission to delete this product",
+        },
+        { status: 403 },
+      )
+    }
+
+    // Delete the product
+    const deletedProduct = await Product.findOneAndDelete({ product_id: Number.parseInt(id) })
 
     return NextResponse.json({ message: "Product deleted successfully" })
   } catch (error: any) {

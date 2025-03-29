@@ -184,6 +184,7 @@ const ProductSchema = new mongoose.Schema({
   rating: Number,
   updated_at: { type: Date, default: Date.now },
   seller_name: { type: String, required: true },
+  emailId: { type: String, required: true },
   location: { type: String, required: true },
   category_name: { type: String, required: true },
   sub_category_name: String,
