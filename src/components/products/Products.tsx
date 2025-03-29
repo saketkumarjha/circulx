@@ -36,20 +36,56 @@ export default function ProductsPage() {
   const [selectedPowerRating, setSelectedPowerRating] = useState<string[]>([])
   const [selectedPhases, setSelectedPhases] = useState<string[]>([])
   const [selectedSuctionSize, setSelectedSuctionSize] = useState<string[]>([])
-  // const router = useRouter()
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true)
+        setError(null)
+        console.log("Fetching products from API")
         const response = await axios.get("/api/products")
         console.log("Response:", response)
-        const products: Product[] = response.data
-        setProducts(products)
-        setFilteredProducts(products)
-        const uniqueCategories = Array.from(new Set(products.map((product) => product.category_name)))
+
+        // Check if response.data is an array or has a products property
+        const productsData = Array.isArray(response.data)
+          ? response.data
+          : response.data.products
+            ? response.data.products
+            : []
+
+        console.log("Products data:", productsData)
+
+        if (productsData.length === 0) {
+          console.log("No products found")
+          setError("No products found. Please add some products first.")
+        }
+
+        // Ensure products have the correct type
+        const typedProducts = productsData.map((product: any) => ({
+          product_id: product.product_id || 0,
+          title: product.title || "Untitled Product",
+          description: product.description || "",
+          category_name: product.category_name || "Uncategorized",
+          price: product.price || 0,
+          discount: product.discount || 0,
+          image_link: product.image_link || "",
+          rating: product.rating || 0,
+        }))
+
+        setProducts(typedProducts)
+        setFilteredProducts(typedProducts)
+
+        // Extract unique categories with proper type handling
+        const categoryNames: string[] = typedProducts.map((product: { category_name: any }) => product.category_name || "")
+        const uniqueCategories: string[] = Array.from(new Set(categoryNames))
         setCategories(uniqueCategories)
       } catch (error) {
         console.error("Error fetching products:", error)
+        setError("Failed to fetch products. Please try again later.")
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -150,18 +186,26 @@ export default function ProductsPage() {
     })
   }
 
+  // Function to render a placeholder image if the product image is missing
+  const getImageSrc = (imageLink: string) => {
+    if (!imageLink || imageLink.trim() === "") {
+      return "/placeholder.svg?height=262&width=200"
+    }
+    return imageLink
+  }
+
   return (
     <div>
       <div className="max-w-180 mx-auto p-4 mb-80">
         <div
-          className="relative w-[1440px] h-80 bg-cover bg-center flex justify-center mb-8 rounded-lg overflow-hidden"
+          className="relative w-full md:w-[1440px] h-80 bg-cover bg-center flex justify-center mb-8 rounded-lg overflow-hidden"
           style={{
             backgroundImage:
               "url(https://s3-alpha-sig.figma.com/img/84bd/a9e5/fd9b94264980eff659745ea88d1557c0?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=GXbhLG2SW53yETIxo~gMDWer8pBx~wkKJVQrTiDndO4ZRFGVaCA7MO9C4iBlKl3km7Iq-GpcwLr~sbgdqtWfA7wQAmzsDeSlcMY7bFatnfIvXKcGPYjoK5dsCjQlMVFPv-X~H60PquN9faI20VklRb1ZbJ0oopCHnJebsay3Ar661VNGl9ShCbah8Ydq8bl-yIP5zpV0qVhftz3-Og3ED-H8HjYc0lX2iDjRi9iQg3t2yKi6e2FnFanN9P9ls38sJ7wOwq2-rjSe6t-9fUcdGESjHGeynulh9eL8crMxWWW67JF21rQbPDcFuimARlJMhgTROevZRDYvL2GK07W3pQ__)",
           }}
         >
           <div className="inset-0 max-w-[768px] max-h-[276px] flex flex-col items-start justify-center mt-[41px] text-white text-start">
-            <h1 className="text-6xl font-semibold mb-1">
+            <h1 className="text-4xl md:text-6xl font-semibold mb-1">
               Find the Best Deals on <br /> Water Pumps & Motor
             </h1>
             <p className="text-gray-100 mb-4">Paper, Metal, Glass, and more - direct from trusted suppliers.</p>
@@ -171,8 +215,8 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-20 pt-[60px] pb-24">
-          <div className="w-[262px] h-[32px] mb-60">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4 md:px-20 pt-[60px] pb-24">
+          <div className="w-full md:w-[262px] h-[32px] mb-60">
             <div className="flex gap-1 mb-4">
               <img
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAXklEQVR4nOWUQQrAIAwE5/8fa5tPbS8KHopYjVWagb3JLsgQiIIBAs5ZAyriUlJLpvXddwPTv6jGlcoP/oRtp64GknHRVL0Db1FcdW07/VoZOWzqvaauA09lwfRjBTfsYIzjlbUBMQAAAABJRU5ErkJggg=="
@@ -462,29 +506,50 @@ export default function ProductsPage() {
           </div>
           <div className="md:col-span-3 min-h-[500px]">
             <h2 className="font-semibold text-[40px] text-start mb-5">Water Pumps</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredProducts.map((product) => (
-                <div key={product.product_id} className="bg-white w-[262px] h-[433px] pb-4 rounded-lg">
-                  <div className="relative w-[262px] h-[349px] bg-slate-200 flex">
-                    <Image src={product.image_link} alt={product.title} width={262} height={200} className="" />
-                    {product.discount > 0 && (
-                      <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                        NEW
-                      </span>
-                    )}
-                  </div>
-                  <h4 className="text-lg font-semibold text-start">{product.title}</h4>
-                  <p className="text-gray-600 text-start">₹{product.price}</p>
+
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <p className="text-xl">Loading products...</p>
+              </div>
+            ) : error ? (
+              <div className="flex justify-center items-center h-64">
+                <p className="text-xl text-red-500">{error}</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredProducts.map((product) => (
+                    <div key={product.product_id} className="bg-white w-full md:w-[262px] h-[433px] pb-4 rounded-lg">
+                      <div className="relative w-full md:w-[262px] h-[349px] bg-slate-200 flex justify-center items-center">
+                        <Image
+                          src={getImageSrc(product.image_link) || "/placeholder.svg"}
+                          alt={product.title}
+                          width={262}
+                          height={200}
+                          className="object-contain"
+                        />
+                        {product.discount > 0 && (
+                          <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                            NEW
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="text-lg font-semibold text-start px-2">{product.title}</h4>
+                      <p className="text-gray-600 text-start px-2">₹{product.price}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <button className="rounded-2xl bg-green-800 text-white w-full p-1">Show More</button>
+                {filteredProducts.length > 0 && (
+                  <button className="rounded-2xl bg-green-800 text-white w-full p-1 mt-4">Show More</button>
+                )}
+              </>
+            )}
           </div>
         </div>
         <div className="flex justify-center mt-20">
           <Image src="/time-delivery-banner.png" alt="On time delivery" width={800} height={583} />
         </div>
-        <div className="px-40 flex flex-col mt-28">
+        <div className="px-4 md:px-40 flex flex-col mt-28">
           <div className="">
             <h3 className="text-[#FF6600] font-bold text-base leading-4 mb-4">PROMOTION</h3>
             <h2 className="text-[40px] font-normal leading-10 mb-4">Live shopping | Explore top deals</h2>

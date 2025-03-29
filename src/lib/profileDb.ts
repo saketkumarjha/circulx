@@ -159,6 +159,38 @@ const ProfileProgressSchema = new mongoose.Schema<IProfileProgress>(
   { timestamps: true },
 )
 
+// Define Product schema
+const ProductSchema = new mongoose.Schema({
+  product_id: { type: Number, required: true, unique: true },
+  title: { type: String, required: true },
+  model: String,
+  description: String,
+  category_id: Number,
+  sub_category_id: Number,
+  units: String,
+  weight: Number,
+  dimensions: {
+    length: Number,
+    width: Number,
+    height: Number,
+  },
+  image_link: String,
+  stock: { type: Number, required: true },
+  price: { type: Number, required: true },
+  discount: Number,
+  SKU: { type: String, required: true },
+  seller_id: String,
+  created_at: { type: Date, default: Date.now },
+  rating: Number,
+  updated_at: { type: Date, default: Date.now },
+  seller_name: { type: String, required: true },
+  location: { type: String, required: true },
+  category_name: { type: String, required: true },
+  sub_category_name: String,
+  is_draft: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true },
+})
+
 // Function to register models
 function registerModels(connection: Connection) {
   // Only register models if they don't already exist
@@ -183,6 +215,9 @@ function registerModels(connection: Connection) {
   if (!connection.models.ProfileProgress) {
     connection.model("ProfileProgress", ProfileProgressSchema)
   }
+  if (!connection.models.Product) {
+    connection.model("Product", ProductSchema)
+  }
 }
 
 // Export schemas for use in other files
@@ -194,5 +229,6 @@ export {
   BankSchema,
   DocumentSchema,
   ProfileProgressSchema,
+  ProductSchema,
 }
 

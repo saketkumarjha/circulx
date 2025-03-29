@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { connectDB } from "@/lib/prod_db"
+import { connectProfileDB } from "@/lib/profileDb"
 import mongoose from "mongoose"
 
 // Define the Product schema
@@ -22,7 +22,7 @@ const productSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   discount: Number,
   SKU: { type: String, required: true },
-  seller_id: Number,
+  seller_id: String, // Changed to String to match userId from profileDB
   created_at: { type: Date, default: Date.now },
   rating: Number,
   updated_at: { type: Date, default: Date.now },
@@ -36,21 +36,25 @@ const productSchema = new mongoose.Schema({
 
 // Create or get the model
 let Product: mongoose.Model<any>
-try {
-  Product = mongoose.model("Product")
-} catch {
-  Product = mongoose.model("Product", productSchema)
-}
 
 // GET handler to fetch products
 export async function GET(req: NextRequest) {
   try {
-    await connectDB()
+    // Connect to PROFILE_DB instead of PROD_DB
+    const connection = await connectProfileDB()
+
+    // Register the Product model with this connection if it doesn't exist
+    if (!connection.models.Product) {
+      connection.model("Product", productSchema)
+    }
+
+    // Get the Product model from this connection
+    Product = connection.models.Product
 
     // Get products
     const products = await Product.find({}).sort({ created_at: -1 })
 
-    console.log("Fetched products:", products)
+    console.log("Fetched products from PROFILE_DB:", products.length)
 
     return NextResponse.json({ products })
   } catch (error: any) {
@@ -62,7 +66,16 @@ export async function GET(req: NextRequest) {
 // POST handler to create a new product
 export async function POST(req: NextRequest) {
   try {
-    await connectDB()
+    // Connect to PROFILE_DB instead of PROD_DB
+    const connection = await connectProfileDB()
+
+    // Register the Product model with this connection if it doesn't exist
+    if (!connection.models.Product) {
+      connection.model("Product", productSchema)
+    }
+
+    // Get the Product model from this connection
+    Product = connection.models.Product
 
     const data = await req.json()
     console.log("Received product data:", data)
@@ -80,7 +93,7 @@ export async function POST(req: NextRequest) {
     })
 
     await product.save()
-    console.log("Saved product:", product)
+    console.log("Saved product to PROFILE_DB:", product)
 
     return NextResponse.json(product, { status: 201 })
   } catch (error: any) {
@@ -92,7 +105,16 @@ export async function POST(req: NextRequest) {
 // PUT handler to update a product
 export async function PUT(req: NextRequest) {
   try {
-    await connectDB()
+    // Connect to PROFILE_DB instead of PROD_DB
+    const connection = await connectProfileDB()
+
+    // Register the Product model with this connection if it doesn't exist
+    if (!connection.models.Product) {
+      connection.model("Product", productSchema)
+    }
+
+    // Get the Product model from this connection
+    Product = connection.models.Product
 
     const { searchParams } = new URL(req.url)
     const id = searchParams.get("id")
@@ -127,7 +149,16 @@ export async function PUT(req: NextRequest) {
 // PATCH handler to update product status
 export async function PATCH(req: NextRequest) {
   try {
-    await connectDB()
+    // Connect to PROFILE_DB instead of PROD_DB
+    const connection = await connectProfileDB()
+
+    // Register the Product model with this connection if it doesn't exist
+    if (!connection.models.Product) {
+      connection.model("Product", productSchema)
+    }
+
+    // Get the Product model from this connection
+    Product = connection.models.Product
 
     const { searchParams } = new URL(req.url)
     const id = searchParams.get("id")
@@ -162,7 +193,16 @@ export async function PATCH(req: NextRequest) {
 // DELETE handler to delete a product
 export async function DELETE(req: NextRequest) {
   try {
-    await connectDB()
+    // Connect to PROFILE_DB instead of PROD_DB
+    const connection = await connectProfileDB()
+
+    // Register the Product model with this connection if it doesn't exist
+    if (!connection.models.Product) {
+      connection.model("Product", productSchema)
+    }
+
+    // Get the Product model from this connection
+    Product = connection.models.Product
 
     const { searchParams } = new URL(req.url)
     const id = searchParams.get("id")

@@ -127,7 +127,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
         toast({
           title: "Error",
           description: "Failed to load categories. Please refresh the page.",
-          
         })
       }
     } catch (error) {
@@ -135,7 +134,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
       toast({
         title: "Error",
         description: "Failed to load categories. Please refresh the page.",
-        
       })
     } finally {
       setIsLoadingCategories(false)
@@ -269,7 +267,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
       toast({
         title: "Error saving product",
         description: "There was an error saving your product. Please try again.",
-        
       })
     } finally {
       setIsLoading(false)
@@ -281,7 +278,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
       toast({
         title: "Error",
         description: "Category name cannot be empty",
-        
       })
       return
     }
@@ -319,7 +315,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
         toast({
           title: "Error",
           description: error.error || "Failed to add category",
-          
         })
       }
     } catch (error) {
@@ -327,7 +322,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
       toast({
         title: "Error",
         description: "Failed to add category. Please try again.",
-        
       })
     } finally {
       setAddingCategory(false)
@@ -339,7 +333,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
       toast({
         title: "Error",
         description: "Subcategory name cannot be empty and a parent category must be selected",
-        
       })
       return
     }
@@ -394,7 +387,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
         toast({
           title: "Error",
           description: error.error || "Failed to add subcategory",
-          
         })
       }
     } catch (error) {
@@ -402,7 +394,6 @@ export default function ProductForm({ onSubmit, onCancel, initialData, productId
       toast({
         title: "Error",
         description: "Failed to add subcategory. Please try again.",
-        
       })
     } finally {
       setAddingCategory(false)
