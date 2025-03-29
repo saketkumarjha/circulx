@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useRouter } from "next/navigation"
 
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../store"
@@ -11,7 +12,7 @@ import { useState, useEffect, useRef } from "react"
 import axios from "axios"
 import ProductCard from "@/components/layout/product-card"
 import "swiper/css"
-import { Truck, RefreshCw, Lock, Phone, ChevronLeft, ChevronRight } from "lucide-react"
+import { Truck, RefreshCw, Lock, Phone, ChevronLeft, ChevronRight, Trash2 } from "lucide-react"
 
 interface Product {
   product_id: number
@@ -146,6 +147,7 @@ const features = [
 ]
 
 export default function Cart() {
+  const router = useRouter()
   const dispatch = useDispatch()
   const cartItems = useSelector((state: RootState) => state.cart.items)
 
@@ -154,7 +156,14 @@ export default function Cart() {
   }
 
   const handleDecrement = (id: string) => {
-    dispatch(decreaseQuantity(id))
+    const item = cartItems.find((item) => item.id === id)
+    if (item && item.quantity <= 1) {
+      // If quantity is 1 or less, remove the item completely
+      dispatch(removeItem(id))
+    } else {
+      // Otherwise just decrease the quantity
+      dispatch(decreaseQuantity(id))
+    }
   }
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([])
 
@@ -163,8 +172,9 @@ export default function Cart() {
       try {
         const response = await axios.get("/api/products")
         const products: Product[] = response.data
-        console.log(products)
-        setRecommendedProducts(products)
+        // Limit to 8 most recent products
+        const recentProducts = products.slice(0, 8)
+        setRecommendedProducts(recentProducts)
       } catch (error) {
         console.error("Error fetching recommended products:", error)
       }
@@ -215,49 +225,107 @@ export default function Cart() {
     }, 0)
   }
 
+  const handleReturnToShop = () => {
+    router.push("/")
+  }
+
+  // Calculate the cart container height based on number of items
+  const getCartContainerHeight = () => {
+    if (cartItems.length === 0) return "auto"
+
+    // We're not using dynamic height anymore, as it causes issues on mobile
+    return "auto" // Let the container expand naturally based on content
+  }
+
   return (
-    <div className="container text-center mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">Your Cart</h2>
       {cartItems.length === 0 ? (
-        <p className="mt-20">Your cart is empty.</p>
+        <div className="flex flex-col items-center justify-center min-h-[200px]">
+          <p className="text-lg text-gray-500">Your cart is empty.</p>
+          <Button variant="outline" onClick={handleReturnToShop} className="mt-4">
+            Return to Shop
+          </Button>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
-            <div className="bg-white p-4 border border-[#9E9E9E] rounded shadow-xl h-[537px]">
-              <div className="flex justify-between border-b pb-2">
-                <h2 className="font-semibold w-1/4">PRODUCTS</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+          <div className="lg:col-span-2">
+            <div className="bg-white p-3 sm:p-4 border border-[#9E9E9E] rounded shadow-xl">
+              {/* Cart header - Hide on small screens, use alternative layout */}
+              <div className="hidden sm:flex justify-between border-b pb-2">
+                <h2 className="font-semibold w-1/4 text-left">PRODUCTS</h2>
                 <h2 className="font-semibold w-1/4 text-right">PRICE</h2>
                 <h2 className="font-semibold w-1/4 text-right">QUANTITY</h2>
                 <h2 className="font-semibold w-1/4 text-right">SUB-TOTAL</h2>
               </div>
-              <div className="py-2 min-h-96 relative">
-                <div className="max-h-[350px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+
+              <div className="py-2 relative">
+                <div
+                  className={`${cartItems.length > 5 ? "max-h-[600px] overflow-y-auto" : ""} pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100`}
+                >
                   <ul>
                     {cartItems.map((item) => (
                       <li
                         key={item.id}
-                        className="flex flex-wrap md:flex-nowrap justify-between items-center mb-4 border-b pb-4"
+                        className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-4"
                       >
-                        <div className="w-full md:w-1/4 flex items-center mb-2 md:mb-0">
-                          <Image src={item.image_link || "/placeholder.svg"} alt="product" width={100} height={100} />
-                          <h4 className="text-sm font-semibold ml-4 line-clamp-2 text-left">{item.title}</h4>
+                        {/* Product info - Full width on mobile, 1/4 on larger screens */}
+                        <div className="w-full sm:w-1/4 flex items-center mb-3 sm:mb-0">
+                          <div className="relative w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] flex-shrink-0">
+                            <Image
+                              src={item.image_link || "/placeholder.svg"}
+                              alt={item.title}
+                              fill
+                              className="object-cover rounded"
+                            />
+                          </div>
+                          <div className="ml-3 sm:ml-4 flex-1">
+                            <h4 className="text-sm font-semibold line-clamp-2 text-left">{item.title}</h4>
+                            {/* Mobile only price */}
+                            <p className="text-sm text-gray-600 mt-1 sm:hidden">₹{item.price}</p>
+                          </div>
                         </div>
-                        <div className="w-full md:w-1/4 text-right mb-2 md:mb-0">
+
+                        {/* Price - Hidden on mobile, shown on larger screens */}
+                        <div className="hidden sm:block sm:w-1/4 text-right">
                           <p>₹{item.price}</p>
                         </div>
-                        <div className="w-full md:w-1/4 flex flex-col items-end mb-2 md:mb-0">
+
+                        {/* Quantity controls - Full width on mobile, 1/4 on larger screens */}
+                        <div className="w-full sm:w-1/4 flex justify-between sm:justify-end items-center mb-3 sm:mb-0">
+                          <span className="sm:hidden text-sm font-medium">Quantity:</span>
                           <div className="flex border items-center gap-2">
-                            <button className="px-2 rounded hover:bg-gray-100" onClick={() => handleDecrement(item.id)}>
+                            <button
+                              className="px-2 rounded hover:bg-gray-100"
+                              onClick={() => handleDecrement(item.id)}
+                              aria-label="Decrease quantity"
+                            >
                               -
                             </button>
                             <p className="w-8 text-center">{item.quantity}</p>
-                            <button className="px-2 rounded hover:bg-gray-100" onClick={() => handleIncrement(item.id)}>
+                            <button
+                              className="px-2 rounded hover:bg-gray-100"
+                              onClick={() => handleIncrement(item.id)}
+                              aria-label="Increase quantity"
+                            >
                               +
                             </button>
                           </div>
                         </div>
-                        <div className="w-full md:w-1/4 text-right">
-                          <p>₹{calculateSubTotal(item.price, item.quantity)}</p>
+
+                        {/* Subtotal and remove button - Full width on mobile, 1/4 on larger screens */}
+                        <div className="w-full sm:w-1/4 flex justify-between sm:justify-end items-center">
+                          <span className="sm:hidden text-sm font-medium">Subtotal:</span>
+                          <div className="flex items-center">
+                            <p className="mr-3">₹{calculateSubTotal(item.price, item.quantity)}</p>
+                            <button
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="text-gray-500 hover:text-red-500 transition-colors"
+                              aria-label="Remove item"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
                         </div>
                       </li>
                     ))}
@@ -268,7 +336,7 @@ export default function Cart() {
                     <button
                       className="p-1 bg-gray-200 rounded-full hover:bg-gray-300 focus:outline-none"
                       onClick={() => {
-                        const container = document.querySelector(".max-h-\\[350px\\]")
+                        const container = document.querySelector(".overflow-y-auto")
                         if (container) container.scrollBy({ top: -100, behavior: "smooth" })
                       }}
                       aria-label="Scroll up"
@@ -289,7 +357,7 @@ export default function Cart() {
                     <button
                       className="p-1 bg-gray-200 rounded-full hover:bg-gray-300 focus:outline-none"
                       onClick={() => {
-                        const container = document.querySelector(".max-h-\\[350px\\]")
+                        const container = document.querySelector(".overflow-y-auto")
                         if (container) container.scrollBy({ top: 100, behavior: "smooth" })
                       }}
                       aria-label="Scroll down"
@@ -310,17 +378,21 @@ export default function Cart() {
                   </div>
                 )}
               </div>
-              <Button variant="outline" onClick={handleClearCart} className="m-1">
-                CLEAR CART
-              </Button>
-              <Button variant="outline" onClick={handleClearCart}>
-                RETURN TO SHOP
-              </Button>
+
+              {/* Action buttons - Ensure they stay inside the cart box */}
+              <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-4 pb-2 border-t pt-4">
+                <Button variant="outline" onClick={handleClearCart} className="text-xs sm:text-sm">
+                  CLEAR CART
+                </Button>
+                <Button variant="outline" onClick={handleReturnToShop} className="text-xs sm:text-sm">
+                  RETURN TO SHOP
+                </Button>
+              </div>
             </div>
           </div>
           <div className="flex flex-col">
             <div className="bg-white p-4 border border-[#9E9E9E] rounded shadow-xl">
-              <h2 className="font-semibold border-b text-xl">Cart Totals</h2>
+              <h2 className="font-semibold border-b text-lg sm:text-xl pb-2">Cart Totals</h2>
               <div className="flex justify-between py-2">
                 <span>Sub-total</span>
                 <span>₹{calculateCartSubTotal()}</span>
@@ -344,45 +416,39 @@ export default function Cart() {
 
               <button className="w-full bg-orange-500 text-white py-2 rounded-lg mt-4">PROCEED TO CHECKOUT</button>
             </div>
-            <div className="bg-white p-4 mt-2 border border-[#9E9E9E] rounded shadow-xl">
-              <div className="flex flex-col">
-                <h2 className="font-semibold p-2 mb-6 border-b text-lg">Coupon Code</h2>
-                <input type="text" placeholder="Coupon Code" className="w-full p-4 border rounded-lg" />
-                <button className="w-full bg-orange-500 text-white p-2 rounded-lg mt-2 max-w-[159px]">
-                  APPLY COUPON
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}
-      <div className="flex justify-center">
-        <div className="mt-80 max-w-[1120px] text-center">
-          <h2 className="text-3xl">Recommended based on your shopping trends</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4 justify-center">
-            {recommendedProducts.map((product) => (
-              <ProductCard
-                key={product.product_id}
-                title={product.title}
-                company={product.seller_name}
-                location={product.location}
-                price={product.price}
-                discount={product.discount}
-                image_link={product.image_link}
-                href={`/product/${product.product_id}`}
-                rating={product.rating}
-                originalPrice={product.price + product.discount}
-                hoverImage={product.image_link} seller_id={0}              />
-            ))}
-          </div>
+
+      {/* Recommended Products Section */}
+      <div className="mt-16 sm:mt-24 lg:mt-32 max-w-[1120px] mx-auto">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-6 text-center">
+          Recommended based on your shopping trends
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4 justify-center">
+          {recommendedProducts.slice(0, 8).map((product) => (
+            <ProductCard
+              key={product.product_id}
+              title={product.title}
+              company={product.seller_name}
+              location={product.location}
+              price={product.price}
+              discount={product.discount}
+              image_link={product.image_link}
+              href={`/product/${product.product_id}`}
+              rating={product.rating}
+              originalPrice={product.price + product.discount}
+              hoverImage={product.image_link} seller_id={0}            />
+          ))}
         </div>
       </div>
-      <div className="mt-20 flex justify-center">
-        <div className="max-w-[1280px] h-[601px] flex bg-[#FDCC0D] py-[90px] rounded-[20px]">
-          <div>
+
+      {/* Promotional Banner */}
+      <div className="mt-16 sm:mt-20 flex justify-center">
+        <div className="w-full max-w-[1280px] flex flex-col md:flex-row bg-[#FDCC0D] rounded-[20px] overflow-hidden">
+          <div className="w-full md:w-1/2 h-[250px] md:h-auto relative">
             <svg
-              width="795"
-              height="421"
+              className="w-full h-full object-cover"
               viewBox="0 0 795 421"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -397,43 +463,44 @@ export default function Cart() {
               </defs>
             </svg>
           </div>
-          <div className="flex flex-col items-start gap-[26px] py-28 pr-20">
-            <div>
-              <h3 className="text-6xl text-start  text-white mb-2">
-                Get a free <br /> demo
-              </h3>
-              <p className="text-white text-start">
-                Lorem Neque porro quisquam est qui <br /> dolorem ipsum quia dolor sit
-              </p>
-            </div>
-            <button className="inline-block text-lg font-medium text-[#FEFEFE] bg-[#14BA6D] py-3 px-14 rounded-[8px]">
+          <div className="w-full md:w-1/2 flex flex-col justify-center p-6 md:p-10">
+            <h3 className="text-3xl md:text-4xl lg:text-6xl font-bold text-white mb-4">
+              Get a free <br className="hidden md:block" /> demo
+            </h3>
+            <p className="text-white text-sm md:text-base mb-6">
+              Lorem Neque porro quisquam est qui <br className="hidden md:block" /> dolorem ipsum quia dolor sit
+            </p>
+            <button className="bg-[#14BA6D] text-white py-3 px-8 rounded-lg text-sm md:text-base font-medium self-start">
               Explore now
             </button>
           </div>
         </div>
       </div>
-      <div className="flex flex-col mt-[86px] max-w-[1440px] max-h-[687px]">
-        <div className="flex max-w-[1220px] justify-between">
-          <h2 className="text-start text-3xl mb-4">Your browsing history</h2>
-          <div className="underline">
-            <p className="">Page 1 of 2</p>
+
+      {/* Browsing History Section */}
+      <div className="mt-16 sm:mt-20 max-w-[1440px] mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-2 sm:mb-0">Your browsing history</h2>
+          <div className="underline text-sm">
+            <p>Page 1 of 2</p>
           </div>
         </div>
-        <div className="mt-12 relative pb-4">
+        <div className="relative">
           <div
             ref={historyRef}
-            className="flex overflow-x-hidden hover:overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent hover:scrollbar-thumb-gray-300 gap-4 h-[450px]"
+            className="flex overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 gap-4 pb-4"
           >
             {browsingHistory.map((product) => (
-              <div key={product.product_id} className="flex-shrink-0 h-[433px] w-[262px] bg-white">
-                <Image
-                  src={product.image_link || "/placeholder.svg"}
-                  alt={product.title}
-                  width={150}
-                  height={150}
-                  className="object-cover w-full max-h-[349px]"
-                />
-                <h3 className="text-lg pt-4 text-start font-semibold pl-1">{product.title}</h3>
+              <div key={product.product_id} className="flex-shrink-0 w-[180px] sm:w-[220px] md:w-[262px] bg-white">
+                <div className="relative aspect-square w-full">
+                  <Image
+                    src={product.image_link || "/placeholder.svg"}
+                    alt={product.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <h3 className="text-base md:text-lg pt-3 font-semibold px-2">{product.title}</h3>
               </div>
             ))}
           </div>
@@ -442,20 +509,22 @@ export default function Cart() {
             className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none z-10"
             aria-label="Previous product"
           >
-            <ChevronLeft className="w-6 h-6 text-gray-800" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-800" />
           </button>
           <button
             onClick={scrollRight}
             className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 shadow-md transition-all duration-200 focus:outline-none z-10"
             aria-label="Next product"
           >
-            <ChevronRight className="w-6 h-6 text-gray-800" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-gray-800" />
           </button>
         </div>
       </div>
-      <div className="w-full py-4 flex justify-center items-center mt-0">
-        <div className="rounded-2xl py-8 px-6 mt-4 sm:px-6 md:px-8 lg:px-12 w-full max-w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center gap-[27px]">
+
+      {/* Features Section */}
+      <div className="w-full py-8 mt-16 mb-8">
+        <div className="rounded-2xl py-6 px-4 sm:px-6 md:px-8 lg:px-12 w-full max-w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center gap-4 sm:gap-6">
             {features.map((feature, index) => (
               <FeatureCard
                 key={index}
