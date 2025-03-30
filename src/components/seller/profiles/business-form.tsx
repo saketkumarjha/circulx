@@ -56,10 +56,10 @@ export function BusinessForm({ initialData }: { initialData?: BusinessDetails })
 
       if (result.success) {
         toast.success(result.message || "Business details saved successfully")
-        router.refresh()
-        setTimeout(() => {
-          router.push("/seller/profile")
-        }, 1000)
+
+        // Force a hard refresh of the page instead of using router.refresh()
+        // This ensures the server gets the latest data and updates the UI
+        window.location.href = "/seller/profile"
       } else {
         toast.error(result.error || "Failed to save business details")
       }

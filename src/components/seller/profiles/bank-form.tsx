@@ -79,10 +79,8 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
 
       if (result.success) {
         toast.success(result.message || "Bank details saved successfully")
-        router.refresh()
-        setTimeout(() => {
-          router.push("/seller/profile")
-        }, 1000)
+        // Use direct page reload instead of router.refresh() + setTimeout
+        window.location.href = "/seller/profile"
       } else {
         toast.error(result.error || "Failed to save bank details")
       }

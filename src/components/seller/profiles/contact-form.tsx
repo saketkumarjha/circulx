@@ -48,10 +48,9 @@ export function ContactForm({ initialData }: { initialData?: ContactDetails }) {
 
       if (result.success) {
         toast.success(result.message || "Contact details saved successfully")
-        router.refresh()
-        setTimeout(() => {
-          router.push("/seller/profile")
-        }, 1000)
+
+        // Force a hard refresh of the page instead of using router.refresh()
+        window.location.href = "/seller/profile"
       } else {
         toast.error(result.error || "Failed to save contact details")
       }

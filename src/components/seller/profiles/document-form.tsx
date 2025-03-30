@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileUpload } from "./file-upload"
 import { useRouter } from "next/navigation"
-import { Toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 interface DocumentFormProps {
   initialData?: {
     panCardUrl?: string | null
     aadharCardUrl?: string | null
   }
-  onSuccess?: () => void // Added this prop to fix the type error
+  onSuccess?: () => void
 }
 
 export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
@@ -42,10 +42,7 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
       const response = await saveDocumentsAndComplete(formDataObj)
 
       if (response.success) {
-        toast({
-          title: "Success",
-          description: "Profile completed successfully",
-        })
+        toast.success("Profile completed successfully")
 
         // Call the onSuccess callback if provided
         if (onSuccess) {
@@ -54,22 +51,14 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
 
         // Redirect to profile success page
         if (response.redirect) {
-          router.push("/seller/profile/success")
+          window.location.href = "/seller/profile"
         }
       } else {
-        toast({
-          title: "Error",
-          description: response.message || "Failed to complete profile",
-          
-        })
+        toast.error(response.message || "Failed to complete profile")
       }
     } catch (error) {
       console.error("Error completing profile:", error)
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-       
-      })
+      toast.error("An unexpected error occurred")
     } finally {
       setIsLoading(false)
     }
@@ -117,9 +106,5 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
       </Card>
     </form>
   )
-}
-
-function toast(arg0: { title: string; description: string }) {
-  throw new Error("Function not implemented.")
 }
 

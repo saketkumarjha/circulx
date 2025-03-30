@@ -79,12 +79,8 @@ export function AddressForm({ initialData }: { initialData?: AddressDetails }) {
 
       if (result.success) {
         toast.success(result.message || "Address details saved successfully")
-        // Instead of reloading the page, use router.refresh() to update the UI
-        router.refresh()
-        // Wait a moment before navigating to the next tab
-        setTimeout(() => {
-          router.push("/seller/profile")
-        }, 1000)
+        // Use direct page reload instead of router.refresh() + setTimeout
+        window.location.href = "/seller/profile"
       } else {
         toast.error(result.error || "Failed to save address details")
       }
