@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -39,8 +39,23 @@ const bankSchema = z.object({
   bankLetterUrl: z.string().optional(),
 })
 
+// Function to fetch bank details from IFSC code
+async function fetchBankDetails(ifscCode: string) {
+  try {
+    const response = await fetch(`https://ifsc.razorpay.com/${ifscCode}`)
+    if (!response.ok) {
+      throw new Error("Invalid IFSC code")
+    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching bank details:", error)
+    return null
+  }
+}
+
 export function BankForm({ initialData }: { initialData?: BankDetails }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoadingIfsc, setIsLoadingIfsc] = useState(false)
   const router = useRouter()
 
   const form = useForm<BankDetails>({
@@ -56,6 +71,37 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
       bankLetterUrl: "",
     },
   })
+
+  // Watch the IFSC code field to auto-fill bank details
+  const ifscCode = form.watch("ifscCode")
+
+  useEffect(() => {
+    // Only proceed if IFSC code is complete (11 characters)
+    if (ifscCode && ifscCode.length === 11) {
+      const fetchDetails = async () => {
+        setIsLoadingIfsc(true)
+        try {
+          const bankData = await fetchBankDetails(ifscCode)
+          if (bankData) {
+            // Auto-fill the form fields
+            form.setValue("bankName", bankData.BANK || "")
+            form.setValue("branch", bankData.BRANCH || "")
+            form.setValue("city", bankData.CITY || "")
+            toast.success("Bank details fetched successfully")
+          } else {
+            toast.error("Could not fetch bank details. Please enter manually.")
+          }
+        } catch (error) {
+          console.error("Error in fetching bank details:", error)
+          toast.error("Error fetching bank details. Please enter manually.")
+        } finally {
+          setIsLoadingIfsc(false)
+        }
+      }
+
+      fetchDetails()
+    }
+  }, [ifscCode, form])
 
   async function onSubmit(data: BankDetails) {
     try {
@@ -135,9 +181,26 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
               <FormLabel>
                 IFSC Code<span className="text-red-500">*</span>
               </FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., SBIN0001234" {...field} />
-              </FormControl>
+              <div className="relative">
+                <FormControl>
+                  <Input
+                    placeholder="e.g., SBIN0001234"
+                    {...field}
+                    onChange={(e) => {
+                      // Convert to uppercase
+                      const value = e.target.value.toUpperCase()
+                      field.onChange(value)
+                    }}
+                    maxLength={11}
+                  />
+                </FormControl>
+                {isLoadingIfsc && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Enter a valid IFSC code to auto-fill bank details</p>
               <FormMessage />
             </FormItem>
           )}
