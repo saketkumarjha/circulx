@@ -11,8 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileUpload } from "./file-upload"
 import { saveBankDetails } from "@/actions/profile"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Loader2, Edit } from "lucide-react"
 
 // Define types
 export type AccountType = "Savings" | "Current"
@@ -53,31 +52,65 @@ async function fetchBankDetails(ifscCode: string) {
   }
 }
 
-export function BankForm({ initialData }: { initialData?: BankDetails }) {
+interface BankFormProps {
+  initialData?: BankDetails
+  onSaved?: () => void
+}
+
+export function BankForm({ initialData, onSaved }: BankFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoadingIfsc, setIsLoadingIfsc] = useState(false)
-  const router = useRouter()
+
+  // Simplified condition: Just check if initialData exists
+  const [isEditing, setIsEditing] = useState(!initialData)
+
+  // Log the initialData to help debug
+  console.log("BankForm initialData:", initialData)
+
+  const defaultValues = {
+    accountHolderName: "",
+    accountNumber: "",
+    ifscCode: "",
+    bankName: "",
+    branch: "",
+    city: "",
+    accountType: "Savings" as AccountType,
+    bankLetterUrl: "",
+  }
 
   const form = useForm<BankDetails>({
     resolver: zodResolver(bankSchema),
-    defaultValues: initialData || {
-      accountHolderName: "",
-      accountNumber: "",
-      ifscCode: "",
-      bankName: "",
-      branch: "",
-      city: "",
-      accountType: "Savings",
-      bankLetterUrl: "",
-    },
+    defaultValues: initialData
+      ? {
+          ...defaultValues,
+          ...initialData,
+        }
+      : defaultValues,
   })
+
+  // Force form reset when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      console.log("Resetting form with initialData:", initialData)
+      form.reset({
+        accountHolderName: initialData.accountHolderName || "",
+        accountNumber: initialData.accountNumber || "",
+        ifscCode: initialData.ifscCode || "",
+        bankName: initialData.bankName || "",
+        branch: initialData.branch || "",
+        city: initialData.city || "",
+        accountType: initialData.accountType || "Savings",
+        bankLetterUrl: initialData.bankLetterUrl || "",
+      })
+    }
+  }, [initialData, form])
 
   // Watch the IFSC code field to auto-fill bank details
   const ifscCode = form.watch("ifscCode")
 
   useEffect(() => {
-    // Only proceed if IFSC code is complete (11 characters)
-    if (ifscCode && ifscCode.length === 11) {
+    // Only proceed if IFSC code is complete (11 characters) and form is in editing mode
+    if (ifscCode && ifscCode.length === 11 && isEditing) {
       const fetchDetails = async () => {
         setIsLoadingIfsc(true)
         try {
@@ -101,7 +134,7 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
 
       fetchDetails()
     }
-  }, [ifscCode, form])
+  }, [ifscCode, form, isEditing])
 
   async function onSubmit(data: BankDetails) {
     try {
@@ -125,8 +158,12 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
 
       if (result.success) {
         toast.success(result.message || "Bank details saved successfully")
-        // Use direct page reload instead of router.refresh() + setTimeout
-        window.location.href = "/seller/profile"
+        setIsEditing(false) // Set to view mode after successful save
+
+        // Call the onSaved callback if provided
+        if (onSaved) {
+          onSaved()
+        }
       } else {
         toast.error(result.error || "Failed to save bank details")
       }
@@ -141,114 +178,162 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="accountHolderName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Account Holder Name<span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., John Doe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="accountNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Account Number<span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., 12345678901234" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="ifscCode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                IFSC Code<span className="text-red-500">*</span>
-              </FormLabel>
-              <div className="relative">
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="accountHolderName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Account Holder Name<span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="e.g., SBIN0001234"
-                    {...field}
-                    onChange={(e) => {
-                      // Convert to uppercase
-                      const value = e.target.value.toUpperCase()
-                      field.onChange(value)
-                    }}
-                    maxLength={11}
+                  <Input placeholder="e.g., John Doe" {...field} disabled={!isEditing} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="accountNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Account Number<span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g., 12345678901234" {...field} disabled={!isEditing} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="ifscCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  IFSC Code<span className="text-red-500">*</span>
+                </FormLabel>
+                <div className="relative">
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., SBIN0001234"
+                      {...field}
+                      onChange={(e) => {
+                        // Convert to uppercase
+                        const value = e.target.value.toUpperCase()
+                        field.onChange(value)
+                      }}
+                      maxLength={11}
+                      disabled={!isEditing}
+                    />
+                  </FormControl>
+                  {isLoadingIfsc && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Enter a valid IFSC code to auto-fill bank details</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField
+              control={form.control}
+              name="bankName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Bank Name<span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., State Bank of India" {...field} disabled={!isEditing} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="branch"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Branch<span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Main Branch" {...field} disabled={!isEditing} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    City<span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Mumbai" {...field} disabled={!isEditing} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="accountType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Account Type<span className="text-red-500">*</span>
+                </FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!isEditing}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select account type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Savings">Savings</SelectItem>
+                    <SelectItem value="Current">Current</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="bankLetterUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Bank Letter (Optional)</FormLabel>
+                <FormControl>
+                  <FileUpload
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    maxSize={5}
+                    label="Upload bank letter"
+                    disabled={!isEditing}
                   />
-                </FormControl>
-                {isLoadingIfsc && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                  </div>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">Enter a valid IFSC code to auto-fill bank details</p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormField
-            control={form.control}
-            name="bankName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Bank Name<span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., State Bank of India" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="branch"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Branch<span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Main Branch" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  City<span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Mumbai" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -256,65 +341,38 @@ export function BankForm({ initialData }: { initialData?: BankDetails }) {
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="accountType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Account Type<span className="text-red-500">*</span>
-              </FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select account type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Savings">Savings</SelectItem>
-                  <SelectItem value="Current">Current</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
+        <div className="flex space-x-4">
+          {!isEditing && initialData && (
+            <Button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              variant="outline"
+              className="flex items-center gap-2"
+              size="sm"
+            >
+              <Edit className="h-4 w-4" />
+              Edit
+            </Button>
           )}
-        />
 
-        <FormField
-          control={form.control}
-          name="bankLetterUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bank Letter (Optional)</FormLabel>
-              <FormControl>
-                <FileUpload
-                  value={field.value || ""}
-                  onChange={field.onChange}
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  maxSize={5}
-                  label="Upload bank letter"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          {isEditing && (
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+              size="sm"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
           )}
-        />
-
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-orange-600 hover:bg-orange-700 text-white"
-          size="sm"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            "Save Changes"
-          )}
-        </Button>
+        </div>
       </form>
     </Form>
   )

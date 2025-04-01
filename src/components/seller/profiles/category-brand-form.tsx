@@ -3,19 +3,19 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { saveCategoryAndBrand } from "@/actions/profile"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Loader2, Edit } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 
 // Define types
 export interface CategoryBrandDetails {
   categories: string[]
-  authorizedBrands: string[]
+  authorizedBrands: string
 }
 
 // Define CheckboxListProps
@@ -24,11 +24,14 @@ interface CheckboxListProps {
   onChange: (values: string[]) => void
   label: string
   options: string[]
+  disabled?: boolean
 }
 
 // Create CheckboxList component
-function CheckboxList({ selectedValues, onChange, label, options }: CheckboxListProps) {
+function CheckboxList({ selectedValues, onChange, label, options, disabled = false }: CheckboxListProps) {
   const handleCheckboxChange = (value: string) => {
+    if (disabled) return
+
     if (selectedValues.includes(value)) {
       onChange(selectedValues.filter((item) => item !== value))
     } else {
@@ -46,10 +49,11 @@ function CheckboxList({ selectedValues, onChange, label, options }: CheckboxList
               id={option}
               checked={selectedValues.includes(option)}
               onCheckedChange={() => handleCheckboxChange(option)}
+              disabled={disabled}
             />
             <label
               htmlFor={option}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed ${disabled ? "opacity-70" : ""}`}
             >
               {option}
             </label>
@@ -62,49 +66,77 @@ function CheckboxList({ selectedValues, onChange, label, options }: CheckboxList
 
 const categorySchema = z.object({
   categories: z.array(z.string()).min(1, "Select at least one category"),
-  authorizedBrands: z.array(z.string()).min(1, "Select at least one brand"),
+  authorizedBrands: z.string().min(1, "Please enter the brands you are authorized to sell"),
 })
 
-// Sample data - in a real app, this would come from an API
+// Updated categories list
 const availableCategories = [
-  "Electronics",
-  "Fashion",
-  "Home & Kitchen",
-  "Beauty & Personal Care",
-  "Books",
-  "Toys & Games",
-  "Sports & Outdoors",
+  "Abrasives",
+  "Agriculture & Farming",
   "Automotive",
-  "Health & Wellness",
+  "Bearings & Power Transmission",
+  "Cleaning & Housekeeping",
+  "Cutting Tools & Machining",
+  "Electronic Components",
+  "Fasteners",
+  "Food Processing Machinery",
+  "Hand Tools",
+  "Hardware",
+  "Health & Nutrition",
+  "Hose, Tube & Fittings",
+  "Hydraulics",
+  "Kitchen and Pantry Supplies",
+  "Lab Supplies",
+  "LED & Lighting",
+  "Material Handling",
+  "Measurement & Testing",
+  "Medical Supplies",
+  "Oils & Lubricants",
+  "Outdoor & Recreational Supplies",
+  "Packaging Material & Supplies",
+  "Personal Hygiene",
+  "Paints & Coatings",
+  "Plumbing & Bathroom Fittings",
+  "Pneumatics",
+  "Security",
+  "Seals & Gaskets",
+  "Solar",
+  "Tapes, Adhesives & Sealants",
+  "Welding & Soldering",
 ]
 
-const availableBrands = [
-  "Apple",
-  "Samsung",
-  "Sony",
-  "Nike",
-  "Adidas",
-  "Philips",
-  "LG",
-  "Bosch",
-  "Nestle",
-  "Unilever",
-  "Procter & Gamble",
-  "Coca-Cola",
-  "PepsiCo",
-]
+interface CategoryBrandFormProps {
+  initialData?: CategoryBrandDetails
+  onSaved?: () => void
+}
 
-export function CategoryBrandForm({ initialData }: { initialData?: CategoryBrandDetails }) {
+export function CategoryBrandForm({ initialData, onSaved }: CategoryBrandFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
+
+  // Simplified condition: Just check if initialData exists
+  const [isEditing, setIsEditing] = useState(!initialData)
+
+  // Log the initialData to help debug
+  console.log("CategoryBrandForm initialData:", initialData)
 
   const form = useForm<CategoryBrandDetails>({
     resolver: zodResolver(categorySchema),
-    defaultValues: initialData || {
-      categories: [],
-      authorizedBrands: [],
+    defaultValues: {
+      categories: initialData?.categories || [],
+      authorizedBrands: initialData?.authorizedBrands || "",
     },
   })
+
+  // Force form reset when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      console.log("Resetting form with initialData:", initialData)
+      form.reset({
+        categories: initialData.categories || [],
+        authorizedBrands: initialData.authorizedBrands || "",
+      })
+    }
+  }, [initialData, form])
 
   async function onSubmit(data: CategoryBrandDetails) {
     try {
@@ -112,21 +144,24 @@ export function CategoryBrandForm({ initialData }: { initialData?: CategoryBrand
 
       const formData = new FormData()
 
-      // Add each category and brand to the FormData
+      // Add each category to the FormData
       data.categories.forEach((category) => {
         formData.append("categories", category)
       })
 
-      data.authorizedBrands.forEach((brand) => {
-        formData.append("authorizedBrands", brand)
-      })
+      // Add authorized brands as a string
+      formData.append("authorizedBrands", data.authorizedBrands)
 
       const result = await saveCategoryAndBrand(formData)
 
       if (result.success) {
         toast.success(result.message || "Category and brand details saved successfully")
-        // Use direct page reload instead of router.refresh() + setTimeout
-        window.location.href = "/seller/profile"
+        setIsEditing(false) // Set to view mode after successful save
+
+        // Call the onSaved callback if provided
+        if (onSaved) {
+          onSaved()
+        }
       } else {
         toast.error(result.error || "Failed to save category and brand details")
       }
@@ -141,63 +176,83 @@ export function CategoryBrandForm({ initialData }: { initialData?: CategoryBrand
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="categories"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Categories<span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <CheckboxList
-                  options={availableCategories}
-                  selectedValues={field.value}
-                  onChange={field.onChange}
-                  label="Select categories you want to sell in"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="categories"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Categories<span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <CheckboxList
+                    options={availableCategories}
+                    selectedValues={field.value}
+                    onChange={field.onChange}
+                    label="Select categories you want to sell in"
+                    disabled={!isEditing}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="authorizedBrands"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Authorized Brands<span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <CheckboxList
-                  options={availableBrands}
-                  selectedValues={field.value}
-                  onChange={field.onChange}
-                  label="Select brands you are authorized to sell"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="authorizedBrands"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Authorized Brands<span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Brands you are authorized to sell"
+                    {...field}
+                    disabled={!isEditing}
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-orange-600 hover:bg-orange-700 text-white"
-          size="sm"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            "Save Changes"
+        <div className="flex space-x-4">
+          {!isEditing && initialData && (
+            <Button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              variant="outline"
+              className="flex items-center gap-2"
+              size="sm"
+            >
+              <Edit className="h-4 w-4" />
+              Edit
+            </Button>
           )}
-        </Button>
+
+          {isEditing && (
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+              size="sm"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          )}
+        </div>
       </form>
     </Form>
   )

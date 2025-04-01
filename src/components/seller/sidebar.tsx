@@ -1,18 +1,18 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import { LayoutDashboard, Package2, ClipboardList, Star, UserCircle, HelpCircle, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const router = useRouter()
 
   const toggleSidebar = () => setIsOpen(!isOpen)
 
@@ -33,6 +33,14 @@ export function Sidebar() {
     setIsOpen(false)
   }, [pathname])
 
+  // Only redirect on initial load when pathname is exactly /seller or /seller/
+  useEffect(() => {
+    // Only redirect if we're exactly at /seller or /seller/
+    if ((pathname === "/seller" || pathname === "/seller/") && !searchParams.toString()) {
+      router.push("/seller/profile")
+    }
+  }, []) // Empty dependency array means this only runs once on component mount
+
   const navItems = [
     { href: "/seller?view=dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/seller/products", icon: Package2, label: "Product Management" },
@@ -41,6 +49,21 @@ export function Sidebar() {
     { href: "/seller/profile", icon: UserCircle, label: "Profile Management" },
     { href: "/seller/help", icon: HelpCircle, label: "Help/Support" },
   ]
+
+  // Check if the current path matches the nav item's href
+  const isActive = (path: string) => {
+    if (path.includes("?")) {
+      // For paths with query parameters (like /seller?view=dashboard)
+      const [basePath, queryString] = path.split("?")
+      const query = new URLSearchParams(queryString)
+      const view = query.get("view")
+
+      return pathname === basePath && searchParams.get("view") === view
+    }
+
+    // For regular paths
+    return pathname === path
+  }
 
   return (
     <div className="relative h-full">
@@ -69,58 +92,26 @@ export function Sidebar() {
           </div>
           <nav className="flex-1 overflow-y-auto px-4 py-1">
             {navItems.map((item) => {
-              // Special handling for Dashboard to check if it's active
-              const isDashboardActive =
-                item.href.includes("dashboard") && pathname === "/seller" && searchParams.get("view") === "dashboard"
-
-              // Special handling for Profile Management to check if it's active
-              const isProfileActive =
-                item.href === "/seller/profile" || (pathname === "/seller" && !searchParams.get("view"))
-
-              // For other items, check if pathname matches
-              const isActive = item.href.includes("dashboard")
-                ? isDashboardActive
-                : item.href === "/seller/profile"
-                  ? isProfileActive
-                  : pathname === item.href
-
+              const active = isActive(item.href)
+              const Icon = item.icon
               return (
-                <SidebarLink
-                  key={item.href}
+                <Link
+                  key={item.label}
                   href={item.href}
-                  icon={<item.icon className="h-5 w-5" />}
-                  label={item.label}
-                  isActive={isActive}
-                />
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all",
+                    active ? "bg-green-900 text-white" : "hover:bg-green-900 hover:text-white",
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                  {item.label}
+                </Link>
               )
             })}
           </nav>
         </div>
       </div>
     </div>
-  )
-}
-
-interface SidebarLinkProps {
-  href: string
-  icon: React.ReactNode
-  label: string
-  isActive: boolean
-}
-
-function SidebarLink({ href, icon, label, isActive }: SidebarLinkProps) {
-  return (
-    <Link
-      href={href}
-      className={`
-        flex items-center gap-3 rounded-md px-3 py-2 mb-1
-        text-sm font-medium transition-colors duration-200
-        ${isActive ? "bg-green-900 text-white" : "text-black hover:bg-green-900"}
-      `}
-    >
-      {icon}
-      {label}
-    </Link>
   )
 }
 

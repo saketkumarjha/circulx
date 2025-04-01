@@ -604,7 +604,7 @@ export async function getProfileData() {
       progress: progress
         ? {
             completedSteps: progress.completedSteps,
-            currentStep: progress.currentStep,
+            currentStep: progress.currentStep || "business", // Ensure currentStep is included
           }
         : {
             completedSteps: [],

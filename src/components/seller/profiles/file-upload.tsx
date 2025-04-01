@@ -14,6 +14,7 @@ interface FileUploadProps {
   accept?: string
   maxSize?: number
   label?: string
+  disabled?: boolean // Added disabled prop
 }
 
 export const FileUpload = ({
@@ -24,6 +25,7 @@ export const FileUpload = ({
   accept,
   maxSize,
   label,
+  disabled = false, // Added with default value
 }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(value || null)
@@ -67,7 +69,7 @@ export const FileUpload = ({
     accept: accept ? { [accept]: [] } : generateClientDropzoneAccept([endpoint]),
     multiple: false,
     maxSize: maxSize ? maxSize * 1024 * 1024 : undefined,
-    disabled: isUploading,
+    disabled: isUploading || disabled, // Updated to include the disabled prop
   })
 
   const handleRemove = () => {
@@ -122,6 +124,7 @@ export const FileUpload = ({
             onClick={handleRemove}
             className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
             type="button"
+            disabled={disabled} // Added disabled state to the remove button
           >
             <X className="h-4 w-4" />
           </button>
@@ -131,7 +134,11 @@ export const FileUpload = ({
       {(!hasValidFile || isUploading) && (
         <div
           {...getRootProps()}
-          className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center hover:border-orange-500 transition-colors cursor-pointer"
+          className={`border-2 border-dashed border-gray-300 rounded-md p-6 text-center ${
+            disabled
+              ? "bg-gray-100 cursor-not-allowed opacity-70"
+              : "hover:border-orange-500 transition-colors cursor-pointer"
+          }`}
         >
           <input {...getInputProps()} />
           <div className="space-y-2">

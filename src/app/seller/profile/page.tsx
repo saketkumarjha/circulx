@@ -31,6 +31,27 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [profileData, setProfileData] = useState<any>(null)
   const [showSuccess, setShowSuccess] = useState(false)
+  // Track the furthest step the user has reached
+  const [furthestStep, setFurthestStep] = useState<number>(0)
+  // Add a key to force re-render of forms when tab changes
+  const [formKey, setFormKey] = useState(Date.now())
+
+  // Function to check if a tab is completed
+  const isTabCompleted = useCallback(
+    (tab: TabType) => {
+      return completedSteps.includes(tab)
+    },
+    [completedSteps],
+  )
+
+  // Function to check if a tab is enabled (can be clicked)
+  const isTabEnabled = useCallback(
+    (tab: TabType) => {
+      const tabIndex = TAB_ORDER.indexOf(tab)
+      return isTabCompleted(tab) || tabIndex <= furthestStep
+    },
+    [isTabCompleted, furthestStep],
+  )
 
   // Use useCallback to prevent recreation of this function on every render
   const fetchProfileData = useCallback(async () => {
@@ -38,15 +59,28 @@ export default function ProfilePage() {
       setLoading(true)
       const result = await getProfileData()
       if (result.success) {
+        console.log("Profile data loaded:", result.data)
         setProfileData(result.data)
 
         // Check if result.data.progress exists before accessing its properties
         if (result.data.progress) {
-          setCompletedSteps(result.data.progress.completedSteps || [])
-          setActiveTab(result.data.progress.currentStep || "business")
+          const completed = result.data.progress.completedSteps || []
+          setCompletedSteps(completed)
+
+          // Set the furthest step based on completed steps
+          if (completed.length > 0) {
+            const indices = completed.map((step: TabType) => TAB_ORDER.indexOf(step))
+            const maxIndex = Math.max(...indices)
+            setFurthestStep(Math.max(maxIndex + 1, furthestStep)) // Set to the next step after the furthest completed one
+          }
+
+          // Set the active tab based on the current step from the server
+          if (result.data.progress.currentStep) {
+            setActiveTab(result.data.progress.currentStep)
+          }
 
           // Show success screen if all steps are completed
-          if (result.data.progress.completedSteps?.includes("documents")) {
+          if (completed.includes("documents")) {
             setShowSuccess(true)
           }
         }
@@ -56,44 +90,83 @@ export default function ProfilePage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [furthestStep])
 
-  // Only fetch data on initial mount
+  // Update furthestStep when a tab is clicked and refresh data
+  const handleTabClick = useCallback(
+    async (tab: TabType) => {
+      if (isTabEnabled(tab)) {
+        try {
+          // Refresh data from the server before changing tabs
+          await fetchProfileData()
+
+          setActiveTab(tab)
+          const tabIndex = TAB_ORDER.indexOf(tab)
+          // Update furthestStep if the clicked tab is further than the current furthestStep
+          setFurthestStep((prev) => Math.max(prev, tabIndex))
+
+          // Generate a new key to force re-render of the form component
+          setFormKey(Date.now())
+        } catch (error) {
+          console.error("Error changing tabs:", error)
+        }
+      }
+    },
+    [isTabEnabled, fetchProfileData],
+  )
+
+  // Callback for when a form is successfully saved
+  const handleFormSaved = useCallback(async () => {
+    // Refresh the data from the server
+    await fetchProfileData()
+
+    // After refreshing data, the activeTab should be updated to the next tab
+    // based on the server's currentStep value, which was updated in the server action
+
+    // Generate a new key to force re-render of the form component
+    setFormKey(Date.now())
+  }, [fetchProfileData])
+
+  // Fetch data on initial mount
   useEffect(() => {
     fetchProfileData()
   }, [fetchProfileData])
-
-  // Memoize this function to prevent recreation on every render
-  const isTabEnabled = useCallback(
-    (tab: TabType) => {
-      const currentIndex = TAB_ORDER.indexOf(activeTab)
-      const tabIndex = TAB_ORDER.indexOf(tab)
-      return tabIndex <= currentIndex || completedSteps.includes(tab)
-    },
-    [activeTab, completedSteps],
-  )
 
   // Memoize renderForm to prevent unnecessary re-renders
   const renderForm = useCallback(() => {
     if (!profileData) return null
 
+    console.log("Rendering form for tab:", activeTab)
+    console.log("Profile data for this tab:", profileData[activeTab])
+
     switch (activeTab) {
       case "business":
-        return <BusinessForm initialData={profileData.business} />
+        return <BusinessForm key={`business-${formKey}`} initialData={profileData.business} onSaved={handleFormSaved} />
       case "contact":
-        return <ContactForm initialData={profileData.contact} />
+        return <ContactForm key={`contact-${formKey}`} initialData={profileData.contact} onSaved={handleFormSaved} />
       case "category":
-        return <CategoryBrandForm initialData={profileData.category} />
+        return (
+          <CategoryBrandForm key={`category-${formKey}`} initialData={profileData.category} onSaved={handleFormSaved} />
+        )
       case "addresses":
-        return <AddressForm initialData={profileData.address} />
+        return <AddressForm key={`addresses-${formKey}`} initialData={profileData.address} onSaved={handleFormSaved} />
       case "bank":
-        return <BankForm initialData={profileData.bank} />
+        return <BankForm key={`bank-${formKey}`} initialData={profileData.bank} onSaved={handleFormSaved} />
       case "documents":
-        return <DocumentForm initialData={profileData.document} onSuccess={() => setShowSuccess(true)} />
+        return (
+          <DocumentForm
+            key={`documents-${formKey}`}
+            initialData={profileData.document}
+            onSuccess={() => {
+              setShowSuccess(true)
+              handleFormSaved()
+            }}
+          />
+        )
       default:
         return null
     }
-  }, [activeTab, profileData])
+  }, [activeTab, profileData, formKey, handleFormSaved])
 
   if (loading) {
     return (
@@ -119,7 +192,7 @@ export default function ProfilePage() {
           {tabs.map((tab) => (
             <button
               key={tab.value}
-              onClick={() => isTabEnabled(tab.value) && setActiveTab(tab.value)}
+              onClick={() => handleTabClick(tab.value)}
               disabled={!isTabEnabled(tab.value)}
               className={cn(
                 "px-3 py-2 text-xs md:text-sm font-medium transition-colors whitespace-nowrap",
@@ -128,10 +201,10 @@ export default function ProfilePage() {
                 isTabEnabled(tab.value)
                   ? "hover:text-orange-600 text-muted-foreground"
                   : "opacity-50 cursor-not-allowed text-muted-foreground",
-                completedSteps.includes(tab.value) ? "text-green-600" : "",
+                isTabCompleted(tab.value) ? "text-green-600" : "",
               )}
             >
-              {completedSteps.includes(tab.value) && <CheckCircle className="h-3 w-3 md:h-4 md:w-4 text-green-600" />}
+              {isTabCompleted(tab.value) && <CheckCircle className="h-3 w-3 md:h-4 md:w-4 text-green-600" />}
               {tab.label}
             </button>
           ))}
