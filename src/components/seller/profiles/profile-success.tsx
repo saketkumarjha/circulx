@@ -73,7 +73,7 @@ export function ProfileSuccess() {
       {/* Success message - Responsive padding and text size */}
       <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 bg-gray-50 rounded-lg shadow-sm my-4 sm:my-8">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-orange-600 max-w-3xl">
-          Congratulations,Your profile has been submitted successfully
+          Congratulations,Your profile has been submitted successfully and is now under review!
         </h2>
       </div>
     </div>
