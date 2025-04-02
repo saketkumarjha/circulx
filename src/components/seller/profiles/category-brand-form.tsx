@@ -40,20 +40,30 @@ function CheckboxList({ selectedValues, onChange, label, options, disabled = fal
   }
 
   return (
-    <div className="space-y-2">
-      <p className="text-sm text-gray-500">{label}</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+    <div className="space-y-3">
+      <p className="text-sm text-gray-500 font-medium">{label}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[1px]">
         {options.map((option) => (
-          <div key={option} className="flex items-center space-x-2">
+          <div
+            key={option}
+            className={`flex items-center space-x-2 p-1 rounded-md transition-colors ${
+              selectedValues.includes(option)
+                ? "bg-orange-50 border border-orange-200"
+                : "hover:bg-gray-50 border border-transparent"
+            }`}
+          >
             <Checkbox
               id={option}
               checked={selectedValues.includes(option)}
               onCheckedChange={() => handleCheckboxChange(option)}
               disabled={disabled}
+              className={selectedValues.includes(option) ? "text-orange-600 border-orange-600" : ""}
             />
             <label
               htmlFor={option}
-              className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed ${disabled ? "opacity-70" : ""}`}
+              className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed ${
+                disabled ? "opacity-70" : ""
+              } ${selectedValues.includes(option) ? "text-orange-700" : ""}`}
             >
               {option}
             </label>
@@ -175,16 +185,22 @@ export function CategoryBrandForm({ initialData, onSaved }: CategoryBrandFormPro
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100"
+      >
         <div className="space-y-6">
           <FormField
             control={form.control}
             name="categories"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>
+              <FormItem className="space-y-4">
+                <FormLabel className="text-base font-semibold">
                   Categories<span className="text-red-500">*</span>
                 </FormLabel>
+                <p className="text-sm text-gray-500 -mt-2">
+                  
+                </p>
                 <FormControl>
                   <CheckboxList
                     options={availableCategories}
@@ -203,13 +219,14 @@ export function CategoryBrandForm({ initialData, onSaved }: CategoryBrandFormPro
             control={form.control}
             name="authorizedBrands"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>
+              <FormItem className="space-y-4">
+                <FormLabel className="text-base font-semibold">
                   Authorized Brands<span className="text-red-500">*</span>
                 </FormLabel>
+                
                 <FormControl>
                   <Input
-                    placeholder="Brands you are authorized to sell"
+                    placeholder="Enter the brands you are authorized to sell (comma separated)."
                     {...field}
                     disabled={!isEditing}
                     className="w-full"

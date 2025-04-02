@@ -23,7 +23,38 @@ export function ProfileSuccess() {
         </p>
       </div>
 
-      {/* Progress Bar Navigation - Responsive spacing and text */}
+
+
+ {/* Progress Percentage Bar - Responsive spacing */}
+ <div className="w-full mb-6 sm:mb-8">
+        <div className="flex justify-between mb-2">
+          <span className="text-xs sm:text-sm font-medium">Profile Completion</span>
+          <span className="text-xs sm:text-sm font-medium">100%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5">
+          <div
+            className="bg-green-900 h-2 sm:h-2.5 rounded-full transition-all duration-500 ease-in-out"
+            style={{ width: "100%" }}
+          ></div>
+        </div>
+        <div className="flex justify-between mt-2">
+          {tabs.map((tab, index) => (
+            <div key={tab.value} className="flex flex-col items-center">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-green-900"></div>
+              <span className="text-[10px] sm:text-xs mt-1 hidden sm:block md:block">
+                {/* Show abbreviated labels on small screens */}
+                {window.innerWidth < 640 && index > 0 && index < tabs.length - 1
+                  ? tab.label.substring(0, 1)
+                  : tab.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+
+
+{/*
       <div className="mb-6 sm:mb-8">
         <nav className="flex space-x-1 sm:space-x-2 md:space-x-4 border-b overflow-x-auto pb-1">
           {tabs.map((tab) => (
@@ -42,34 +73,12 @@ export function ProfileSuccess() {
           ))}
         </nav>
       </div>
+*/}
 
-      {/* Progress Percentage Bar - Responsive spacing */}
-      <div className="w-full mb-6 sm:mb-8">
-        <div className="flex justify-between mb-2">
-          <span className="text-xs sm:text-sm font-medium">Profile Completion</span>
-          <span className="text-xs sm:text-sm font-medium">100%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5">
-          <div
-            className="bg-green-600 h-2 sm:h-2.5 rounded-full transition-all duration-500 ease-in-out"
-            style={{ width: "100%" }}
-          ></div>
-        </div>
-        <div className="flex justify-between mt-2">
-          {tabs.map((tab, index) => (
-            <div key={tab.value} className="flex flex-col items-center">
-              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-green-600"></div>
-              <span className="text-[10px] sm:text-xs mt-1 hidden sm:block md:block">
-                {/* Show abbreviated labels on small screens */}
-                {window.innerWidth < 640 && index > 0 && index < tabs.length - 1
-                  ? tab.label.substring(0, 1)
-                  : tab.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
 
+      
+
+     
       {/* Success message - Responsive padding and text size */}
       <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 bg-gray-50 rounded-lg shadow-sm my-4 sm:my-8">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-orange-600 max-w-3xl">
