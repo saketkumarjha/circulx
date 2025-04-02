@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileUpload } from "./file-upload"
 import { toast } from "sonner"
-import { Edit, Loader2 } from "lucide-react"
+import { Edit, Loader2, AlertTriangle } from "lucide-react"
 
 interface DocumentFormProps {
   initialData?: {
@@ -113,7 +113,17 @@ export function DocumentForm({ initialData, onSuccess }: DocumentFormProps) {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-4">
+        <CardFooter className="flex flex-col items-center space-y-4">
+          {isEditing && (
+            <div className="flex items-start gap-2 text-amber-600 bg-amber-50 p-3 rounded-md w-full mb-2">
+              <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+              <p className="text-sm">
+                <span className="font-bold">⚠️ Review your profile carefully!</span> After final submission, you cannot
+                edit your data without permission.
+              </p>
+            </div>
+          )}
+
           {!isEditing && initialData && (
             <Button
               type="button"
