@@ -44,7 +44,7 @@ export default function Footer() {
               <div className="w-8 h-8 bg-emerald-400 rounded-lg flex items-center justify-center">
                 <ShoppingBag className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-semibold">Circulx</span>
+              <span className="text-xl font-semibold">IND2B</span>
             </Link>
             <p className="text-sm text-gray-600">
               © 2024 Conscious Club Transfer Your Social Username Into A Payment Alias

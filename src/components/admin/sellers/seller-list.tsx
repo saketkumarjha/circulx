@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Plus, ArrowUpDown } from "lucide-react"
+import { Search, Plus, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface Seller {
   id: string
@@ -19,13 +20,15 @@ interface Seller {
 
 export function SellerList() {
   const [sellers, setSellers] = useState<Seller[]>([])
-  const [filteredSellers, setFilteredSellers] = useState<Seller[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true)
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Seller
     direction: "ascending" | "descending"
   } | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+  const [searchColumn, setSearchColumn] = useState<"id" | "name" | "email">("name")
 
   const router = useRouter()
   const { toast } = useToast()
@@ -43,7 +46,6 @@ export function SellerList() {
         const data = await response.json()
         console.log("Fetched sellers:", data)
         setSellers(data)
-        setFilteredSellers(data)
       } catch (error) {
         console.error("Error fetching sellers:", error)
         toast({
@@ -58,41 +60,46 @@ export function SellerList() {
     fetchSellers()
   }, [toast])
 
-  useEffect(() => {
+  const filteredSellers = useMemo(() => {
+    let filtered = [...sellers]
+
+    // Apply search filter
     if (searchTerm) {
-      const filtered = sellers.filter(
-        (seller) =>
-          (seller.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-          (seller.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-          (seller.id?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
-      )
-      setFilteredSellers(filtered)
-    } else {
-      setFilteredSellers(sellers)
-    }
-  }, [searchTerm, sellers])
-
-  const handleSort = (key: keyof Seller) => {
-    let direction: "ascending" | "descending" = "ascending"
-
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending"
+      filtered = filtered.filter((seller) => {
+        const searchTermLower = searchTerm.toLowerCase()
+        let valueToSearch = ""
+        if (searchColumn === "id") {
+          valueToSearch = seller.id?.toLowerCase() || ""
+        } else if (searchColumn === "name") {
+          valueToSearch = seller.name?.toLowerCase() || ""
+        } else if (searchColumn === "email") {
+          valueToSearch = seller.email?.toLowerCase() || ""
+        }
+        return valueToSearch.startsWith(searchTermLower)
+      })
     }
 
-    setSortConfig({ key, direction })
+    // Apply sorting
+    if (sortConfig !== null) {
+      filtered.sort((a, b) => {
+        const aValue = a[sortConfig.key] || ""
+        const bValue = b[sortConfig.key] || ""
+        if (aValue < bValue) {
+          return sortConfig.direction === "ascending" ? -1 : 1
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === "ascending" ? 1 : -1
+        }
+        return 0
+      })
+    }
 
-    const sortedSellers = [...filteredSellers].sort((a, b) => {
-      if ((a[key] || "") < (b[key] || "")) {
-        return direction === "ascending" ? -1 : 1
-      }
-      if ((a[key] || "") > (b[key] || "")) {
-        return direction === "ascending" ? 1 : -1
-      }
-      return 0
-    })
+    return filtered
+  }, [sellers, searchTerm, sortConfig, searchColumn])
 
-    setFilteredSellers(sortedSellers)
-  }
+  useEffect(() => {
+    setCurrentPage(1) // Reset to first page on search or sort
+  }, [searchTerm, sortConfig])
 
   const handleAddSeller = () => {
     router.push("/admin/sellers/add")
@@ -101,6 +108,31 @@ export function SellerList() {
   const handleViewSeller = (sellerId: string) => {
     router.push(`/admin/sellers/${sellerId}`)
   }
+
+  const handleSort = (key: keyof Seller) => {
+    setSortConfig((currentSortConfig) => {
+      if (currentSortConfig?.key === key) {
+        return {
+          key,
+          direction: currentSortConfig.direction === "ascending" ? "descending" : "ascending",
+        }
+      } else {
+        return { key, direction: "ascending" }
+      }
+    })
+  }
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredSellers.length / itemsPerPage)
+
+  // Get current page data
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return filteredSellers.slice(startIndex, endIndex)
+  }
+
+  const currentPageData = getCurrentPageData()
 
   return (
     <div className="space-y-4">
@@ -116,6 +148,16 @@ export function SellerList() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <Select value={searchColumn} onValueChange={(value: any) => setSearchColumn(value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Search By" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="email">Email</SelectItem>
+              <SelectItem value="id">GSTIN</SelectItem>
+            </SelectContent>
+          </Select>
           <Button onClick={handleAddSeller} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Add Seller
@@ -123,7 +165,7 @@ export function SellerList() {
         </div>
       </div>
 
-      <div className="bg-white rounded-md shadow overflow-hidden">
+      <div className="bg-white rounded-md shadow overflow-x-auto">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -134,7 +176,7 @@ export function SellerList() {
                   onClick={() => handleSort("id")}
                 >
                   <div className="flex items-center">
-                    ID
+                    GSTIN
                     <ArrowUpDown className="ml-1 h-4 w-4" />
                   </div>
                 </th>
@@ -172,7 +214,7 @@ export function SellerList() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
-                Array.from({ length: 5 }).map((_, index) => (
+                Array.from({ length: itemsPerPage }).map((_, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Skeleton className="h-4 w-16" />
@@ -188,8 +230,8 @@ export function SellerList() {
                     </td>
                   </tr>
                 ))
-              ) : filteredSellers.length > 0 ? (
-                filteredSellers.map((seller) => (
+              ) : currentPageData.length > 0 ? (
+                currentPageData.map((seller) => (
                   <tr
                     key={seller.id || Math.random().toString()}
                     className="hover:bg-gray-50 cursor-pointer"
@@ -215,6 +257,31 @@ export function SellerList() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Pagination controls */}
+      <div className="flex items-center justify-between">
+        <Button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          variant="outline"
+          size="sm"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Previous
+        </Button>
+        <div className="text-sm text-gray-500">
+          Page {currentPage} of {totalPages}
+        </div>
+        <Button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          variant="outline"
+          size="sm"
+        >
+          Next
+          <ChevronRight className="h-4 w-4 ml-2" />
+        </Button>
       </div>
     </div>
   )
