@@ -130,3 +130,70 @@ To learn more about the technologies used in this project, check out the followi
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
 Welcome to this project!
+
+
+
+
++------------------+
+|   User Entry     |
++------------------+
+         |
+         v
++------------------+
+|  Authentication  |
++------------------+
+         |
+         v
+    +----+----+
+    |         |
+    v         v
++--------+  +--------+
+| Seller |  | Admin  |
++--------+  +--------+
+    |         |
+    v         v
++------------------+
+|    Dashboard     |
++------------------+
+    |         |
+    v         v
++--------+  +------------------+
+| Profile|  | Admin Features   |
+| Setup  |  +------------------+
++--------+         |
+    |             v
+    |     +------------------+
+    |     | Reports & Analytics|
+    |     +------------------+
+    |             |
+    v             v
++------------------+
+| Product Management|
++------------------+
+    |         |
+    v         v
++--------+  +--------+
+| Create |  | List   |
+| Product|  | Products|
++--------+  +--------+
+    |         |
+    v         v
++------------------+
+| Order Management |
++------------------+
+    |         |
+    v         v
++--------+  +--------+
+| Orders |  | Payments|
++--------+  +--------+
+    |         |
+    v         v
++------------------+
+| Checkout Process |
++------------------+
+    |         |
+    v         v
++--------+  +--------+
+| Razorpay|  | Order |
+| Payment |  | Confirmation|
++--------+  +--------+
